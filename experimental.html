@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Experimental batches | Uintah Valley</title>
+  <meta name="description" content="Request Uintah Valley Experimental vanilla trials: double-fold Madagascar, Mexican beans, barrel-rested extract, or bean paste.">
+  <meta property="og:title" content="Experimental vanilla trials — Uintah Valley">
+  <meta property="og:description" content="Small-batch trials, not the mainline recipe. Add to a request list and email an order.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://uintahvalley.com/experimental.html">
+  <meta property="og:image" content="https://uintahvalley.com/assets/logo-square.png">
+  <meta name="theme-color" content="#144916">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/logo-square.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo-color.svg" width="46" height="63" alt="Uintah Valley badge">
+        <span>
+          <span class="brand-name">Uintah Valley</span>
+          <span class="brand-meta">LLC · Utah</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <a href="index.html">Home</a>
+        <a href="shop.html">Shop</a>
+        <a href="experimental.html" aria-current="page">Experimental</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a class="cart-link" href="cart.html">Request list <span class="cart-count" data-cart-count>0</span></a>
+      </nav>
+    </div>
+  </header>
+  <div class="stock-banner" role="status">
+    <div class="wrap">
+      <p style="margin:0">Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.</p>
+      <a href="#trials">These Experimental batches can be requested</a>
+    </div>
+  </div>
+
+  <main id="main" class="wrap">
+    <header class="page-hero">
+      <p class="crumbs"><a href="index.html">Home</a> / <a href="shop.html">Shop</a> / Experimental</p>
+      <p class="eyebrow">Small-batch trials</p>
+      <h1>Experimental</h1>
+      <p class="lede">Kitchen trials, limited on purpose. They are not a restock of Pure Vanilla Extract and they are not a promise that every bottle will taste like the last. Names below can be renamed later; prices are provisional.</p>
+    </header>
+
+    <section class="chooser product-buy" id="choose">
+      <p class="eyebrow">Choose a trial</p>
+      <h2 style="margin:0 0 0.8rem">Add one to your request list</h2>
+      <fieldset class="option-row" style="border:0;padding:0;margin:0 0 1rem">
+        <legend class="fine">Which Experimental item?</legend>
+        <label class="option">
+          <input type="radio" name="sku" value="exp-double-fold" checked>
+          <span>Double-Fold · $16</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="sku" value="exp-mexican">
+          <span>Mexican Trial · $14</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="sku" value="exp-barrel">
+          <span>Barrel Rested · $18</span>
+        </label>
+        <label class="option">
+          <input type="radio" name="sku" value="exp-paste">
+          <span>Bean Paste · $22</span>
+        </label>
+      </fieldset>
+      <div class="qty">
+        <label for="qty">Quantity</label>
+        <input id="qty" data-add-qty type="number" min="1" max="24" value="1">
+        <span class="price" data-price>$16</span>
+        <span class="provisional">Provisional</span>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" type="button" data-add="exp-double-fold" data-add-dynamic>Add Experimental item</button>
+        <a class="btn" href="cart.html">Review list</a>
+      </div>
+    </section>
+
+    <section class="section" id="trials" style="padding-top:1.5rem">
+      <h2>The four options</h2>
+      <div class="card-grid two">
+        <article class="card" id="double-fold">
+          <p class="eyebrow"><span class="pill pill-exp">Experimental</span> · 1 fl oz</p>
+          <h3>Double-Fold Madagascar</h3>
+          <p>A stronger extract built around Madagascar beans. More bean relative to spirit than a typical single-fold bottle. Still homemade, still a trial.</p>
+          <p class="price">$16 <span class="provisional">Provisional</span></p>
+          <button class="btn btn-primary" type="button" data-add="exp-double-fold">Add Double-Fold</button>
+        </article>
+        <article class="card" id="mexican">
+          <p class="eyebrow"><span class="pill pill-exp">Experimental</span> · 1 fl oz</p>
+          <h3>Mexican Vanilla Trial</h3>
+          <p>Same kitchen method, Mexican beans instead of the mainline Madagascar lot. Expect a different profile — that is the point of the trial.</p>
+          <p class="price">$14 <span class="provisional">Provisional</span></p>
+          <button class="btn btn-primary" type="button" data-add="exp-mexican">Add Mexican Trial</button>
+        </article>
+        <article class="card" id="barrel">
+          <p class="eyebrow"><span class="pill pill-exp">Experimental</span> · 1 fl oz</p>
+          <h3>Bourbon-Barrel Rested</h3>
+          <p>Extract rested on oak. Not a whiskey, not a guarantee of barrel character in every sip of batter — a small rest, labeled honestly as experimental.</p>
+          <p class="price">$18 <span class="provisional">Provisional</span></p>
+          <button class="btn btn-primary" type="button" data-add="exp-barrel">Add Barrel Rested</button>
+        </article>
+        <article class="card" id="paste">
+          <p class="eyebrow"><span class="pill pill-exp">Experimental</span> · 4 oz jar</p>
+          <h3>Vanilla Bean Paste (trial)</h3>
+          <p>A scrapeable paste for bakers who want seeds in the bowl. A jar, not the mainline extract bottle. Trial batch only.</p>
+          <p class="price">$22 <span class="provisional">Provisional</span></p>
+          <button class="btn btn-primary" type="button" data-add="exp-paste">Add bean paste</button>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo-color.svg" width="54" height="74" alt="">
+        <div>
+          <strong>Uintah Valley LLC</strong>
+          <div>Homemade vanilla extract · Utah</div>
+        </div>
+      </div>
+      <div>
+        <div><a href="shop.html">Shop</a> · <a href="experimental.html">Experimental</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
+        <p>Orders: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a></p>
+      </div>
+    </div>
+    <div class="wrap legal">
+      <p>Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol.</p>
+      <p>© <span data-year>2026</span> Uintah Valley LLC. Prices shown are provisional until confirmed in reply.</p>
+    </div>
+  </footer>
+  <script src="js/cart.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>
