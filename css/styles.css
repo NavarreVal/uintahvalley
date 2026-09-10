@@ -126,9 +126,24 @@ h1,
   text-decoration: none;
 }
 
-.brand img {
+.brand img,
+.brand-logo {
   width: 46px;
   height: auto;
+}
+
+.brand-marks {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.brand-marks .brand-svg {
+  width: 42px;
+}
+
+.brand-marks .brand-png {
+  width: 42px;
 }
 
 .brand-name {
@@ -231,6 +246,35 @@ h1,
   height: 100%;
   object-fit: cover;
   min-height: 240px;
+}
+
+.media-studio {
+  background: #fff;
+}
+
+.media-studio img {
+  object-fit: contain;
+  background: #fff;
+  min-height: 260px;
+}
+
+.gallery {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.gallery .media {
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .gallery {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .gallery .media:first-child {
+    grid-row: span 2;
+  }
 }
 
 .actions {

@@ -49,29 +49,34 @@ Checkout is a browser list (`localStorage`) plus a `mailto:hello@uintahvalley.co
 
 ## Brand assets
 
-Official color mark (paths from the brand SVG) is `assets/logo-color.svg`. Pages use it in the header.
+Header uses the official color **PNG** next to the **SVG** mark. Large homepage badge stays SVG.
 
 | File | Use |
 | --- | --- |
-| `assets/logo-color.svg` | Header / hero mark |
-| `assets/logo-square.png` | Official square lockup — favicon fallback, Apple touch icon, Open Graph image |
+| `assets/logo-color.svg` | Header + large hero mark |
+| `assets/logo-color.png` | Official CLR PNG (`UintaValleyLogoA_CLR.png`) in the header |
+| `assets/logo-square.png` | Square lockup — favicon fallback, Apple touch icon |
 | `assets/favicon.svg` | Simple tab icon derived from the badge |
 
 Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`, tree taupe `#777a69`, cream `#fff6d2`, plus style-sheet accents red `#de1e2a` and sage `#aaad95`. Display type is Quattrocento; body is Source Sans 3 (Helvetica Neue stand-in).
 
-## Product photos (drop-in)
+## Product photos (committed)
 
-Tasteful SVG stand-ins ship today. Replace these **exact filenames** (same folder) when CAPT has photos — the pages already point at the `.jpg` paths and fall back to SVG if the JPEG is missing:
+These JPEGs are in the repo now. Replace in place if CAPT sends a tighter crop — **keep the filenames**.
 
-| Drop in | Used for |
-| --- | --- |
-| `assets/hero.jpg` | Home / about landscape |
-| `assets/bottle.jpg` | Mainline / shop bottle |
-| `assets/beans.jpg` | Product process / beans |
+| Site path | Source file | Used for |
+| --- | --- | --- |
+| `assets/bottle-hero.jpg` | `IMG_5405_EDIT.jpg` | Primary 1 fl oz product hero (three amber bottles) |
+| `assets/bottle-angle-1.jpg` | `IMG_5406_EDIT.jpg` | Alternate bottle angle |
+| `assets/bottle-angle-2.jpg` | `IMG_5407_EDIT.jpg` | Alternate bottle angle |
+| `assets/bottle-angle-3.jpg` | `IMG_5410_EDIT.jpg` | Alternate bottle angle |
+| `assets/beans-jar.jpg` | `IMG_5971RAWedit.jpg` | Mason jar of whole vanilla beans |
+| `assets/landscape.jpg` | `IMG_4852RAWedit.jpg` | Uintah Basin / about + home strip |
+| `assets/logo-color.png` | `UintaValleyLogoA_CLR.png` | Header raster mark |
 
-SVG placeholders to keep until then: `assets/hero.svg`, `assets/bottle.svg`, `assets/beans.svg`.
+SVG fallbacks if a JPEG is missing: `assets/hero.svg`, `assets/bottle.svg`, `assets/beans.svg`.
 
-Suggested frames: landscape for `hero.jpg`, portrait bottle on cream or wood for `bottle.jpg`, beans close-up for `beans.jpg`. No need to change HTML if the names match.
+Label copy used on the site: **Pure Vanilla Extract**, **Made with Madagascar Vanilla Beans**, **NET 1 FL OZ (29 mL)**. Batch/year stays off the homepage.
 
 ## Local preview
 
@@ -101,8 +106,7 @@ npx wrangler pages deploy . --project-name uintahvalley
 
 ## Later
 
-- Confirm Experimental names, prices, and the public order email.
-- Drop in real photos (table above).
+- Confirm Experimental names, prices, the public order email, and the 1 fl oz restock price (placeholder $12).
 - Add live payments (Stripe or Shopify) when you want card checkout.
 - Nutrition / cottage-food label copy on the bottle is separate from this site.
 
