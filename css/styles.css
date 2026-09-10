@@ -667,6 +667,51 @@ h1,
   border: 3px solid var(--ink);
 }
 
+.purity {
+  margin: 1rem 0 0;
+  padding: 0.95rem 1rem;
+  background: #e7f0c8;
+  border: 3px solid var(--forest-deep);
+}
+
+.purity p {
+  margin: 0;
+}
+
+.claims {
+  display: grid;
+  gap: 1rem;
+}
+
+.claim {
+  margin: 0;
+  padding: 1.05rem 1.1rem 1.15rem;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.claim dt {
+  font-family: "Quattrocento", "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+}
+
+.claim dd {
+  margin: 0;
+}
+
+@media (min-width: 760px) {
+  .claims.five {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .claims.five .claim:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (min-width: 760px) {
   .hero {
     grid-template-columns: 1.15fr 0.85fr;
