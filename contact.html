@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact | Uintah Valley</title>
+  <meta name="description" content="Email Uintah Valley LLC about homemade vanilla extract orders and questions. hello@uintahvalley.com">
+  <meta property="og:title" content="Contact Uintah Valley">
+  <meta property="og:description" content="Order help and questions by email. No ticket system — just mailto.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://uintahvalley.com/contact.html">
+  <meta property="og:image" content="https://uintahvalley.com/assets/logo-square.png">
+  <meta name="theme-color" content="#144916">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/logo-square.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo-color.svg" width="46" height="63" alt="Uintah Valley badge">
+        <span>
+          <span class="brand-name">Uintah Valley</span>
+          <span class="brand-meta">LLC · Utah</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <a href="index.html">Home</a>
+        <a href="shop.html">Shop</a>
+        <a href="about.html">About</a>
+        <a href="contact.html" aria-current="page">Contact</a>
+        <a class="cart-link" href="cart.html">Request list <span class="cart-count" data-cart-count>0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <header class="page-hero">
+      <p class="crumbs"><a href="index.html">Home</a> / Contact</p>
+      <p class="eyebrow">Order help</p>
+      <h1>Write us.</h1>
+      <p class="lede">This form opens your email app. If that fails, send a message directly to <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a>.</p>
+    </header>
+
+    <section class="section" style="padding-top:1rem">
+      <div class="split">
+        <form class="form card" data-order-form>
+          <label>
+            Name
+            <input name="name" type="text" autocomplete="name">
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" autocomplete="email">
+          </label>
+          <label>
+            What do you need?
+            <textarea name="notes" rows="6" placeholder="Bottle sizes, quantity, pickup vs mail, or a question about a batch."></textarea>
+          </label>
+          <p class="note">If your request list has bottles in it, those lines are included in the email body.</p>
+          <button class="btn btn-accent" type="submit">Open email draft</button>
+        </form>
+        <div>
+          <h2>What to expect</h2>
+          <ul class="facts">
+            <li>We reply with what we can actually bottle or set aside.</li>
+            <li>Prices on the site are provisional until that reply.</li>
+            <li>Payment is arranged off-site for now. There is no card form here.</li>
+          </ul>
+          <p><a class="btn" href="cart.html">Check your request list</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo-color.svg" width="54" height="74" alt="">
+        <div>
+          <strong>Uintah Valley LLC</strong>
+          <div>Homemade vanilla extract · Utah</div>
+        </div>
+      </div>
+      <div>
+        <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
+        <p>Orders: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a></p>
+      </div>
+    </div>
+    <div class="wrap legal">
+      <p>Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol.</p>
+      <p>© <span data-year>2026</span> Uintah Valley LLC. Prices shown are provisional until confirmed in reply.</p>
+    </div>
+  </footer>
+  <script src="js/cart.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>
