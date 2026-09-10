@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="hero-title">
+  <title id="hero-title">Uintah Basin foothills placeholder</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3d5a3a"/>
+      <stop offset="0.45" stop-color="#2e6423"/>
+      <stop offset="1" stop-color="#144916"/>
+    </linearGradient>
+    <linearGradient id="ridge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#72a813"/>
+      <stop offset="1" stop-color="#5e8924"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <path fill="#1a2418" d="M0 420 180 300 310 390 520 180 710 360 880 220 1040 340 1220 140 1400 300 1600 210V900H0Z"/>
+  <path fill="url(#ridge)" d="M0 520 220 390 400 480 640 300 860 470 1100 330 1280 450 1600 360V900H0Z"/>
+  <path fill="#144916" d="M0 640c180-70 340-40 520-120 220-100 360 10 560-70 210-84 360-20 520-90V900H0Z"/>
+  <path d="M80 780c240-40 380 30 620-20 210-44 360 10 520-30 140-34 260 8 380-20" fill="none" stroke="#111" stroke-width="18" stroke-linecap="round"/>
+  <g fill="#777a69">
+    <path d="M210 610 230 540 250 610h-8l-12-28-12 28z"/>
+    <path d="M1180 520 1210 410 1240 520h-12l-18-42-18 42z"/>
+    <path d="M1410 560 1430 500 1450 560h-8l-12-24-12 24z"/>
+  </g>
+  <text x="80" y="120" fill="#fff6d2" font-family="Georgia, serif" font-size="28" letter-spacing="4">PLACEHOLDER · DROP IN hero.jpg</text>
+</svg>

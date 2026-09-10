@@ -1,22 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Uintah Valley</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 100px;
-      background-color: #f0f7f0;
-      color: #222;
-    }
-    h1 { color: #1e8449; }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Uintah Valley | Homemade vanilla extract</title>
+  <meta name="description" content="Small-batch homemade vanilla extract from Uintah Valley LLC, a Utah / Uintah Basin maker. Request 2 oz and 6 oz bottles.">
+  <meta property="og:title" content="Uintah Valley homemade vanilla extract">
+  <meta property="og:description" content="Small-batch vanilla extract from a Utah regional maker. Request an order — no online checkout yet.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://uintahvalley.com/">
+  <meta property="og:image" content="https://uintahvalley.com/assets/logo-square.png">
+  <meta name="theme-color" content="#144916">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/logo-square.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/logo-square.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <h1>Uintah Valley</h1>
-  <p>This site is being constructed.</p>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/logo-color.svg" width="46" height="63" alt="Uintah Valley badge">
+        <span>
+          <span class="brand-name">Uintah Valley</span>
+          <span class="brand-meta">LLC · Utah</span>
+        </span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="shop.html">Shop</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a class="cart-link" href="cart.html">Request list <span class="cart-count" data-cart-count>0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="wrap hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Homemade · Small-batch · Uintah Basin</p>
+        <h1>Vanilla extract, made in Utah and bottled to order.</h1>
+        <p class="lede">Uintah Valley LLC steeps vanilla beans in alcohol and bottles the extract in small batches. Choose a 2 oz or 6 oz bottle, add it to a request list, and email an order — no card form on this site yet.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="shop.html">Shop extract</a>
+          <a class="btn" href="product.html">See sizes &amp; process</a>
+        </div>
+      </div>
+      <img class="hero-mark" src="assets/logo-color.svg" width="280" height="382" alt="Uintah Valley hexagonal badge">
+    </section>
+
+    <section class="wrap">
+      <figure class="hero-photo">
+        <img src="assets/hero.jpg" data-fallback="assets/hero.svg" alt="Foothill landscape placeholder until a product photo is added">
+      </figure>
+    </section>
+
+    <section class="section wrap">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Featured</p>
+          <h2>Homemade vanilla extract</h2>
+        </div>
+        <a href="shop.html">All bottles</a>
+      </div>
+      <div class="card-grid two">
+        <article class="card">
+          <div class="media">
+            <img src="assets/bottle.jpg" data-fallback="assets/bottle.svg" alt="Amber bottle placeholder for Uintah Valley vanilla extract">
+          </div>
+          <p class="eyebrow">Kitchen staple</p>
+          <h3>6 oz bottle</h3>
+          <p>The size referenced on current label work. Enough for regular baking without a giant jug.</p>
+          <p class="price">$42 <span class="provisional">Provisional</span></p>
+          <div class="actions">
+            <a class="btn btn-primary" href="product.html?size=6oz">View 6 oz</a>
+            <button class="btn" type="button" data-add="vanilla-6oz">Add to request</button>
+          </div>
+        </article>
+        <article class="card">
+          <p class="eyebrow">Maker note</p>
+          <h3>A regional kitchen brand, not a catalog company</h3>
+          <p>Uintah Valley is a Utah maker label. Extract is homemade: vanilla beans, alcohol, time. We do not list invented reviews, certifications, or shipping promises here.</p>
+          <p>When you send a request, we reply with what is actually on hand and how to finish the order.</p>
+          <a class="btn" href="about.html">Read the short story</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section band">
+      <div class="wrap split">
+        <div>
+          <p class="eyebrow">How ordering works</p>
+          <h2>Land, pick a bottle, send a request.</h2>
+          <p>This storefront keeps a list in your browser, then opens your email app with a summary. Payment is arranged after we confirm the order — nothing is charged on this page.</p>
+        </div>
+        <ol class="facts">
+          <li>Choose 2 oz ($18) or 6 oz ($42). Prices are provisional.</li>
+          <li>Add bottles to your request list. It stays on this device.</li>
+          <li>Send the summary to hello@uintahvalley.com and wait for a reply.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo-color.svg" width="54" height="74" alt="">
+        <div>
+          <strong>Uintah Valley LLC</strong>
+          <div>Homemade vanilla extract · Utah</div>
+        </div>
+      </div>
+      <div>
+        <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
+        <p>Orders: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a></p>
+      </div>
+    </div>
+    <div class="wrap legal">
+      <p>Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol.</p>
+      <p>© <span data-year>2026</span> Uintah Valley LLC. Prices shown are provisional until confirmed in reply.</p>
+    </div>
+  </footer>
+  <script src="js/cart.js"></script>
+  <script src="js/site.js"></script>
 </body>
 </html>
