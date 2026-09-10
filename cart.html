@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Request list | Uintah Valley</title>
-  <meta name="description" content="Review your Uintah Valley vanilla extract request and email an order summary. No online payment.">
-  <meta property="og:title" content="Vanilla extract request list">
+  <meta name="description" content="Review your Uintah Valley request list and email an order summary. No online payment.">
+  <meta property="og:title" content="Request list — Uintah Valley">
   <meta property="og:description" content="Local request list plus mailto order summary for Uintah Valley LLC.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://uintahvalley.com/cart.html">
@@ -17,16 +17,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <script>
+    try { if (localStorage.getItem("uintahvalley-oos-banner") === "dismissed") document.documentElement.classList.add("oos-banner-off"); } catch (e) {}
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="index.html">
-        <span class="brand-marks">
-          <img class="brand-svg" src="assets/logo-color.svg" width="42" height="57" alt="">
-          <img class="brand-png" src="assets/logo-color.png" width="42" height="57" alt="Uintah Valley badge">
-        </span>
+        <picture class="brand-mark">
+          <source srcset="assets/logo-color.svg" type="image/svg+xml">
+          <img src="assets/logo-color.png" width="42" height="57" alt="">
+        </picture>
         <span>
           <span class="brand-name">Uintah Valley</span>
           <span class="brand-meta">LLC · Utah</span>
@@ -45,8 +48,11 @@
   </header>
   <div class="stock-banner" role="status">
     <div class="wrap">
-      <p style="margin:0">Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.</p>
-      <a href="experimental.html">Shop Experimental batches</a>
+      <p>Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.</p>
+      <div class="stock-banner-end">
+        <a href="experimental.html">Shop Experimental batches</a>
+        <button type="button" class="banner-dismiss" data-dismiss-banner aria-label="Dismiss out-of-stock notice">&times;</button>
+      </div>
     </div>
   </div>
 
@@ -74,7 +80,7 @@
         <img src="assets/logo-color.svg" width="54" height="74" alt="">
         <div>
           <strong>Uintah Valley LLC</strong>
-          <div>Homemade vanilla extract · Utah</div>
+          <div>Homemade goods · Uintah Basin · Utah</div>
         </div>
       </div>
       <div>
