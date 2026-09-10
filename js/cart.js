@@ -182,8 +182,8 @@
         const product = PRODUCTS[item.id];
         if (!product) return;
         lines.push(
-          "- [" + lineLabel(product) + "] " + product.name + " · " + product.size +
-          " × " + item.qty +
+          "- [" + lineLabel(product) + "] " + product.name + " Â· " + product.size +
+          " Ã— " + item.qty +
           "  (" + money(product.price) + " each, provisional)"
         );
       });

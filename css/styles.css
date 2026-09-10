@@ -126,9 +126,24 @@ h1,
   text-decoration: none;
 }
 
-.brand img {
+.brand img,
+.brand-logo {
   width: 46px;
   height: auto;
+}
+
+.brand-marks {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.brand-marks .brand-svg {
+  width: 42px;
+}
+
+.brand-marks .brand-png {
+  width: 42px;
 }
 
 .brand-name {
@@ -231,6 +246,35 @@ h1,
   height: 100%;
   object-fit: cover;
   min-height: 240px;
+}
+
+.media-studio {
+  background: #fff;
+}
+
+.media-studio img {
+  object-fit: contain;
+  background: #fff;
+  min-height: 260px;
+}
+
+.gallery {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.gallery .media {
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .gallery {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .gallery .media:first-child {
+    grid-row: span 2;
+  }
 }
 
 .actions {
@@ -621,6 +665,51 @@ h1,
   padding: 1rem;
   background: var(--cream);
   border: 3px solid var(--ink);
+}
+
+.purity {
+  margin: 1rem 0 0;
+  padding: 0.95rem 1rem;
+  background: #e7f0c8;
+  border: 3px solid var(--forest-deep);
+}
+
+.purity p {
+  margin: 0;
+}
+
+.claims {
+  display: grid;
+  gap: 1rem;
+}
+
+.claim {
+  margin: 0;
+  padding: 1.05rem 1.1rem 1.15rem;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.claim dt {
+  font-family: "Quattrocento", "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+}
+
+.claim dd {
+  margin: 0;
+}
+
+@media (min-width: 760px) {
+  .claims.five {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .claims.five .claim:last-child {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (min-width: 760px) {

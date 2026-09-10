@@ -15,5 +15,5 @@
     <ellipse cx="360" cy="340" rx="8" ry="160" transform="rotate(8 360 340)"/>
     <ellipse cx="740" cy="300" rx="8" ry="150" transform="rotate(-12 740 300)"/>
   </g>
-  <text x="60" y="70" fill="#777a69" font-family="Georgia, serif" font-size="24" letter-spacing="3">PLACEHOLDER · DROP IN beans.jpg</text>
+  <text x="60" y="70" fill="#777a69" font-family="Georgia, serif" font-size="24" letter-spacing="3">PLACEHOLDER Â· DROP IN beans.jpg</text>
 </svg>
