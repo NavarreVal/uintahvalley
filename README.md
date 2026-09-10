@@ -1,6 +1,6 @@
 # Uintah Valley
 
-Static storefront for **Uintah Valley LLC** — homemade vanilla extract from a Utah / Uintah Basin maker. No build step. Meant for [Cloudflare Pages](https://developers.cloudflare.com/pages/) on **uintahvalley.com**.
+Static storefront for **Uintah Valley LLC** â€” homemade vanilla extract from a Utah / Uintah Basin maker. No build step. Meant for [Cloudflare Pages](https://developers.cloudflare.com/pages/) on **uintahvalley.com**.
 
 ## Stock status
 
@@ -16,7 +16,7 @@ What *can* be requested: the **Experimental** line.
 | --- | --- |
 | `index.html` | Home, sold-out notice, CTA into Experimental |
 | `shop.html` | Mainline (sold out) + Experimental listing |
-| `product.html` | Mainline Pure Vanilla Extract detail — no purchase |
+| `product.html` | Mainline Pure Vanilla Extract detail â€” no purchase |
 | `experimental.html` | Trial chooser + four Experimental cards |
 | `about.html` | Short LLC / homemade Utah note (no invented biography) |
 | `contact.html` | Mailto contact / order help |
@@ -29,12 +29,12 @@ Shared styles live in `css/styles.css`. Cart logic is `js/cart.js`. Header menu 
 
 Confirm before taking money. Marked on the site as provisional.
 
-### Mainline — not for sale
+### Mainline â€” not for sale
 
-- Pure Vanilla Extract, 1 fl oz — listed as sold out (placeholder **$12** if a future restock needs a number)
-- Pure Vanilla Extract, 6 oz — optional label-draft size, also sold out (**$42** was the earlier draft)
+- Pure Vanilla Extract, 1 fl oz â€” listed as sold out (placeholder **$12** if a future restock needs a number)
+- Pure Vanilla Extract, 6 oz â€” optional label-draft size, also sold out (**$42** was the earlier draft)
 
-### Experimental — orderable
+### Experimental â€” orderable
 
 CAPT can rename these later:
 
@@ -55,14 +55,14 @@ Header uses the official color **PNG** next to the **SVG** mark. Large homepage 
 | --- | --- |
 | `assets/logo-color.svg` | Header + large hero mark |
 | `assets/logo-color.png` | Official CLR PNG (`UintaValleyLogoA_CLR.png`) in the header |
-| `assets/logo-square.png` | Square lockup — favicon fallback, Apple touch icon |
+| `assets/logo-square.png` | Square lockup â€” favicon fallback, Apple touch icon |
 | `assets/favicon.svg` | Simple tab icon derived from the badge |
 
 Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`, tree taupe `#777a69`, cream `#fff6d2`, plus style-sheet accents red `#de1e2a` and sage `#aaad95`. Display type is Quattrocento; body is Source Sans 3 (Helvetica Neue stand-in).
 
 ## Product photos (committed)
 
-These JPEGs are in the repo now. Replace in place if CAPT sends a tighter crop — **keep the filenames**.
+These JPEGs are in the repo now. Replace in place if CAPT sends a tighter crop â€” **keep the filenames**.
 
 | Site path | Source file | Used for |
 | --- | --- | --- |
@@ -94,7 +94,7 @@ Open [http://localhost:8080](http://localhost:8080). Walk Home ? Experimental ? 
 2. Select `NavarreVal/uintahvalley`.
 3. Build settings: **Framework preset** none. **Build command** empty. **Output directory** `/` (project root).
 4. Production branch: `main`.
-5. After the first deploy, **Custom domains ? uintahvalley.com** (and `www` if you want it). Point the domain’s DNS to Cloudflare if it is not already.
+5. After the first deploy, **Custom domains ? uintahvalley.com** (and `www` if you want it). Point the domainâ€™s DNS to Cloudflare if it is not already.
 
 `404.html` is the real not-found page. `_redirects` sends unknown paths there. `_headers` adds basic security headers.
 
