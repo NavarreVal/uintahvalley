@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Uintah Valley | Homemade vanilla extract</title>
-  <meta name="description" content="Uintah Valley extract is alcohol and vanilla beans — no water, no sugar, no chemical flavor. Mainline is sold out; request Experimental trials.">
-  <meta property="og:title" content="Uintah Valley homemade vanilla extract">
-  <meta property="og:description" content="Not watered down. Beans and alcohol only. Mainline is out of stock; Experimental batches can be requested.">
+  <title>Uintah Valley | Homemade goods from the Basin</title>
+  <meta name="description" content="Uintah Valley LLC shop — homemade goods from Utah's Uintah Basin. Vanilla is the current line: mainline Pure Vanilla Extract is sold out; request Experimental trials.">
+  <meta property="og:title" content="Uintah Valley LLC — homemade goods from the Basin">
+  <meta property="og:description" content="A Utah kitchen shop. Vanilla is what we bottle today. Mainline is out of stock; Experimental batches can be requested.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://uintahvalley.com/">
-  <meta property="og:image" content="https://uintahvalley.com/assets/bottle-hero.jpg">
+  <meta property="og:image" content="https://uintahvalley.com/assets/hero.jpg">
   <meta name="theme-color" content="#144916">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/logo-square.png" type="image/png" sizes="32x32">
@@ -18,16 +18,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <script>
+    try { if (localStorage.getItem("uintahvalley-oos-banner") === "dismissed") document.documentElement.classList.add("oos-banner-off"); } catch (e) {}
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="index.html">
-        <span class="brand-marks">
-          <img class="brand-svg" src="assets/logo-color.svg" width="42" height="57" alt="">
-          <img class="brand-png" src="assets/logo-color.png" width="42" height="57" alt="Uintah Valley badge">
-        </span>
+        <picture class="brand-mark">
+          <source srcset="assets/logo-color.svg" type="image/svg+xml">
+          <img src="assets/logo-color.png" width="42" height="57" alt="">
+        </picture>
         <span>
           <span class="brand-name">Uintah Valley</span>
           <span class="brand-meta">LLC · Utah</span>
@@ -46,8 +49,11 @@
   </header>
   <div class="stock-banner" role="status">
     <div class="wrap">
-      <p style="margin:0">Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.</p>
-      <a href="experimental.html">Shop Experimental batches</a>
+      <p>Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.</p>
+      <div class="stock-banner-end">
+        <a href="experimental.html">Shop Experimental batches</a>
+        <button type="button" class="banner-dismiss" data-dismiss-banner aria-label="Dismiss out-of-stock notice">&times;</button>
+      </div>
     </div>
   </div>
 
@@ -55,8 +61,8 @@
     <section class="wrap hero">
       <div class="hero-copy">
         <p class="eyebrow">Homemade · Small-batch · Uintah Basin</p>
-        <h1>Experimental batches are what we can bottle right now.</h1>
-        <p class="lede">Alcohol and vanilla beans. No water to stretch the batch. The mainline 1 fl oz Pure Vanilla Extract is sold out indefinitely; Experimental trials are what we can bottle right now.</p>
+        <h1>Homemade goods from the Uintah Basin.</h1>
+        <p class="lede">Uintah Valley LLC is a Utah kitchen shop. Vanilla is the line we bottle today — alcohol and beans, no water to stretch a batch. Mainline Pure Vanilla Extract is sold out indefinitely; Experimental trials are what we can send out now.</p>
         <div class="actions">
           <a class="btn btn-primary" href="experimental.html">Shop Experimental</a>
           <a class="btn" href="product.html">Mainline story (sold out)</a>
@@ -67,7 +73,7 @@
 
     <section class="wrap">
       <figure class="hero-photo">
-        <img src="assets/landscape.jpg" data-fallback="assets/hero.svg" alt="Uintah Basin country: a reservoir, yellow alkali flats, and a person standing on the ridge">
+        <img src="assets/hero.jpg" alt="A small bottle of vanilla extract standing on wood next to two cured vanilla beans">
       </figure>
     </section>
 
@@ -118,11 +124,11 @@
           <h3>Four trials, one request list</h3>
           <p>Choose Double-Fold Madagascar, Mexican Vanilla Trial, Bourbon-Barrel Rested, or Vanilla Bean Paste. Add what you want, then email the summary — no card form on this site.</p>
           <p class="price">$14–$22 <span class="provisional">Provisional</span></p>
-          <a class="btn btn-primary" href="experimental.html">Choose a trial</a>
+          <a class="btn btn-primary" href="experimental.html">See Experimental trials</a>
         </article>
         <article class="card is-sold-out">
           <div class="media media-studio">
-            <img src="assets/bottle-hero.jpg" data-fallback="assets/bottle.svg" alt="Three amber 1 fl oz bottles of Uintah Valley Pure Vanilla Extract with white labels">
+            <img src="assets/bottle-hero.jpg" alt="Three amber 1 fl oz bottles of Uintah Valley Pure Vanilla Extract with white labels">
           </div>
           <p class="eyebrow">Mainline · <span class="sold-badge">Sold out</span></p>
           <h3>Pure Vanilla Extract · 1 fl oz</h3>
@@ -154,7 +160,7 @@
         <img src="assets/logo-color.svg" width="54" height="74" alt="">
         <div>
           <strong>Uintah Valley LLC</strong>
-          <div>Homemade vanilla extract · Utah</div>
+          <div>Homemade goods · Uintah Basin · Utah</div>
         </div>
       </div>
       <div>
