@@ -543,6 +543,86 @@ h1,
   border-left: 6px solid var(--lime);
 }
 
+.stock-banner {
+  background: #de1e2a;
+  color: #fff;
+  border-bottom: 3px solid #8f1218;
+  padding: 0.85rem 0;
+  font-weight: 650;
+}
+
+.stock-banner .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.2rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.stock-banner a {
+  color: #fff6d2;
+  font-weight: 700;
+}
+
+.callout {
+  margin: 1rem 0 0;
+  padding: 1rem 1.1rem;
+  border: 3px solid var(--ink);
+  background: #fff3c8;
+}
+
+.callout-oos {
+  background: #f8d4d6;
+  border-color: var(--red-deep);
+}
+
+.callout-exp {
+  background: #e7f0c8;
+  border-color: var(--forest);
+}
+
+.sold-badge,
+.pill {
+  display: inline-block;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sold-badge {
+  background: var(--red);
+  color: #fff;
+}
+
+.pill-exp {
+  background: var(--forest-deep);
+  color: var(--cream);
+}
+
+.card.is-sold-out {
+  background: #f3eee0;
+}
+
+.card.is-sold-out .media {
+  filter: grayscale(0.35);
+}
+
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.chooser {
+  margin: 1.2rem 0;
+  padding: 1rem;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+}
+
 @media (min-width: 760px) {
   .hero {
     grid-template-columns: 1.15fr 0.85fr;
@@ -559,6 +639,16 @@ h1,
 
   .card-grid.three {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card-grid.four {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1040px) {
+  .card-grid.four {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

@@ -21,27 +21,45 @@
   });
 
   const params = new URLSearchParams(window.location.search);
-  const sizeAliases = { "2oz": "vanilla-2oz", "6oz": "vanilla-6oz" };
-  const size = sizeAliases[params.get("size")] || params.get("size");
-  if (size) {
-    const choice = document.querySelector('input[name="size"][value="' + size + '"]');
+  const skuAliases = {
+    "1oz": "vanilla-1oz",
+    "2oz": "vanilla-2oz",
+    "6oz": "vanilla-6oz",
+    "double-fold": "exp-double-fold",
+    "mexican": "exp-mexican",
+    "barrel": "exp-barrel",
+    "paste": "exp-paste"
+  };
+  const sku = skuAliases[params.get("sku") || params.get("size")] || params.get("sku") || params.get("size");
+  if (sku) {
+    const choice = document.querySelector('input[name="sku"][value="' + sku + '"], input[name="size"][value="' + sku + '"]');
     if (choice) choice.checked = true;
   }
 
-  const sizeInputs = document.querySelectorAll('input[name="size"]');
+  const skuInputs = document.querySelectorAll('input[name="sku"], input[name="size"]');
   const addButton = document.querySelector("[data-add-dynamic]");
   const priceEl = document.querySelector("[data-price]");
   function syncProduct() {
+    const selected = document.querySelector('input[name="sku"]:checked, input[name="size"]:checked');
+    const id = selected ? selected.value : (addButton && addButton.getAttribute("data-add"));
+    if (!id || !window.UVCart || !UVCart.PRODUCTS[id]) return;
+    const product = UVCart.PRODUCTS[id];
+    if (priceEl) priceEl.textContent = "$" + product.price;
     if (!addButton) return;
-    const selected = document.querySelector('input[name="size"]:checked');
-    const id = selected ? selected.value : "vanilla-6oz";
-    addButton.setAttribute("data-add", id);
-    if (priceEl && window.UVCart && UVCart.PRODUCTS[id]) {
-      priceEl.textContent = "$" + UVCart.PRODUCTS[id].price;
+    if (!product.available) {
+      addButton.disabled = true;
+      addButton.setAttribute("aria-disabled", "true");
+      addButton.removeAttribute("data-add");
+      addButton.textContent = "Sold out";
+      return;
     }
+    addButton.disabled = false;
+    addButton.removeAttribute("aria-disabled");
+    addButton.setAttribute("data-add", id);
   }
-  sizeInputs.forEach(function (input) {
+  skuInputs.forEach(function (input) {
     input.addEventListener("change", syncProduct);
   });
   syncProduct();
 })();
+

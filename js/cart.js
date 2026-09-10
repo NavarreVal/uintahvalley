@@ -2,25 +2,78 @@
   const STORAGE_KEY = "uintahvalley-cart-v1";
   const ORDER_EMAIL = "hello@uintahvalley.com";
   const PRODUCTS = {
+    "vanilla-1oz": {
+      id: "vanilla-1oz",
+      name: "Uintah Valley Pure Vanilla Extract",
+      size: "1 fl oz",
+      price: 12,
+      line: "mainline",
+      available: false
+    },
     "vanilla-2oz": {
       id: "vanilla-2oz",
-      name: "Homemade Vanilla Extract",
+      name: "Uintah Valley Pure Vanilla Extract",
       size: "2 oz",
-      price: 18
+      price: 18,
+      line: "mainline",
+      available: false
     },
     "vanilla-6oz": {
       id: "vanilla-6oz",
-      name: "Homemade Vanilla Extract",
+      name: "Uintah Valley Pure Vanilla Extract",
       size: "6 oz",
-      price: 42
+      price: 42,
+      line: "mainline",
+      available: false
+    },
+    "exp-double-fold": {
+      id: "exp-double-fold",
+      name: "Double-Fold Madagascar",
+      size: "1 fl oz",
+      price: 16,
+      line: "experimental",
+      available: true
+    },
+    "exp-mexican": {
+      id: "exp-mexican",
+      name: "Mexican Vanilla Trial",
+      size: "1 fl oz",
+      price: 14,
+      line: "experimental",
+      available: true
+    },
+    "exp-barrel": {
+      id: "exp-barrel",
+      name: "Bourbon-Barrel Rested",
+      size: "1 fl oz",
+      price: 18,
+      line: "experimental",
+      available: true
+    },
+    "exp-paste": {
+      id: "exp-paste",
+      name: "Vanilla Bean Paste (trial)",
+      size: "4 oz jar",
+      price: 22,
+      line: "experimental",
+      available: true
     }
   };
+
+  function isAvailable(product) {
+    return !!(product && product.available);
+  }
 
   function loadCart() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       const parsed = raw ? JSON.parse(raw) : { items: [] };
-      return Array.isArray(parsed.items) ? parsed : { items: [] };
+      const items = Array.isArray(parsed.items) ? parsed.items : [];
+      return {
+        items: items.filter(function (item) {
+          return isAvailable(PRODUCTS[item.id]);
+        })
+      };
     } catch (err) {
       return { items: [] };
     }
@@ -48,9 +101,16 @@
     return "$" + Number(n).toFixed(2).replace(/\.00$/, "");
   }
 
+  function lineLabel(product) {
+    return product.line === "experimental" ? "Experimental" : "Mainline";
+  }
+
   function addItem(id, qty) {
     const product = PRODUCTS[id];
-    if (!product) return;
+    if (!isAvailable(product)) {
+      showToast("Uintah Valley Pure Vanilla Extract (mainline) is out of stock.");
+      return;
+    }
     const cart = loadCart();
     const nextQty = Math.max(1, parseInt(qty, 10) || 1);
     const existing = cart.items.find(function (item) { return item.id === id; });
@@ -60,10 +120,11 @@
       cart.items.push({ id: id, qty: nextQty });
     }
     saveCart(cart);
-    showToast(product.size + " vanilla extract added to your request list.");
+    showToast(product.name + " added to your request list.");
   }
 
   function setQty(id, qty) {
+    if (!isAvailable(PRODUCTS[id])) return;
     const cart = loadCart();
     const nextQty = Math.max(0, parseInt(qty, 10) || 0);
     cart.items = cart.items
@@ -110,7 +171,7 @@
     const lines = [
       "Hello Uintah Valley,",
       "",
-      "I would like to request the following homemade vanilla extract:",
+      "I would like to request the following Experimental batch items:",
       ""
     ];
 
@@ -121,7 +182,7 @@
         const product = PRODUCTS[item.id];
         if (!product) return;
         lines.push(
-          "- " + product.name + " · " + product.size +
+          "- [" + lineLabel(product) + "] " + product.name + " · " + product.size +
           " × " + item.qty +
           "  (" + money(product.price) + " each, provisional)"
         );
@@ -137,10 +198,11 @@
       lines.push("Notes: " + extra.notes);
     }
     lines.push("");
+    lines.push("I understand these are Experimental batches (not the mainline recipe).");
     lines.push("I understand prices are provisional and there is no online payment yet.");
     lines.push("Please reply with availability and how to complete this order.");
 
-    const subject = encodeURIComponent("Vanilla extract order request");
+    const subject = encodeURIComponent("Experimental vanilla order request");
     const body = encodeURIComponent(lines.join("\n"));
     return "mailto:" + ORDER_EMAIL + "?subject=" + subject + "&body=" + body;
   }
@@ -149,11 +211,12 @@
     const root = document.querySelector("[data-cart-root]");
     if (!root) return;
     const cart = loadCart();
+    saveCart(cart);
     if (!cart.items.length) {
       root.innerHTML =
         '<div class="empty-cart">' +
         "<p>Your request list is empty.</p>" +
-        '<p><a class="btn btn-primary" href="shop.html">Browse bottles</a></p>' +
+        '<p><a class="btn btn-primary" href="experimental.html">Browse Experimental batches</a></p>' +
         "</div>";
       return;
     }
@@ -163,9 +226,10 @@
       if (!product) return "";
       return (
         "<tr>" +
-        "<td>" + product.name + "<div class='fine'>" + product.size + "</div></td>" +
+        "<td>" + product.name +
+        "<div class='fine'><span class='pill pill-exp'>Experimental</span> " + product.size + "</div></td>" +
         "<td>" + money(product.price) + "</td>" +
-        "<td><input data-qty='" + product.id + "' type='number' min='1' max='24' value='" + item.qty + "' aria-label='Quantity for " + product.size + "'></td>" +
+        "<td><input data-qty='" + product.id + "' type='number' min='1' max='24' value='" + item.qty + "' aria-label='Quantity for " + product.name + "'></td>" +
         "<td>" + money(product.price * item.qty) + "</td>" +
         "<td><button class='btn' type='button' data-remove='" + product.id + "'>Remove</button></td>" +
         "</tr>"
@@ -199,8 +263,10 @@
     const addBtn = event.target.closest("[data-add]");
     if (!addBtn) return;
     event.preventDefault();
+    if (addBtn.disabled || addBtn.getAttribute("aria-disabled") === "true") return;
     const id = addBtn.getAttribute("data-add");
-    const qtyField = document.querySelector("[data-add-qty]");
+    const scope = addBtn.closest(".product-buy, .card, form") || document;
+    const qtyField = scope.querySelector("[data-add-qty]");
     addItem(id, qtyField ? qtyField.value : 1);
   });
 
@@ -221,6 +287,7 @@
     ORDER_EMAIL: ORDER_EMAIL,
     loadCart: loadCart,
     addItem: addItem,
+    isAvailable: isAvailable,
     orderMailto: orderMailto,
     updateCartCount: updateCartCount,
     renderCartPage: renderCartPage

@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Shop vanilla extract | Uintah Valley</title>
-  <meta name="description" content="Request 2 oz ($18) or 6 oz ($42) homemade vanilla extract from Uintah Valley LLC. Prices are provisional.">
-  <meta property="og:title" content="Shop Uintah Valley vanilla extract">
-  <meta property="og:description" content="Two bottle sizes. Client-side request list, then email — no card checkout yet.">
+  <title>Shop | Uintah Valley</title>
+  <meta name="description" content="Mainline Pure Vanilla Extract is sold out. Request Experimental vanilla trials from Uintah Valley LLC.">
+  <meta property="og:title" content="Shop Uintah Valley vanilla">
+  <meta property="og:description" content="Mainline is out of stock indefinitely. Experimental batches can be requested by email.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://uintahvalley.com/shop.html">
   <meta property="og:image" content="https://uintahvalley.com/assets/logo-square.png">
@@ -33,47 +33,111 @@
       <nav class="site-nav" id="site-nav">
         <a href="index.html">Home</a>
         <a href="shop.html" aria-current="page">Shop</a>
+        <a href="experimental.html">Experimental</a>
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
         <a class="cart-link" href="cart.html">Request list <span class="cart-count" data-cart-count>0</span></a>
       </nav>
     </div>
   </header>
+  <div class="stock-banner" role="status">
+    <div class="wrap">
+      <p style="margin:0">Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.</p>
+      <a href="experimental.html">Shop Experimental batches</a>
+    </div>
+  </div>
 
   <main id="main" class="wrap">
     <header class="page-hero">
       <p class="crumbs"><a href="index.html">Home</a> / Shop</p>
-      <p class="eyebrow">Bottles</p>
-      <h1>Vanilla extract</h1>
-      <p class="lede">One recipe, two sizes. Add what you want to a request list, then email the summary. Prices below are provisional and will be confirmed before you pay.</p>
+      <p class="eyebrow">Two lines</p>
+      <h1>Shop</h1>
+      <p class="lede">Mainline Pure Vanilla Extract stays on the shelf for the story. Orders, for now, go through Experimental trials.</p>
     </header>
 
-    <section class="section" style="padding-top:1rem">
-      <div class="card-grid two">
-        <article class="card">
+    <section class="section" style="padding-top:1rem" id="mainline">
+      <h2>Mainline</h2>
+      <div class="callout callout-oos">
+        <p style="margin:0"><strong>Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.</strong> It cannot be added to a request list.</p>
+      </div>
+      <div class="card-grid two" style="margin-top:1.2rem">
+        <article class="card is-sold-out">
           <div class="media">
-            <img src="assets/bottle.jpg" data-fallback="assets/bottle.svg" alt="Placeholder bottle for the 2 ounce size">
+            <img src="assets/bottle.jpg" data-fallback="assets/bottle.svg" alt="Placeholder bottle for 1 ounce Pure Vanilla Extract">
           </div>
-          <p class="eyebrow">Smaller bottle</p>
-          <h2>2 oz homemade vanilla extract</h2>
-          <p>A short bottle for a gift or a first batch through the kitchen.</p>
-          <p class="price">$18 <span class="provisional">Provisional</span></p>
+          <p class="eyebrow">Primary bottle · <span class="sold-badge">Sold out</span></p>
+          <h3>Pure Vanilla Extract · 1 fl oz</h3>
+          <p>The photographed label size. Madagascar beans, homemade extract. Not for sale until a future batch exists.</p>
           <div class="actions">
-            <a class="btn btn-primary" href="product.html?size=2oz">Details</a>
-            <button class="btn" type="button" data-add="vanilla-2oz">Add 2 oz</button>
+            <a class="btn" href="product.html">Details</a>
+            <button class="btn" type="button" disabled aria-disabled="true">Unavailable</button>
+          </div>
+        </article>
+        <article class="card is-sold-out">
+          <div class="media">
+            <img src="assets/bottle.jpg" data-fallback="assets/bottle.svg" alt="Placeholder bottle for a 6 ounce label draft">
+          </div>
+          <p class="eyebrow">Optional size · <span class="sold-badge">Sold out</span></p>
+          <h3>Pure Vanilla Extract · 6 oz</h3>
+          <p>A larger size from label drafts. Also mainline, also unavailable — listed so the old size is not quietly invented as in-stock.</p>
+          <div class="actions">
+            <a class="btn" href="product.html">Details</a>
+            <button class="btn" type="button" disabled aria-disabled="true">Unavailable</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="experimental">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Orderable</p>
+          <h2>Experimental</h2>
+        </div>
+        <a href="experimental.html">Full trial notes</a>
+      </div>
+      <div class="callout callout-exp">
+        <p style="margin:0">Small-batch trials. Not the mainline recipe. Limited, and honest about that. Prices are provisional.</p>
+      </div>
+      <div class="card-grid two" style="margin-top:1.2rem">
+        <article class="card">
+          <p class="eyebrow"><span class="pill pill-exp">Experimental</span></p>
+          <h3>Double-Fold Madagascar</h3>
+          <p>Stronger extract. 1 fl oz.</p>
+          <p class="price">$16 <span class="provisional">Provisional</span></p>
+          <div class="actions">
+            <a class="btn" href="experimental.html?sku=exp-double-fold">Details</a>
+            <button class="btn btn-primary" type="button" data-add="exp-double-fold">Add to request</button>
           </div>
         </article>
         <article class="card">
-          <div class="media">
-            <img src="assets/bottle.jpg" data-fallback="assets/bottle.svg" alt="Placeholder bottle for the 6 ounce size">
-          </div>
-          <p class="eyebrow">Label size</p>
-          <h2>6 oz homemade vanilla extract</h2>
-          <p>The size current label work is built around — the everyday baker’s bottle.</p>
-          <p class="price">$42 <span class="provisional">Provisional</span></p>
+          <p class="eyebrow"><span class="pill pill-exp">Experimental</span></p>
+          <h3>Mexican Vanilla Trial</h3>
+          <p>Mexican beans. 1 fl oz.</p>
+          <p class="price">$14 <span class="provisional">Provisional</span></p>
           <div class="actions">
-            <a class="btn btn-primary" href="product.html?size=6oz">Details</a>
-            <button class="btn" type="button" data-add="vanilla-6oz">Add 6 oz</button>
+            <a class="btn" href="experimental.html?sku=exp-mexican">Details</a>
+            <button class="btn btn-primary" type="button" data-add="exp-mexican">Add to request</button>
+          </div>
+        </article>
+        <article class="card">
+          <p class="eyebrow"><span class="pill pill-exp">Experimental</span></p>
+          <h3>Bourbon-Barrel Rested</h3>
+          <p>Rested on oak. 1 fl oz.</p>
+          <p class="price">$18 <span class="provisional">Provisional</span></p>
+          <div class="actions">
+            <a class="btn" href="experimental.html?sku=exp-barrel">Details</a>
+            <button class="btn btn-primary" type="button" data-add="exp-barrel">Add to request</button>
+          </div>
+        </article>
+        <article class="card">
+          <p class="eyebrow"><span class="pill pill-exp">Experimental</span></p>
+          <h3>Vanilla Bean Paste (trial)</h3>
+          <p>Scrapeable paste. 4 oz jar.</p>
+          <p class="price">$22 <span class="provisional">Provisional</span></p>
+          <div class="actions">
+            <a class="btn" href="experimental.html?sku=exp-paste">Details</a>
+            <button class="btn btn-primary" type="button" data-add="exp-paste">Add to request</button>
           </div>
         </article>
       </div>
@@ -90,7 +154,7 @@
         </div>
       </div>
       <div>
-        <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
+        <div><a href="shop.html">Shop</a> · <a href="experimental.html">Experimental</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
         <p>Orders: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a></p>
       </div>
     </div>

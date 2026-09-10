@@ -2,30 +2,50 @@
 
 Static storefront for **Uintah Valley LLC** — homemade vanilla extract from a Utah / Uintah Basin maker. No build step. Meant for [Cloudflare Pages](https://developers.cloudflare.com/pages/) on **uintahvalley.com**.
 
+## Stock status
+
+**Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.**
+
+The red banner on every page repeats that. Mainline 1 fl oz (and the optional 6 oz label-draft size) stay visible for the brand story. They cannot be added to the request list. Any leftover mainline SKUs in `localStorage` are dropped.
+
+What *can* be requested: the **Experimental** line.
+
 ## Pages
 
 | File | Purpose |
 | --- | --- |
-| `index.html` | Home, logo, featured 6 oz, how ordering works |
-| `shop.html` | 2 oz and 6 oz listing |
-| `product.html` | Detail, sizes, ingredients / process, add to request list |
+| `index.html` | Home, sold-out notice, CTA into Experimental |
+| `shop.html` | Mainline (sold out) + Experimental listing |
+| `product.html` | Mainline Pure Vanilla Extract detail — no purchase |
+| `experimental.html` | Trial chooser + four Experimental cards |
 | `about.html` | Short LLC / homemade Utah note (no invented biography) |
 | `contact.html` | Mailto contact / order help |
-| `cart.html` | localStorage request list + email summary |
+| `cart.html` | localStorage request list + email summary (Experimental only) |
 | `404.html` | Cloudflare Pages not-found page |
 
 Shared styles live in `css/styles.css`. Cart logic is `js/cart.js`. Header menu and image fallbacks are `js/site.js`.
 
 ## Provisional prices
 
-Confirm before taking money. Marked on the site as provisional:
+Confirm before taking money. Marked on the site as provisional.
 
-- 2 oz — **$18**
-- 6 oz — **$42**
+### Mainline — not for sale
 
-Checkout is a browser list (`localStorage`) plus a `mailto:hello@uintahvalley.com` order summary. There is no Stripe, Shopify, or fake payment flow.
+- Pure Vanilla Extract, 1 fl oz — listed as sold out (placeholder **$12** if a future restock needs a number)
+- Pure Vanilla Extract, 6 oz — optional label-draft size, also sold out (**$42** was the earlier draft)
 
-Change the mailbox in `js/cart.js` (`ORDER_EMAIL`) and the visible mailto links if needed.
+### Experimental — orderable
+
+CAPT can rename these later:
+
+| SKU id | Name | Size | Price |
+| --- | --- | --- | --- |
+| `exp-double-fold` | Double-Fold Madagascar | 1 fl oz | **$16** |
+| `exp-mexican` | Mexican Vanilla Trial | 1 fl oz | **$14** |
+| `exp-barrel` | Bourbon-Barrel Rested | 1 fl oz | **$18** |
+| `exp-paste` | Vanilla Bean Paste (trial) | 4 oz jar | **$22** |
+
+Checkout is a browser list (`localStorage`) plus a `mailto:hello@uintahvalley.com` order summary. There is no Stripe, Shopify, or fake payment flow. Change the mailbox in `js/cart.js` (`ORDER_EMAIL`) and the visible mailto links if needed.
 
 ## Brand assets
 
@@ -46,7 +66,7 @@ Tasteful SVG stand-ins ship today. Replace these **exact filenames** (same folde
 | Drop in | Used for |
 | --- | --- |
 | `assets/hero.jpg` | Home / about landscape |
-| `assets/bottle.jpg` | Product and shop bottle |
+| `assets/bottle.jpg` | Mainline / shop bottle |
 | `assets/beans.jpg` | Product process / beans |
 
 SVG placeholders to keep until then: `assets/hero.svg`, `assets/bottle.svg`, `assets/beans.svg`.
@@ -61,7 +81,7 @@ From the repo root:
 python3 -m http.server 8080
 ```
 
-Open [http://localhost:8080](http://localhost:8080). Click through Home ? Shop ? Product ? Request list ? email draft.
+Open [http://localhost:8080](http://localhost:8080). Walk Home ? Experimental ? add a trial ? Request list ? email draft. Confirm mainline pages have no working add-to-cart.
 
 ## Deploy to Cloudflare Pages (uintahvalley.com)
 
@@ -81,7 +101,7 @@ npx wrangler pages deploy . --project-name uintahvalley
 
 ## Later
 
-- Confirm prices and the public order email.
+- Confirm Experimental names, prices, and the public order email.
 - Drop in real photos (table above).
 - Add live payments (Stripe or Shopify) when you want card checkout.
 - Nutrition / cottage-food label copy on the bottle is separate from this site.
