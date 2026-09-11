@@ -21,18 +21,18 @@
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
-  const bottles = document.querySelector(".hero-bottles");
-  if (bottles) {
+  const plate = document.querySelector(".hero-plate");
+  if (plate) {
     const reveal = function () {
       requestAnimationFrame(function () {
-        bottles.classList.add("is-in");
+        plate.classList.add("is-in");
       });
     };
-    if (bottles.complete) {
+    if (plate.complete) {
       reveal();
     } else {
-      bottles.addEventListener("load", reveal, { once: true });
-      bottles.addEventListener("error", reveal, { once: true });
+      plate.addEventListener("load", reveal, { once: true });
+      plate.addEventListener("error", reveal, { once: true });
     }
   }
 
