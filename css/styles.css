@@ -281,28 +281,15 @@ h3,
   place-items: center;
   min-height: 10rem;
   pointer-events: none;
-  opacity: 0;
-  transform: translateX(110%);
-  transition:
-    transform 0.95s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.7s ease-out;
-}
-
-.hero-product.is-in {
-  opacity: 1;
-  transform: translateX(0);
 }
 
 .hero-orchid {
   position: absolute;
   z-index: 0;
-  width: min(145%, 22rem);
-  max-height: min(48vh, 26rem);
+  width: min(180%, 28rem);
+  max-height: min(58vh, 34rem);
   object-fit: contain;
-}
-
-.hero-orchid[hidden] {
-  display: none;
+  opacity: 0.9;
 }
 
 .hero-bottles {
@@ -313,11 +300,21 @@ h3,
   max-height: min(38vh, 20.4rem);
   object-fit: contain;
   filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.4));
+  opacity: 0;
+  transform: translateX(110%);
+  transition:
+    transform 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.7s ease-out;
+}
+
+.hero-bottles.is-in {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-product,
-  .hero-product.is-in {
+  .hero-bottles,
+  .hero-bottles.is-in {
     opacity: 1;
     transform: none;
     transition: none;
@@ -685,8 +682,8 @@ h3,
   }
 
   .hero-orchid {
-    width: min(145%, 13rem);
-    max-height: 32vh;
+    width: min(175%, 16rem);
+    max-height: 36vh;
   }
 
   .hero-bottles {

@@ -50,7 +50,11 @@ Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`,
 
 `assets/hero-home.jpg` **is** CAPT’s forested mountain still (evergreen valley, two snow-patched peaks, blue sky). That file is the only homepage hero background.
 
-The homepage uses a full-bleed `<img class="hero-photo">` of `assets/hero-home.jpg` behind a transparent header. Copy and bottles sit mid-hero (not under the nav, not on the bottom edge) over a dark left / bottom-left scrim. The three-bottle cutout (`assets/bottles-hero.png`) overlays to the right of the title at about 0.6× the first overlay size, flies in from the right (honors `prefers-reduced-motion`), and has no white box. A slot behind the bottles is wired for `assets/vanilla-orchid-beans.png` (merchant orchid + beans alpha; hidden until that file loads).
+The homepage uses a full-bleed `<img class="hero-photo">` of `assets/hero-home.jpg` behind a transparent header. Copy and bottles sit mid-hero (not under the nav, not on the bottom edge) over a dark left / bottom-left scrim.
+
+Layering to the right of the title: mountain photo, then `assets/vanilla-orchid-beans.png` (slightly larger, ~0.9 opacity), then `assets/bottles-hero.png` (about 0.6× the first overlay size; flies in from the right; honors `prefers-reduced-motion`). No white boxes.
+
+`assets/vanilla-orchid-beans.png` is a transparent composite: orchid cut from a public-domain Commons / U.S. government *Vanilla planifolia* photo; beans cut from CAPT stock.
 
 Do not use `assets/hero.jpg` (vanilla bottle), `assets/landscape.jpg` (basin overlook), stock/shutterstock, or a CSS gradient standing in for the mountain photo.
 
