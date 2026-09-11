@@ -213,9 +213,10 @@ h3,
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   color: #fff;
   overflow: hidden;
+  padding-top: calc(var(--header-h) + 2.4rem);
 }
 
 .hero-photo {
@@ -231,19 +232,26 @@ h3,
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.58) 0%, rgba(255, 255, 255, 0.18) 22%, transparent 40%),
-    linear-gradient(90deg, rgba(10, 22, 12, 0.55) 0%, rgba(10, 22, 12, 0.18) 48%, transparent 72%),
-    linear-gradient(0deg, rgba(10, 22, 12, 0.5) 0%, transparent 46%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.08) 14%, transparent 26%),
+    linear-gradient(90deg, rgba(6, 12, 8, 0.84) 0%, rgba(6, 12, 8, 0.58) 26%, rgba(6, 12, 8, 0.22) 50%, transparent 70%),
+    linear-gradient(215deg, transparent 28%, rgba(6, 12, 8, 0.66) 100%);
 }
 
-.hero-copy {
+.hero-stage {
   position: relative;
   z-index: 1;
   width: min(100% - 2.5rem, var(--max));
-  margin: 0 auto;
-  padding: 0 0 5.5rem;
-  max-width: 38rem;
-  margin-left: max(1.25rem, calc((100% - var(--max)) / 2));
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(12rem, 0.95fr);
+  align-items: start;
+  gap: clamp(1rem, 3.5vw, 2.75rem);
+  padding-bottom: 3rem;
+}
+
+.hero-copy {
+  max-width: 34rem;
+  padding-top: 0.35rem;
 }
 
 .hero-copy .eyebrow {
@@ -252,19 +260,37 @@ h3,
 
 .hero-copy h1 {
   margin: 0 0 0.85rem;
-  font-size: clamp(3rem, 8vw, 6.2rem);
+  font-size: clamp(2.8rem, 7vw, 5.6rem);
   color: #fff;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.4);
 }
 
 .hero-copy .lede {
   margin: 0;
   max-width: 28rem;
   font-size: 1.15rem;
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.45);
 }
 
 .hero-copy .actions {
   margin-top: 1.6rem;
+}
+
+.hero-bottles-slot {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 16rem;
+  pointer-events: none;
+}
+
+.hero-bottles {
+  width: min(100%, 26rem);
+  height: auto;
+  max-height: min(64vh, 34rem);
+  object-fit: contain;
+  filter: drop-shadow(0 22px 30px rgba(0, 0, 0, 0.4));
 }
 
 .btn {
@@ -325,7 +351,7 @@ h3,
 .discover {
   padding: 5.5rem 0 4.5rem;
   background: #fff;
-  text-align: center;
+  text-align: left;
 }
 
 .discover h2 {
@@ -335,7 +361,7 @@ h3,
 
 .discover-tabs {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 2.2rem;
   margin: 0 0 1.1rem;
 }
@@ -359,8 +385,8 @@ h3,
 }
 
 .discover-desc {
-  margin: 0 auto 2.4rem;
-  max-width: 36rem;
+  margin: 0 0 2.4rem;
+  max-width: 40rem;
   color: var(--muted);
 }
 
@@ -618,8 +644,23 @@ h3,
     text-shadow: none;
   }
 
-  .hero-copy {
-    padding-bottom: 3.4rem;
+  .hero {
+    padding-top: calc(var(--header-h) + 1.4rem);
+  }
+
+  .hero-stage {
+    grid-template-columns: minmax(0, 1.1fr) minmax(7.5rem, 0.75fr);
+    gap: 0.75rem;
+    padding-bottom: 2.4rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2.1rem, 9vw, 3.2rem);
+  }
+
+  .hero-bottles {
+    width: 100%;
+    max-height: 42vh;
   }
 
   .discover {
