@@ -1,6 +1,6 @@
 # Uintah Valley
 
-Static storefront for **Uintah Valley LLC** — homemade goods from a Utah / Uintah Basin kitchen. Vanilla is the current line. No build step. Meant for [Cloudflare Pages](https://developers.cloudflare.com/pages/) on **uintahvalley.com**.
+Static storefront for **Uintah Valley LLC** — homemade goods from a Utah kitchen. Vanilla is the current line. No build step. Meant for [Cloudflare Pages](https://developers.cloudflare.com/pages/) on **uintahvalley.com**.
 
 ## Stock status
 
