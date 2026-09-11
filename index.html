@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Uintah Valley | Homemade goods from Utah</title>
-  <meta name="description" content="Uintah Valley LLC shop — homemade goods from Utah. Vanilla is the current line: mainline Pure Vanilla Extract is sold out; request Experimental trials.">
-  <meta property="og:title" content="Uintah Valley LLC — homemade goods from Utah">
-  <meta property="og:description" content="A Utah kitchen shop. Vanilla is what we bottle today. Mainline is out of stock; Experimental batches can be requested.">
+  <title>Uintah Valley | Homemade vanilla from Utah</title>
+  <meta name="description" content="Uintah Valley LLC — homemade vanilla extract from a Utah kitchen. Mainline Pure Vanilla is sold out; Experimental batches can be requested.">
+  <meta property="og:title" content="Uintah Valley LLC — homemade vanilla from Utah">
+  <meta property="og:description" content="Alcohol and Madagascar beans. No water to stretch a batch. Mainline is sold out indefinitely.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://uintahvalley.com/">
-  <meta property="og:image" content="https://uintahvalley.com/assets/hero.jpg">
+  <meta property="og:image" content="https://uintahvalley.com/assets/hero-home.jpg">
   <meta name="theme-color" content="#144916">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/logo-square.png" type="image/png" sizes="32x32">
@@ -18,18 +18,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
-  <script>
-    try { if (localStorage.getItem("uintahvalley-oos-banner") === "dismissed") document.documentElement.classList.add("oos-banner-off"); } catch (e) {}
-  </script>
 </head>
-<body>
+<body class="page-home">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="index.html">
         <picture class="brand-mark">
           <source srcset="assets/logo-color.svg" type="image/svg+xml">
-          <img src="assets/logo-color.png" width="42" height="57" alt="">
+          <img src="assets/logo-color.png" width="48" height="65" alt="">
         </picture>
         <span>
           <span class="brand-name">Uintah Valley</span>
@@ -40,141 +37,122 @@
       <nav class="site-nav" id="site-nav">
         <a href="index.html" aria-current="page">Home</a>
         <a href="shop.html">Shop</a>
-        <a href="experimental.html">Experimental</a>
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
-        <a class="cart-link" href="cart.html">Request list <span class="cart-count" data-cart-count>0</span></a>
       </nav>
     </div>
   </header>
-  <div class="stock-banner" role="status">
-    <div class="wrap">
-      <p>Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.</p>
-      <div class="stock-banner-end">
-        <a href="experimental.html">Shop Experimental batches</a>
-        <button type="button" class="banner-dismiss" data-dismiss-banner aria-label="Dismiss out-of-stock notice">&times;</button>
-      </div>
-    </div>
-  </div>
 
   <main id="main">
-    <section class="wrap hero">
+    <section class="hero" aria-label="Homepage hero">
+      <img class="hero-photo" src="assets/hero-home.jpg" alt="Bald Mountain and Reids Peak above a spruce forest in the Uinta Mountains, Utah">
+      <div class="hero-scrim" aria-hidden="true"></div>
       <div class="hero-copy">
-        <p class="eyebrow">Homemade · Small-batch · Utah</p>
-        <h1>Homemade goods from Utah.</h1>
-        <p class="lede">Uintah Valley LLC is a Utah kitchen shop. Vanilla is the line we bottle today — alcohol and beans, no water to stretch a batch. Mainline Pure Vanilla Extract is sold out indefinitely; Experimental trials are what we can send out now.</p>
+        <p class="eyebrow">Homemade · Utah</p>
+        <h1>Homemade vanilla.</h1>
+        <p class="lede">Locally distilled spirits and Madagascar beans. No water to stretch a batch. Mainline Pure Vanilla is sold out indefinitely — the shop still tells the story.</p>
         <div class="actions">
-          <a class="btn btn-primary" href="experimental.html">Shop Experimental</a>
-          <a class="btn" href="product.html">Mainline story (sold out)</a>
+          <a class="btn btn-primary" href="shop.html">See the shop</a>
         </div>
       </div>
-      <img class="hero-mark" src="assets/logo-color.svg" width="280" height="382" alt="Uintah Valley hexagonal badge">
     </section>
 
-    <section class="wrap">
-      <figure class="hero-photo">
-        <img src="assets/hero.jpg" alt="A small bottle of vanilla extract standing on wood next to two cured vanilla beans">
-      </figure>
-    </section>
+    <section class="discover" id="discover" aria-labelledby="discover-title">
+      <div class="wrap">
+        <h2 id="discover-title">Discover Premium Vanilla Extract</h2>
+        <div class="discover-tabs" role="tablist" aria-label="Vanilla lines" data-discover-tabs>
+          <button type="button" role="tab" id="tab-mainline" aria-selected="true" aria-controls="panel-mainline" data-line="mainline">Uintah Valley</button>
+          <button type="button" role="tab" id="tab-experimental" aria-selected="false" aria-controls="panel-experimental" data-line="experimental">Experimental</button>
+        </div>
 
-    <section class="section wrap" id="why">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">What’s in the bottle</p>
-          <h2>Why Uintah Valley</h2>
+        <div class="discover-panel" id="panel-mainline" role="tabpanel" aria-labelledby="tab-mainline" data-discover-panel="mainline">
+          <p class="discover-desc">This is our mainline product, made with locally distilled spirits and judiciously sourced Madagascar Vanilla.</p>
+          <div class="product-row">
+            <article class="product-card">
+              <div class="placeholder-frame" role="img" aria-label="placeholder 01">placeholder 01</div>
+              <h3>Pure Vanilla Extract · 1 fl oz</h3>
+              <p>The photographed mainline bottle. Alcohol and Madagascar beans.</p>
+              <span class="sold-note">Sold out indefinitely</span>
+            </article>
+            <article class="product-card">
+              <div class="placeholder-frame" role="img" aria-label="placeholder 02">placeholder 02</div>
+              <h3>Pure Vanilla Extract · 6 oz</h3>
+              <p>A larger size that exists as a label draft. Same line, also unavailable.</p>
+              <span class="sold-note">Sold out indefinitely</span>
+            </article>
+            <article class="product-card">
+              <div class="placeholder-frame" role="img" aria-label="placeholder 03">placeholder 03</div>
+              <h3>Pure Vanilla Extract</h3>
+              <p>The rest of the mainline. There is no live checkout while this batch is out.</p>
+              <span class="sold-note">Sold out indefinitely</span>
+            </article>
+          </div>
+        </div>
+
+        <div class="discover-panel" id="panel-experimental" role="tabpanel" aria-labelledby="tab-experimental" data-discover-panel="experimental" hidden>
+          <p class="discover-desc">These are extractives, methods, and beans we're trying out.</p>
+          <div class="product-row">
+            <article class="product-card">
+              <div class="placeholder-frame" role="img" aria-label="placeholder 01">placeholder 01</div>
+              <h3>Double-Fold Madagascar</h3>
+              <p>A stronger extract. Names and prices stay provisional until we reply.</p>
+            </article>
+            <article class="product-card">
+              <div class="placeholder-frame" role="img" aria-label="placeholder 02">placeholder 02</div>
+              <h3>Mexican Vanilla Trial</h3>
+              <p>A different bean. Write us if you want to request a bottle.</p>
+            </article>
+            <article class="product-card">
+              <div class="placeholder-frame" role="img" aria-label="placeholder 03">placeholder 03</div>
+              <h3>Bourbon-Barrel Rested</h3>
+              <p>Oak rest, still a kitchen trial — not a restock of Pure Vanilla.</p>
+            </article>
+          </div>
         </div>
       </div>
-      <p class="lede">We do not pad a jar to hit a price. The extract is beans in alcohol. That is the whole argument.</p>
-      <dl class="claims five">
-        <div class="claim">
-          <dt>No water</dt>
-          <dd>Many extracts add water to stretch the bottle. We do not. Ours is not watered down.</dd>
-        </div>
-        <div class="claim">
-          <dt>Two ingredients</dt>
-          <dd>Alcohol and vanilla beans. That is the recipe. Nothing else goes in to make the extract.</dd>
-        </div>
-        <div class="claim">
-          <dt>No castoreum</dt>
-          <dd>No castoreum — the animal secretion sometimes sold as a flavor note, and in plain talk, beaver butt paste. Not in our kitchen.</dd>
-        </div>
-        <div class="claim">
-          <dt>No chemical flavor</dt>
-          <dd>No lab-made vanilla flavor components. The taste comes from beans sitting in spirit.</dd>
-        </div>
-        <div class="claim">
-          <dt>No added sugar</dt>
-          <dd>No added sugars and no high-fructose corn syrup. Some grocery extracts use both. We do not.</dd>
-        </div>
-      </dl>
     </section>
 
     <section class="section wrap">
-      <div class="section-head">
+      <p class="eyebrow">What’s in the bottle</p>
+      <h2>Two ingredients. That’s the argument.</h2>
+      <p class="lede">We do not pad a jar to hit a price. Lean, and true: no water, no chemical flavor, no added sugar or HFCS, and no castoreum.</p>
+      <dl class="lean-points three" style="margin-top:1.6rem">
         <div>
-          <p class="eyebrow">Available to request</p>
-          <h2>Experimental line</h2>
+          <dt>No water</dt>
+          <dd>Many extracts add water to stretch the bottle. Ours does not.</dd>
         </div>
-        <a href="experimental.html">All trials</a>
-      </div>
-      <p>Limited kitchen trials. Stronger fold, a different bean, oak rest, or a scrapeable paste. Names and prices are provisional. These are not a restock of Pure Vanilla Extract.</p>
-      <div class="card-grid two" style="margin-top:1.2rem">
-        <article class="card">
-          <p class="eyebrow"><span class="pill pill-exp">Experimental</span></p>
-          <h3>Four trials, one request list</h3>
-          <p>Choose Double-Fold Madagascar, Mexican Vanilla Trial, Bourbon-Barrel Rested, or Vanilla Bean Paste. Add what you want, then email the summary — no card form on this site.</p>
-          <p class="price">$14–$22 <span class="provisional">Provisional</span></p>
-          <a class="btn btn-primary" href="experimental.html">See Experimental trials</a>
-        </article>
-        <article class="card is-sold-out">
-          <div class="media media-studio">
-            <img src="assets/bottle-hero.jpg" alt="Three amber 1 fl oz bottles of Uintah Valley Pure Vanilla Extract with white labels">
-          </div>
-          <p class="eyebrow">Mainline · <span class="sold-badge">Sold out</span></p>
-          <h3>Pure Vanilla Extract · 1 fl oz</h3>
-          <p>Made with Madagascar vanilla beans. The photographed bottle is NET 1 FL OZ (29 mL). Kept here for the brand story. It cannot be added to a request list.</p>
-          <a class="btn" href="product.html">Read about mainline</a>
-        </article>
-      </div>
-    </section>
-
-    <section class="section band">
-      <div class="wrap split">
         <div>
-          <p class="eyebrow">How ordering works</p>
-          <h2>Pick an Experimental trial, send a request.</h2>
-          <p>This storefront keeps a list in your browser, then opens your email app with a summary. Payment is arranged after we confirm the order — nothing is charged on this page.</p>
+          <dt>Alcohol + beans</dt>
+          <dd>Locally distilled spirits and Madagascar vanilla. Nothing else goes in to make the extract.</dd>
         </div>
-        <ol class="facts">
-          <li>Mainline Pure Vanilla Extract stays listed but cannot be ordered.</li>
-          <li>Add Experimental bottles or paste to your request list. It stays on this device.</li>
-          <li>Send the summary to hello@uintahvalley.com and wait for a reply.</li>
-        </ol>
-      </div>
+        <div>
+          <dt>Utah kitchen</dt>
+          <dd>Homemade goods from Utah. The brand is named for the valley.</dd>
+        </div>
+      </dl>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="wrap footer-grid">
       <div class="footer-brand">
-        <img src="assets/logo-color.svg" width="54" height="74" alt="">
+        <img src="assets/logo-color.svg" width="52" height="71" alt="">
         <div>
           <strong>Uintah Valley LLC</strong>
           <div>Homemade goods · Utah</div>
         </div>
       </div>
       <div>
-        <div><a href="shop.html">Shop</a> · <a href="experimental.html">Experimental</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
+        <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a></div>
         <p>Orders: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a></p>
       </div>
     </div>
     <div class="wrap legal">
       <p>Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol.</p>
-      <p>© <span data-year>2026</span> Uintah Valley LLC. Prices shown are provisional until confirmed in reply.</p>
+      <p>© <span data-year>2026</span> Uintah Valley LLC</p>
       <p class="footer-credit">Built by <a href="https://navarreval.com/">Navarre</a> and The <a href="https://x.ai/bot">Grok Bot</a> crew of the SS Argus - Gad Kyrath XO</p>
     </div>
   </footer>
-  <script src="js/cart.js"></script>
   <script src="js/site.js"></script>
 </body>
 </html>

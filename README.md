@@ -1,116 +1,76 @@
 # Uintah Valley
 
-Static storefront for **Uintah Valley LLC** — homemade goods from a Utah kitchen. Vanilla is the current line. No build step. Meant for [Cloudflare Pages](https://developers.cloudflare.com/pages/) on **uintahvalley.com**.
+Static site for **Uintah Valley LLC** — homemade goods from a Utah kitchen. Vanilla is the current line. No build step. Meant for [Cloudflare Pages](https://developers.cloudflare.com/pages/) on **uintahvalley.com**.
 
-## Stock status
+## Branch status — read this first
 
-**Uintah Valley Pure Vanilla Extract (mainline) is currently out of stock and will remain unavailable indefinitely.**
+| Branch | What it is |
+| --- | --- |
+| **`main`** | The **live** old storefront. Leave it alone. CAPT will cut over later. |
+| **This branch** (`rebuild/v2` / `cursor/rebuild-v2-ground-up-080f`) | Ground-up rebuild. Preview and iterate here. **Do not merge to `main` until cutover.** |
 
-The red banner on every page repeats that. It can be dismissed with the X; dismissal is stored in `localStorage` (`uintahvalley-oos-banner`). Mainline 1 fl oz (and the optional 6 oz label-draft size) stay visible for the brand story. They cannot be added to the request list. Any leftover mainline SKUs in `localStorage` are dropped.
-
-What *can* be requested: the **Experimental** line.
+Cloudflare Pages production should stay pointed at `main` until CAPT is ready to switch.
 
 ## Pages
 
+Nav is only **Home / Shop / About / Contact**.
+
 | File | Purpose |
 | --- | --- |
-| `index.html` | Home, sold-out notice, CTA into Experimental |
-| `shop.html` | Mainline (sold out) + Experimental listing |
-| `product.html` | Mainline Pure Vanilla Extract detail — no purchase |
-| `experimental.html` | Four Experimental trial cards (request-list add) |
-| `about.html` | Short LLC / homemade Utah note (no invented biography) |
-| `contact.html` | Mailto contact / order help |
-| `cart.html` | localStorage request list + email summary (Experimental only) |
+| `index.html` | Full-bleed mountain hero behind the header, plus Discover tabs |
+| `shop.html` | Vanilla line: mainline sold out; Experimental noted as request-only |
+| `about.html` | Short LLC / Utah kitchen note (named for the valley; not “located in the Uintah Basin”) |
+| `contact.html` | Mailto contact — no card checkout |
 | `404.html` | Cloudflare Pages not-found page |
 
-Shared styles live in `css/styles.css`. Cart logic is `js/cart.js`. Header menu and the dismissible stock banner are `js/site.js`.
+Shared styles: `css/styles.css`. Menu, year, home header scroll, and Discover tabs: `js/site.js`.
 
-## Provisional prices
+Old Experimental / product / cart routes redirect here so bookmarks do not 404 after preview deploys.
 
-Confirm before taking money. Marked on the site as provisional.
+## Honest stock
 
-### Mainline — not for sale
+**Uintah Valley Pure Vanilla Extract (mainline) is out of stock indefinitely.** There is no live checkout on this rebuild. Experimental batches can be requested by email.
 
-- Pure Vanilla Extract, 1 fl oz — listed as sold out (placeholder **$12** if a future restock needs a number)
-- Pure Vanilla Extract, 6 oz — optional label-draft size, also sold out (**$42** was the earlier draft)
+## Discover section (home)
 
-### Experimental — orderable
+Under the hero: **Discover Premium Vanilla Extract** with two selectors.
 
-CAPT can rename these later:
+- **Uintah Valley** — “This is our mainline product, made with locally distilled spirits and judiciously sourced Madagascar Vanilla.”
+- **Experimental** — “These are extractives, methods, and beans we're trying out.”
 
-| SKU id | Name | Size | Price |
-| --- | --- | --- | --- |
-| `exp-double-fold` | Double-Fold Madagascar | 1 fl oz | **$16** |
-| `exp-mexican` | Mexican Vanilla Trial | 1 fl oz | **$14** |
-| `exp-barrel` | Bourbon-Barrel Rested | 1 fl oz | **$18** |
-| `exp-paste` | Vanilla Bean Paste (trial) | 4 oz jar | **$22** |
+Each tab shows three placeholder product cards. No fake buy buttons.
 
-Checkout is a browser list (`localStorage`) plus a `mailto:hello@uintahvalley.com` order summary. There is no Stripe, Shopify, or fake payment flow. Change the mailbox in `js/cart.js` (`ORDER_EMAIL`) and the visible mailto links if needed.
+## Brand
 
-## Brand assets
+Header uses the official color mark: SVG preferred, CLR PNG fallback (`assets/logo-color.svg` / `assets/logo-color.png`).
 
-Header uses a single mark: SVG preferred, official CLR PNG as the `<picture>` fallback (never both visible). Large homepage badge stays SVG.
+Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`, cream `#fff6d2`, taupe `#777a69`. Display type is Quattrocento; body is Source Sans 3.
 
-| File | Use |
-| --- | --- |
-| `assets/logo-color.svg` | Header (preferred) + large hero mark |
-| `assets/logo-color.png` | Official CLR PNG fallback if SVG is not supported |
-| `assets/logo-square.png` | Square lockup — favicon fallback, Apple touch icon |
-| `assets/favicon.svg` | Simple tab icon derived from the badge |
+## Hero photo
 
-Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`, tree taupe `#777a69`, cream `#fff6d2`, plus style-sheet accents red `#de1e2a` and sage `#aaad95`. Display type is Quattrocento; body is Source Sans 3 (Helvetica Neue stand-in).
+`assets/hero-home.jpg` is the homepage full-bleed background (header sits on the image).
 
-## Product photos (committed)
-
-These JPEGs are in the repo now. Replace in place if CAPT sends a tighter crop — **keep the filenames**.
-
-| Site path | Source file | Used for |
-| --- | --- | --- |
-| `assets/bottle-hero.jpg` | `IMG_5405_EDIT.jpg` | Primary 1 fl oz product hero (three amber bottles) |
-| `assets/bottle-angle-1.jpg` | `IMG_5406_EDIT.jpg` | Alternate bottle angle |
-| `assets/bottle-angle-2.jpg` | `IMG_5407_EDIT.jpg` | Alternate bottle angle |
-| `assets/bottle-angle-3.jpg` | `IMG_5410_EDIT.jpg` | Alternate bottle angle |
-| `assets/beans-jar.jpg` | `IMG_5971RAWedit.jpg` | Mason jar of whole vanilla beans |
-| `assets/landscape.jpg` | `IMG_4852RAWedit.jpg` | Uintah Basin / about |
-| `assets/hero.jpg` | `shutterstock_369993419.jpg` | Homepage hero (vanilla bottle + beans) |
-| `assets/stock-beans.jpg` | `shutterstock_56869582.jpg` | Small Experimental accent (beans, not a bottle) |
-| `assets/stock-spices.jpg` | `spice-1631562_1920.jpg` | About kitchen accent |
-| `assets/logo-color.png` | `UintaValleyLogoA_CLR.png` | Header raster fallback |
-
-Experimental SKUs use blank labeled frames (`placeholder 01`–`04`), not mainline bottle photos and not decorative SVG art.
-
-Label copy used on the site: **Pure Vanilla Extract**, **Made with Madagascar Vanilla Beans**, **NET 1 FL OZ (29 mL)**.
+The attached CAPT mountain still was not available on the build VM filesystem. This file is a stand-in of the same Uinta peaks (Bald Mountain and Reids Peak, CC BY-SA, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Reids_Peak,_Utah.jpg)). **Replace the file in place** with CAPT’s shot when you have it — keep the filename.
 
 ## Local preview
-
-From the repo root:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Open [http://localhost:8080](http://localhost:8080). Walk Home → Experimental → add a trial → Request list → email draft. Confirm mainline pages have no working add-to-cart. Confirm the header shows one logo and the red banner can be dismissed.
+Open [http://localhost:8080](http://localhost:8080). Confirm the mountain photo sits behind the logo and nav, the Discover tabs swap copy and cards, and the footer credit is on every page.
 
-## Deploy to Cloudflare Pages (uintahvalley.com)
+## Deploy (later cutover)
 
-1. In Cloudflare: **Workers & Pages ? Create ? Pages ? Connect to Git**.
-2. Select `NavarreVal/uintahvalley`.
-3. Build settings: **Framework preset** none. **Build command** empty. **Output directory** `/` (project root).
-4. Production branch: `main`.
-5. After the first deploy, **Custom domains ? uintahvalley.com** (and `www` if you want it). Point the domain’s DNS to Cloudflare if it is not already.
+1. Cloudflare: **Workers & Pages → Pages**. Project `uintahvalley`.
+2. Framework preset none. Output directory `/`.
+3. Keep **production branch = `main`** until cutover.
+4. To preview this rebuild, attach the branch as a Pages preview, or temporarily switch production only when CAPT is ready.
 
-`404.html` is the real not-found page. `_redirects` sends unknown paths there. `_headers` adds basic security headers.
+`404.html` is the not-found page. `_redirects` and `_headers` stay in the project root.
 
-Optional CLI from a machine with Wrangler logged in:
+## Footer
 
-```bash
-npx wrangler pages deploy . --project-name uintahvalley
-```
+Every page keeps the SS Argus credit and a simple © Uintah Valley LLC line.
 
-## Later
-
-- Confirm Experimental names, prices, the public order email, and the 1 fl oz restock price (placeholder $12).
-- Add live payments (Stripe or Shopify) when you want card checkout.
-- Nutrition / cottage-food label copy on the bottle is separate from this site.
-
-Homemade product, sold for home use, not for resale; the footer states it is prepared without state or local inspection and contains alcohol.
+Homemade product, sold for home use, not for resale; prepared without state or local inspection; contains alcohol.
