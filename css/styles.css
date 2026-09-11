@@ -242,7 +242,7 @@ h3,
   width: min(100% - 2.5rem, var(--max));
   margin-inline: auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(9rem, 0.65fr);
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 0.85fr);
   align-items: center;
   gap: clamp(1rem, 3.5vw, 2.75rem);
 }
@@ -279,16 +279,29 @@ h3,
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 10rem;
+  min-height: 12rem;
+  width: min(100%, 24rem);
   pointer-events: none;
 }
 
-.hero-orchid {
+.hero-flower,
+.hero-beans {
   position: absolute;
   z-index: 0;
-  width: min(180%, 28rem);
-  max-height: min(58vh, 34rem);
   object-fit: contain;
+}
+
+.hero-flower {
+  width: min(48%, 9.5rem);
+  left: -18%;
+  top: 6%;
+  opacity: 0.92;
+}
+
+.hero-beans {
+  width: min(88%, 17rem);
+  right: -28%;
+  bottom: 4%;
   opacity: 0.9;
 }
 
@@ -673,7 +686,7 @@ h3,
   }
 
   .hero-stage {
-    grid-template-columns: minmax(0, 1.1fr) minmax(6.5rem, 0.62fr);
+    grid-template-columns: minmax(0, 1fr) minmax(8rem, 0.8fr);
     gap: 0.75rem;
   }
 
@@ -681,9 +694,14 @@ h3,
     font-size: clamp(2.1rem, 9vw, 3.2rem);
   }
 
-  .hero-orchid {
-    width: min(175%, 16rem);
-    max-height: 36vh;
+  .hero-flower {
+    width: min(52%, 5.5rem);
+    left: -14%;
+  }
+
+  .hero-beans {
+    width: min(90%, 9.5rem);
+    right: -22%;
   }
 
   .hero-bottles {
