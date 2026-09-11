@@ -48,9 +48,11 @@ Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`,
 
 ## Hero photo
 
-`assets/hero-home.jpg` is the homepage full-bleed background (header sits on the image).
+`assets/hero-home.jpg` must be CAPT’s forested mountain still (evergreen valley, two snow-patched peaks, blue sky — **not** the Kamas Lake / Reids Peak alpine shot).
 
-The attached CAPT mountain still was not available on the build VM filesystem. This file is a stand-in of the same Uinta peaks (Bald Mountain and Reids Peak, CC BY-SA, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Reids_Peak,_Utah.jpg)). **Replace the file in place** with CAPT’s shot when you have it — keep the filename.
+The homepage `<img class="hero-photo">` points only at `assets/hero-home.jpg`. No shutterstock bottle hero, no `landscape.jpg`, no CSS gradient standing in for the photo.
+
+If this file is still the lake stand-in, the attachment did not land on the build VM — drop CAPT’s `hero-mountains.jpg` in as `assets/hero-home.jpg` and keep that filename.
 
 ## Local preview
 
