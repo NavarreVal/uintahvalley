@@ -50,7 +50,7 @@ Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`,
 
 `assets/hero-home.jpg` **is** CAPT’s forested mountain still (evergreen valley, two snow-patched peaks, blue sky). That file is the only homepage hero background.
 
-The homepage uses a full-bleed `<img class="hero-photo">` of `assets/hero-home.jpg` behind a transparent header. Copy sits upper-left over a dark left / bottom-left scrim. The three-bottle cutout (`assets/bottles-hero.png`) overlays to the right of the title — no white box. Replace that PNG in place when Lens drops the official transparent file.
+The homepage uses a full-bleed `<img class="hero-photo">` of `assets/hero-home.jpg` behind a transparent header. Copy and bottles sit mid-hero (not under the nav, not on the bottom edge) over a dark left / bottom-left scrim. The three-bottle cutout (`assets/bottles-hero.png`) overlays to the right of the title at about half the first overlay size, flies in from the right (honors `prefers-reduced-motion`), and has no white box.
 
 Do not use `assets/hero.jpg` (vanilla bottle), `assets/landscape.jpg` (basin overlook), stock/shutterstock, or a CSS gradient standing in for the mountain photo.
 
