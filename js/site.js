@@ -21,6 +21,21 @@
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
+  const bottles = document.querySelector(".hero-bottles");
+  if (bottles) {
+    const reveal = function () {
+      requestAnimationFrame(function () {
+        bottles.classList.add("is-in");
+      });
+    };
+    if (bottles.complete) {
+      reveal();
+    } else {
+      bottles.addEventListener("load", reveal, { once: true });
+      bottles.addEventListener("error", reveal, { once: true });
+    }
+  }
+
   const tablist = document.querySelector("[data-discover-tabs]");
   if (!tablist) return;
 
