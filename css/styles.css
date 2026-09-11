@@ -521,6 +521,10 @@ h1,
   color: #fff6d2;
 }
 
+.site-footer a:hover {
+  color: #fff;
+}
+
 .footer-grid {
   display: grid;
   gap: 1.5rem;
@@ -542,6 +546,16 @@ h1,
   border-top: 1px solid #333;
   color: #c8c2ae;
   font-size: 0.88rem;
+}
+
+.footer-credit {
+  margin-top: 0.7rem;
+  color: #ece6d2;
+}
+
+.footer-credit a {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
 }
 
 .toast {
