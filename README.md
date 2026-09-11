@@ -52,9 +52,7 @@ Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`,
 
 The homepage uses a full-bleed `<img class="hero-photo">` of `assets/hero-home.jpg` behind a transparent header. Copy and bottles sit mid-hero (not under the nav, not on the bottom edge) over a dark left / bottom-left scrim.
 
-Layering to the right of the title: mountain photo, then `assets/vanilla-orchid-flower.png` (left / peeking left), then `assets/vanilla-beans-layer.png` (right / more of the bundle exposed), then `assets/bottles-hero.png` (about 0.6× the first overlay size; flies in from the right; honors `prefers-reduced-motion`). Separate layers so each can be nudged in CSS. No white boxes.
-
-Flower: public-domain Commons / U.S. government *Vanilla planifolia* cutout (and Lens rights-clear plate). Beans: CAPT stock cutout. An updated single plate also lives at `assets/vanilla-orchid-beans.png` but the hero uses the two independent files.
+Layering to the right of the title: mountain photo, then the Nyra/Lens single plate `assets/vanilla-orchid-beans.png` (flower left, beans right, center gap), then `assets/bottles-hero.png` on top (about 0.6× the first overlay size; flies in from the right; honors `prefers-reduced-motion`). No white boxes. Interim split files (`vanilla-orchid-flower.png`, `vanilla-beans-layer.png`) are not used on the live hero.
 
 Do not use `assets/hero.jpg` (vanilla bottle), `assets/landscape.jpg` (basin overlook), stock/shutterstock, or a CSS gradient standing in for the mountain photo.
 
