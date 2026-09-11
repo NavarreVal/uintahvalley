@@ -21,11 +21,13 @@
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
+  const product = document.querySelector(".hero-product");
   const bottles = document.querySelector(".hero-bottles");
-  if (bottles) {
+  const orchid = document.querySelector(".hero-orchid");
+  if (product && bottles) {
     const reveal = function () {
       requestAnimationFrame(function () {
-        bottles.classList.add("is-in");
+        product.classList.add("is-in");
       });
     };
     if (bottles.complete) {
@@ -34,6 +36,11 @@
       bottles.addEventListener("load", reveal, { once: true });
       bottles.addEventListener("error", reveal, { once: true });
     }
+  }
+  if (orchid) {
+    orchid.addEventListener("load", function () {
+      orchid.hidden = false;
+    });
   }
 
   const tablist = document.querySelector("[data-discover-tabs]");

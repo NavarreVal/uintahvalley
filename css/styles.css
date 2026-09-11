@@ -242,7 +242,7 @@ h3,
   width: min(100% - 2.5rem, var(--max));
   margin-inline: auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(8rem, 0.55fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(9rem, 0.65fr);
   align-items: center;
   gap: clamp(1rem, 3.5vw, 2.75rem);
 }
@@ -275,20 +275,12 @@ h3,
   margin-top: 1.6rem;
 }
 
-.hero-bottles-slot {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 8rem;
+.hero-product {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 10rem;
   pointer-events: none;
-}
-
-.hero-bottles {
-  width: min(100%, 13rem);
-  height: auto;
-  max-height: min(32vh, 17rem);
-  object-fit: contain;
-  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.4));
   opacity: 0;
   transform: translateX(110%);
   transition:
@@ -296,14 +288,36 @@ h3,
     opacity 0.7s ease-out;
 }
 
-.hero-bottles.is-in {
+.hero-product.is-in {
   opacity: 1;
   transform: translateX(0);
 }
 
+.hero-orchid {
+  position: absolute;
+  z-index: 0;
+  width: min(145%, 22rem);
+  max-height: min(48vh, 26rem);
+  object-fit: contain;
+}
+
+.hero-orchid[hidden] {
+  display: none;
+}
+
+.hero-bottles {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 15.6rem);
+  height: auto;
+  max-height: min(38vh, 20.4rem);
+  object-fit: contain;
+  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.4));
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .hero-bottles,
-  .hero-bottles.is-in {
+  .hero-product,
+  .hero-product.is-in {
     opacity: 1;
     transform: none;
     transition: none;
@@ -662,7 +676,7 @@ h3,
   }
 
   .hero-stage {
-    grid-template-columns: minmax(0, 1.15fr) minmax(5.5rem, 0.55fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(6.5rem, 0.62fr);
     gap: 0.75rem;
   }
 
@@ -670,9 +684,14 @@ h3,
     font-size: clamp(2.1rem, 9vw, 3.2rem);
   }
 
+  .hero-orchid {
+    width: min(145%, 13rem);
+    max-height: 32vh;
+  }
+
   .hero-bottles {
-    width: min(100%, 7.5rem);
-    max-height: 21vh;
+    width: min(100%, 9rem);
+    max-height: 25vh;
   }
 
   .discover {
