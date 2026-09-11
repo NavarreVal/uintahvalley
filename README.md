@@ -48,11 +48,9 @@ Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`,
 
 ## Hero photo
 
-`assets/hero-home.jpg` must be CAPT’s forested mountain still (evergreen valley, two snow-patched peaks, blue sky — **not** the Kamas Lake / Reids Peak alpine shot).
+`assets/hero-home.jpg` **is** CAPT’s forested mountain still (evergreen valley, two snow-patched peaks, blue sky). That file is the only homepage hero background.
 
-The homepage `<img class="hero-photo">` points only at `assets/hero-home.jpg`. No shutterstock bottle hero, no `landscape.jpg`, no CSS gradient standing in for the photo.
-
-If this file is still the lake stand-in, the attachment did not land on the build VM — drop CAPT’s `hero-mountains.jpg` in as `assets/hero-home.jpg` and keep that filename.
+The homepage uses a full-bleed `<img class="hero-photo">` of `assets/hero-home.jpg` behind a transparent header. Do not use `assets/hero.jpg` (vanilla bottle), `assets/landscape.jpg` (basin overlook), stock/shutterstock, or a CSS gradient standing in for the photo.
 
 ## Local preview
 
