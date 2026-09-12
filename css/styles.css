@@ -564,6 +564,9 @@ h3,
   gap: 1.25rem;
   align-items: center;
   max-width: 36rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  background: #fff;
 }
 
 .founder-card img {
@@ -576,6 +579,7 @@ h3,
 
 .founder-card h2 {
   margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
 }
 
 .founder-role {
@@ -734,6 +738,10 @@ h3,
   .footer-grid,
   .lean-points.three {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .founder-card {
+    grid-template-columns: 11.5rem 1fr;
   }
 
   .lean-points.three {
