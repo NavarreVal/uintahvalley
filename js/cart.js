@@ -6,6 +6,23 @@
     return host === "uintahvalley.com" || host === "www.uintahvalley.com";
   }
 
+  function formatContactDetail(detail) {
+    if (!detail) return "";
+    if (typeof detail === "string") return detail;
+    var reason = detail.reason || detail.message || "";
+    if (!reason && detail.attempts && detail.attempts.length) {
+      var last = detail.attempts[detail.attempts.length - 1];
+      if (last && last.message) {
+        reason = "Resend " + last.status + ": " + last.message;
+      }
+    }
+    var hint = detail.hint || "";
+    var parts = [];
+    if (reason) parts.push(reason);
+    if (hint) parts.push(hint);
+    return parts.join(" ");
+  }
+
   function parseContactResponse(res) {
     return res.text().then(function (text) {
       var data = null;
@@ -19,10 +36,12 @@
         };
       }
       if (data && data.ok) return { ok: true, parsed: true };
+      var extra = formatContactDetail(data && data.detail);
       return {
         ok: false,
         parsed: true,
-        error: (data && data.error) || "Could not send that message. Write hello@uintahvalley.com."
+        error: ((data && data.error) || "Could not send that message. Write hello@uintahvalley.com.") +
+          (extra ? " " + extra : "")
       };
     });
   }

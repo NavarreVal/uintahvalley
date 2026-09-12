@@ -1,6 +1,7 @@
 const DEFAULT_TO = "hello@uintahvalley.com";
 const DEFAULT_FROM = "Uintah Valley <hello@uintahvalley.com>";
 const FALLBACK_FROM = "Uintah Valley <beth.t@example.com>";
+const FALLBACK_FROM_BARE = "beth.t@example.com";
 
 function allowedOrigin(origin) {
   if (!origin) return "";
@@ -80,34 +81,101 @@ async function readPayload(request) {
 function resendMessage(payload, raw) {
   if (payload && typeof payload.message === "string") return payload.message;
   if (payload && payload.error && typeof payload.error.message === "string") return payload.error.message;
-  if (typeof raw === "string" && raw) return raw.slice(0, 200);
+  if (payload && typeof payload.error === "string") return payload.error;
+  if (typeof raw === "string" && raw) return raw.slice(0, 240);
   return "";
 }
 
-function normalizeKey(value) {
-  let key = String(value || "").trim();
+function resendName(payload) {
+  if (payload && typeof payload.name === "string") return payload.name;
+  if (payload && payload.error && typeof payload.error.name === "string") return payload.error.name;
+  return "";
+}
+
+export function normalizeKey(value) {
+  let key = String(value == null ? "" : value);
+  key = key.replace(/^\uFEFF/, "");
+  key = key.replace(/[\u200B-\u200D\uFEFF]/g, "");
+  key = key.trim();
   if (
     (key.charAt(0) === '"' && key.charAt(key.length - 1) === '"') ||
     (key.charAt(0) === "'" && key.charAt(key.length - 1) === "'")
   ) {
     key = key.slice(1, -1).trim();
   }
-  if (key.toLowerCase().indexOf("bearer ") === 0) {
-    key = key.slice(7).trim();
+  if (/^bearer\s+/i.test(key)) {
+    key = key.replace(/^bearer\s+/i, "").trim();
   }
-  return key;
+  return key.replace(/[\r\n\t]+/g, "").trim();
 }
 
-function fromCandidates(preferred) {
+function keyMeta(key) {
+  return {
+    present: !!key,
+    length: key ? key.length : 0,
+    prefix: key ? key.slice(0, 3) : ""
+  };
+}
+
+function toHost(address) {
+  const match = String(address || "").match(/@([^>\s]+)/);
+  return match ? match[1] : "";
+}
+
+export function fromCandidates(preferred) {
   const seen = {};
   const list = [];
-  [preferred, FALLBACK_FROM].forEach(function (from) {
+  [preferred, FALLBACK_FROM, FALLBACK_FROM_BARE].forEach(function (from) {
     if (from && !seen[from]) {
       seen[from] = true;
       list.push(from);
     }
   });
   return list;
+}
+
+function debugHint(attempts, to) {
+  const blob = attempts.map(function (item) {
+    return String(item.message || "") + " " + String(item.name || "");
+  }).join(" ").toLowerCase();
+  if (blob.indexOf("not verified") !== -1 || blob.indexOf("domain") !== -1) {
+    return "Verify uintahvalley.com in Resend, or leave EMAIL_FROM unset so the Function retries beth.t@example.com.";
+  }
+  if (blob.indexOf("testing") !== -1 || blob.indexOf("own email") !== -1) {
+    return "beth.t@example.com can only send to the Resend account inbox until uintahvalley.com is verified. Set EMAIL_TO to that inbox, or verify the domain and send from hello@.";
+  }
+  if (blob.indexOf("api key") !== -1 || blob.indexOf("unauthorized") !== -1) {
+    return "RESEND_API_KEY on this Pages environment is missing, quoted, or not the live key. Re-paste it on Production and retry the deployment.";
+  }
+  if (!attempts.length) {
+    return "Function reached Resend with no usable response. Confirm Production RESEND_API_KEY and retry the deployment.";
+  }
+  if (toHost(to) === "uintahvalley.com") {
+    return "Resend rejected the send. If the domain is unverified, set EMAIL_TO to the Resend account email or verify uintahvalley.com.";
+  }
+  return "";
+}
+
+function buildDebugDetail(key, to, from, attempts, extra) {
+  const last = attempts && attempts.length ? attempts[attempts.length - 1] : null;
+  const detail = {
+    key: keyMeta(key),
+    toHost: toHost(to),
+    from: from || "",
+    attempts: (attempts || []).map(function (item) {
+      return {
+        from: item.from,
+        status: item.status,
+        name: item.name || "",
+        message: item.message || ""
+      };
+    }),
+    reason: last && last.message ? last.message : (extra || "")
+  };
+  const hint = debugHint(attempts || [], to);
+  if (hint) detail.hint = hint;
+  if (extra && extra !== detail.reason) detail.extra = extra;
+  return detail;
 }
 
 async function sendResend(key, payload) {
@@ -129,6 +197,7 @@ async function sendResend(key, payload) {
   return {
     status: resend.status,
     id: body && body.id ? body.id : "",
+    name: resendName(body),
     message: resendMessage(body, raw)
   };
 }
@@ -271,6 +340,12 @@ async function handleContactPost(request, env, origin) {
 
   const key = normalizeKey(env.RESEND_API_KEY);
   if (!key) {
+    if (debugOn(env)) {
+      return fail(503, "Email is not configured yet.", origin, env, {
+        key: keyMeta(""),
+        hint: "RESEND_API_KEY is missing on this Pages environment (Production vs Preview). Add the secret and retry the deployment."
+      });
+    }
     return json(503, { ok: false, error: "Email is not configured yet." }, origin);
   }
 
@@ -278,8 +353,9 @@ async function handleContactPost(request, env, origin) {
   const from = String(env.EMAIL_FROM || DEFAULT_FROM).trim();
   const candidates = fromCandidates(from);
 
-  let inbound = { status: 0, id: "", message: "" };
+  let inbound = { status: 0, id: "", name: "", message: "" };
   let usedFrom = from;
+  const attempts = [];
   try {
     for (let i = 0; i < candidates.length; i++) {
       inbound = await sendResend(key, {
@@ -289,19 +365,30 @@ async function handleContactPost(request, env, origin) {
         subject: subject,
         text: text
       });
+      attempts.push({
+        from: candidates[i],
+        status: inbound.status,
+        name: inbound.name,
+        message: inbound.message
+      });
       if (inbound.id) {
         usedFrom = candidates[i];
         break;
       }
-      if (inbound.status === 401 || inbound.status === 403) break;
+      // Invalid API key will fail every from-address; stop. 403 can be an
+      // unverified-domain / testing-recipient restriction — try the next from.
+      if (inbound.status === 401) break;
     }
   } catch (err) {
+    const detail = debugOn(env)
+      ? buildDebugDetail(key, to, from, attempts, "fetch to api.resend.com failed")
+      : "";
     return fail(
       502,
       "Could not send that message. Try again or email hello@uintahvalley.com.",
       origin,
       env,
-      debugOn(env) ? "fetch failed" : ""
+      detail
     );
   }
 
@@ -323,8 +410,13 @@ async function handleContactPost(request, env, origin) {
     ? "Email is not configured correctly."
     : "Could not send that message. Try again or email hello@uintahvalley.com.";
 
-  return fail(502, error, origin, env, debugOn(env) ? {
-    status: inbound.status,
-    message: inbound.message
-  } : "");
+  const detail = debugOn(env) ? buildDebugDetail(key, to, from, attempts) : "";
+  if (debugOn(env)) {
+    try {
+      console.log("contact send failed", JSON.stringify(detail));
+    } catch (err) {
+      // ignore log failures
+    }
+  }
+  return fail(502, error, origin, env, detail);
 }
