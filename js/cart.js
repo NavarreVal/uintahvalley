@@ -29,24 +29,24 @@
     "dons-madagascar-dented-brick": {
       id: "dons-madagascar-dented-brick",
       name: "Madagascar Beans · Dented Brick Craft Rum",
-      size: "1 fl oz",
-      price: 16,
+      size: "4 oz",
+      price: 40,
       line: "dons-reserve",
       available: true
     },
     "dons-tahitian-barbarosi": {
       id: "dons-tahitian-barbarosi",
       name: "Tahitian Barbarosi Spiced Rum",
-      size: "1 fl oz",
-      price: 16,
+      size: "4 oz",
+      price: 40,
       line: "dons-reserve",
       available: true
     },
     "dons-tahiti-five-wives": {
       id: "dons-tahiti-five-wives",
       name: "Tahiti Beans · Five Wives Vodka",
-      size: "1 fl oz",
-      price: 16,
+      size: "4 oz",
+      price: 40,
       line: "dons-reserve",
       available: true
     }
@@ -278,6 +278,23 @@
     window.location.href = orderMailto(extra);
   });
 
+  function requestSummary() {
+    const cart = loadCart();
+    if (!cart.items.length) return "";
+    const lines = ["Request list:"];
+    cart.items.forEach(function (item) {
+      const product = PRODUCTS[item.id];
+      if (!product) return;
+      lines.push(
+        "- [" + lineLabel(product) + "] " + product.name + " · " + product.size +
+        " × " + item.qty +
+        "  (" + money(product.price) + " each, provisional)"
+      );
+    });
+    lines.push("Provisional subtotal: " + money(cartTotal(cart)));
+    return lines.join("\n");
+  }
+
   window.UVCart = {
     PRODUCTS: PRODUCTS,
     ORDER_EMAIL: ORDER_EMAIL,
@@ -285,6 +302,7 @@
     addItem: addItem,
     isAvailable: isAvailable,
     orderMailto: orderMailto,
+    requestSummary: requestSummary,
     updateCartCount: updateCartCount,
     renderCartPage: renderCartPage
   };
