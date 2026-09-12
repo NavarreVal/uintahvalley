@@ -1,5 +1,6 @@
 const DEFAULT_TO = "hello@uintahvalley.com";
 const DEFAULT_FROM = "Uintah Valley <hello@uintahvalley.com>";
+const FALLBACK_FROM = "Uintah Valley <beth.t@example.com>";
 
 function allowedOrigin(origin) {
   if (!origin) return "";
@@ -28,7 +29,13 @@ function corsHeaders(origin) {
 }
 
 function json(status, body, origin) {
-  return new Response(JSON.stringify(body), {
+  let payload = "{\"ok\":false,\"error\":\"Could not send that message. Try again or email hello@uintahvalley.com.\"}";
+  try {
+    payload = JSON.stringify(body);
+  } catch (err) {
+    status = status || 500;
+  }
+  return new Response(payload, {
     status: status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
@@ -75,6 +82,32 @@ function resendMessage(payload, raw) {
   if (payload && payload.error && typeof payload.error.message === "string") return payload.error.message;
   if (typeof raw === "string" && raw) return raw.slice(0, 200);
   return "";
+}
+
+function normalizeKey(value) {
+  let key = String(value || "").trim();
+  if (
+    (key.charAt(0) === '"' && key.charAt(key.length - 1) === '"') ||
+    (key.charAt(0) === "'" && key.charAt(key.length - 1) === "'")
+  ) {
+    key = key.slice(1, -1).trim();
+  }
+  if (key.toLowerCase().indexOf("bearer ") === 0) {
+    key = key.slice(7).trim();
+  }
+  return key;
+}
+
+function fromCandidates(preferred) {
+  const seen = {};
+  const list = [];
+  [preferred, FALLBACK_FROM].forEach(function (from) {
+    if (from && !seen[from]) {
+      seen[from] = true;
+      list.push(from);
+    }
+  });
+  return list;
 }
 
 async function sendResend(key, payload) {
@@ -163,18 +196,45 @@ export function onRequestOptions(context) {
   }
 }
 
+function requestOrigin(request) {
+  try {
+    return request && request.headers ? request.headers.get("Origin") || "" : "";
+  } catch (err) {
+    return "";
+  }
+}
+
 export async function onRequestPost(context) {
   let origin = "";
   let env = {};
   try {
     const request = context && context.request;
     env = (context && context.env) || {};
-    try {
-      origin = request && request.headers ? request.headers.get("Origin") || "" : "";
-    } catch (err) {
-      origin = "";
-    }
+    origin = requestOrigin(request);
     return await handleContactPost(request, env, origin);
+  } catch (err) {
+    return fail(
+      500,
+      "Could not send that message. Try again or email hello@uintahvalley.com.",
+      origin,
+      env,
+      debugOn(env) ? String(err && err.message ? err.message : err) : ""
+    );
+  }
+}
+
+// Pages-compatible catch-all so GET/HEAD/etc. still return JSON, never a bare 502.
+export async function onRequest(context) {
+  let origin = "";
+  let env = {};
+  try {
+    const request = context && context.request;
+    env = (context && context.env) || {};
+    origin = requestOrigin(request);
+    const method = request && request.method ? String(request.method).toUpperCase() : "";
+    if (method === "OPTIONS") return onRequestOptions(context);
+    if (method === "POST") return await onRequestPost(context);
+    return json(405, { ok: false, error: "Method not allowed." }, origin);
   } catch (err) {
     return fail(
       500,
@@ -209,23 +269,32 @@ async function handleContactPost(request, env, origin) {
   }
   const { name, email, notes, requestList, subject, text } = prepared;
 
-  const key = env.RESEND_API_KEY;
+  const key = normalizeKey(env.RESEND_API_KEY);
   if (!key) {
     return json(503, { ok: false, error: "Email is not configured yet." }, origin);
   }
 
   const to = String(env.EMAIL_TO || DEFAULT_TO).trim();
   const from = String(env.EMAIL_FROM || DEFAULT_FROM).trim();
+  const candidates = fromCandidates(from);
 
-  let inbound;
+  let inbound = { status: 0, id: "", message: "" };
+  let usedFrom = from;
   try {
-    inbound = await sendResend(key, {
-      from: from,
-      to: [to],
-      reply_to: [email],
-      subject: subject,
-      text: text
-    });
+    for (let i = 0; i < candidates.length; i++) {
+      inbound = await sendResend(key, {
+        from: candidates[i],
+        to: [to],
+        reply_to: email,
+        subject: subject,
+        text: text
+      });
+      if (inbound.id) {
+        usedFrom = candidates[i];
+        break;
+      }
+      if (inbound.status === 401 || inbound.status === 403) break;
+    }
   } catch (err) {
     return fail(
       502,
@@ -239,7 +308,7 @@ async function handleContactPost(request, env, origin) {
   if (inbound.id) {
     try {
       await sendResend(key, {
-        from: from,
+        from: usedFrom,
         to: [email],
         subject: "We got your message — Uintah Valley",
         text: confirmationText(name, notes, requestList)

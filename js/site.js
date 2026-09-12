@@ -122,36 +122,39 @@
       if (button) button.disabled = true;
       setStatus("", "Sending…");
 
-      fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          notes: notes,
-          company: company,
-          requestList: requestList
-        })
-      }).then(function (res) {
-        return res.text().then(function (text) {
-          var data = null;
-          try {
-            data = text ? JSON.parse(text) : null;
-          } catch (err) {
+      const payload = {
+        name: name,
+        email: email,
+        notes: notes,
+        company: company,
+        requestList: requestList
+      };
+      const send = window.UVContact && typeof window.UVContact.post === "function"
+        ? window.UVContact.post(payload)
+        : fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }).then(function (res) {
+          return res.text().then(function (text) {
+            var data = null;
+            try {
+              data = text ? JSON.parse(text) : null;
+            } catch (err) {
+              return {
+                ok: false,
+                error: "The server returned an unexpected response. Write hello@uintahvalley.com."
+              };
+            }
+            if (data && data.ok) return { ok: true };
             return {
               ok: false,
-              error: "The server returned an unexpected response. Write hello@uintahvalley.com."
+              error: (data && data.error) || "Could not send that message. Write hello@uintahvalley.com."
             };
-          }
-          if (data && data.ok) {
-            return { ok: true };
-          }
-          return {
-            ok: false,
-            error: (data && data.error) || "Could not send that message. Write hello@uintahvalley.com."
-          };
+          });
         });
-      }).then(function (result) {
+
+      send.then(function (result) {
         if (result.ok) {
           contactForm.reset();
           setStatus("ok", "Message sent. We will reply by email.");

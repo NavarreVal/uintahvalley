@@ -74,7 +74,7 @@ Open [http://localhost:8080](http://localhost:8080). Confirm the mountain photo 
 
 `404.html` is the not-found page. `_redirects` and `_headers` stay in the project root.
 
-Contact form secrets: see `CONTACT_FORM.md`. Set `RESEND_API_KEY` (and optional `EMAIL_FROM` / `EMAIL_TO`) in Cloudflare Pages for Production and Preview.
+Contact form secrets: see `CONTACT_FORM.md`. **`RESEND_API_KEY` must exist on Production** (and Preview). Optional: `EMAIL_FROM` / `EMAIL_TO`. Tests: `node --test tests/contact.test.mjs`.
 
 ## Footer
 
