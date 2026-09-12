@@ -548,6 +548,45 @@ h3,
   gap: 2rem;
 }
 
+.residents-note {
+  margin: 1.5rem 0 0;
+  padding: 1rem 1.2rem;
+  background: var(--cream);
+  border: 2px solid var(--forest);
+  color: var(--forest-deep);
+  font-weight: 700;
+  font-size: 1.12rem;
+  line-height: 1.35;
+}
+
+.founder-card {
+  display: grid;
+  gap: 1.25rem;
+  align-items: center;
+  max-width: 36rem;
+}
+
+.founder-card img {
+  width: min(100%, 11.5rem);
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: center 15%;
+  background: #d8d4cc;
+}
+
+.founder-card h2 {
+  margin: 0;
+}
+
+.founder-role {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .note-card,
 .card {
   padding: 1.25rem 1.35rem;
