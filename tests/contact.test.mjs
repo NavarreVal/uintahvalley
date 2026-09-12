@@ -161,3 +161,48 @@ test("Resend fetch throw still returns JSON", async function () {
     globalThis.fetch = original;
   }
 });
+
+test("unverified custom from retries beth.t@example.com and returns ok", async function () {
+  const original = globalThis.fetch;
+  const froms = [];
+  globalThis.fetch = async function (url, opts) {
+    const payload = JSON.parse(opts.body);
+    froms.push(payload.from);
+    if (String(payload.from).includes("hello@uintahvalley.com")) {
+      return new Response(JSON.stringify({ message: "The uintahvalley.com domain is not verified." }), { status: 422 });
+    }
+    return new Response(JSON.stringify({ id: "email_fallback" }), { status: 200 });
+  };
+  try {
+    const res = await onRequestPost(postContext({
+      email: "guest@example.com",
+      notes: "Hello"
+    }, { RESEND_API_KEY: "re_test" }));
+    assert.equal(res.status, 200);
+    const data = await readJson(res);
+    assert.equal(data.ok, true);
+    assert.equal(froms[0].includes("hello@uintahvalley.com"), true);
+    assert.equal(froms.some(function (from) { return from.includes("beth.t@example.com"); }), true);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("trims Bearer prefix and whitespace on RESEND_API_KEY", async function () {
+  const original = globalThis.fetch;
+  let auth = "";
+  globalThis.fetch = async function (url, opts) {
+    auth = opts.headers.Authorization;
+    return new Response(JSON.stringify({ id: "email_123" }), { status: 200 });
+  };
+  try {
+    const res = await onRequestPost(postContext({
+      email: "guest@example.com",
+      notes: "Hello"
+    }, { RESEND_API_KEY: "  Bearer re_test  " }));
+    assert.equal(res.status, 200);
+    assert.equal(auth, "Bearer re_test");
+  } finally {
+    globalThis.fetch = original;
+  }
+});

@@ -1,4 +1,56 @@
 (function () {
+  const PAGES_CONTACT = "https://uintahvalley.pages.dev/api/contact";
+
+  function isCustomDomain() {
+    const host = location.hostname;
+    return host === "uintahvalley.com" || host === "www.uintahvalley.com";
+  }
+
+  function parseContactResponse(res) {
+    return res.text().then(function (text) {
+      var data = null;
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch (err) {
+        return {
+          ok: false,
+          parsed: false,
+          error: "The server returned an unexpected response. Write hello@uintahvalley.com."
+        };
+      }
+      if (data && data.ok) return { ok: true, parsed: true };
+      return {
+        ok: false,
+        parsed: true,
+        error: (data && data.error) || "Could not send that message. Write hello@uintahvalley.com."
+      };
+    });
+  }
+
+  function postContact(payload) {
+    const body = JSON.stringify(payload);
+    const headers = { "Content-Type": "application/json" };
+    return fetch("/api/contact", { method: "POST", headers: headers, body: body })
+      .then(parseContactResponse)
+      .catch(function () {
+        return {
+          ok: false,
+          parsed: false,
+          error: "The server returned an unexpected response. Write hello@uintahvalley.com."
+        };
+      })
+      .then(function (result) {
+        if (result.ok || result.parsed || !isCustomDomain()) return result;
+        return fetch(PAGES_CONTACT, { method: "POST", headers: headers, body: body })
+          .then(parseContactResponse)
+          .catch(function () {
+            return result;
+          });
+      });
+  }
+
+  window.UVContact = { post: postContact };
+
   const STORAGE_KEY = "uintahvalley-cart-v1";
   const DEFAULT_REQUEST_NOTES = "Please review my request list.";
   const PRODUCTS = {
@@ -329,8 +381,17 @@
     });
   });
 
+  function requestSendSucceeded() {
+    return !!(requestStatus && !requestStatus.hidden && requestStatus.classList.contains("is-ok"));
+  }
+
   if (requestOverlay) {
     requestOverlay.addEventListener("keydown", trapRequestFocus);
+    requestOverlay.addEventListener("click", function (event) {
+      if (event.target !== requestOverlay) return;
+      if (!requestSendSucceeded()) return;
+      closeRequestModal();
+    });
   }
 
   if (requestForm) {
@@ -357,34 +418,11 @@
       if (requestSubmit) requestSubmit.disabled = true;
       setRequestStatus("", "Sending…");
 
-      fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email.trim(),
-          notes: notes,
-          company: company,
-          requestList: requestList
-        })
-      }).then(function (res) {
-        return res.text().then(function (text) {
-          var data = null;
-          try {
-            data = text ? JSON.parse(text) : null;
-          } catch (err) {
-            return {
-              ok: false,
-              error: "The server returned an unexpected response. Write hello@uintahvalley.com."
-            };
-          }
-          if (data && data.ok) {
-            return { ok: true };
-          }
-          return {
-            ok: false,
-            error: (data && data.error) || "Could not send that request. Write hello@uintahvalley.com."
-          };
-        });
+      postContact({
+        email: email.trim(),
+        notes: notes,
+        company: company,
+        requestList: requestList
       }).then(function (result) {
         if (result.ok) {
           requestForm.reset();
