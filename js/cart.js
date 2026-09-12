@@ -364,7 +364,7 @@
   function openRequestModal() {
     if (!requestOverlay) return;
     if (!cartHasItems()) {
-      showToast("Add Don's Reserve items to your list first.");
+      showToast("Add items to your list first.");
       syncRequestMailButton();
       return;
     }
@@ -431,7 +431,7 @@
       event.preventDefault();
       const requestList = requestSummary();
       if (!requestList) {
-        setRequestStatus("error", "Add Don's Reserve items to your list first.");
+        setRequestStatus("error", "Add items to your list first.");
         syncRequestMailButton();
         return;
       }
