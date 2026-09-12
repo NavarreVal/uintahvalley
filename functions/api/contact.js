@@ -77,6 +77,46 @@ function resendMessage(payload, raw) {
   return "";
 }
 
+async function sendResend(key, payload) {
+  const resend = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + key,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  const raw = await resend.text();
+  let body = null;
+  try {
+    body = raw ? JSON.parse(raw) : null;
+  } catch (err) {
+    body = null;
+  }
+  return {
+    status: resend.status,
+    id: body && body.id ? body.id : "",
+    message: resendMessage(body, raw)
+  };
+}
+
+function confirmationText(name, notes) {
+  const who = name || "there";
+  const echo = notes.length > 280 ? notes.slice(0, 277) + "…" : notes;
+  return [
+    "Hi " + who + ",",
+    "",
+    "We got your message. Thanks for writing Uintah Valley — we will reply by email.",
+    "Currently we can only sell to Utah residents.",
+    "",
+    "Your message:",
+    echo,
+    "",
+    "Uintah Valley",
+    "hello@uintahvalley.com"
+  ].join("\n");
+}
+
 export function onRequestOptions(context) {
   try {
     const request = context && context.request;
@@ -158,21 +198,14 @@ async function handleContactPost(request, env, origin) {
     requestList ? "\n" + requestList : ""
   ].filter(Boolean).join("\n");
 
-  let resend;
+  let inbound;
   try {
-    resend = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + key,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        from: from,
-        to: [to],
-        reply_to: [email],
-        subject: subject,
-        text: text
-      })
+    inbound = await sendResend(key, {
+      from: from,
+      to: [to],
+      reply_to: [email],
+      subject: subject,
+      text: text
     });
   } catch (err) {
     return fail(
@@ -184,25 +217,26 @@ async function handleContactPost(request, env, origin) {
     );
   }
 
-  const raw = await resend.text();
-  let payload = null;
-  try {
-    payload = raw ? JSON.parse(raw) : null;
-  } catch (err) {
-    payload = null;
-  }
-
-  if (payload && payload.id) {
+  if (inbound.id) {
+    try {
+      await sendResend(key, {
+        from: from,
+        to: [email],
+        subject: "We got your message — Uintah Valley",
+        text: confirmationText(name, notes)
+      });
+    } catch (err) {
+      // Primary mail already went out; do not fail the form.
+    }
     return json(200, { ok: true }, origin);
   }
 
-  const status = resend.status;
-  const error = status === 401 || status === 403
+  const error = inbound.status === 401 || inbound.status === 403
     ? "Email is not configured correctly."
     : "Could not send that message. Try again or email hello@uintahvalley.com.";
 
   return fail(502, error, origin, env, debugOn(env) ? {
-    status: status,
-    message: resendMessage(payload, raw)
+    status: inbound.status,
+    message: inbound.message
   } : "");
 }
