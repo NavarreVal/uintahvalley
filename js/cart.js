@@ -4,58 +4,50 @@
   const PRODUCTS = {
     "vanilla-1oz": {
       id: "vanilla-1oz",
-      name: "Uintah Valley Pure Vanilla Extract",
+      name: "Pure Vanilla Extract",
       size: "1 fl oz",
       price: 12,
       line: "mainline",
       available: false
     },
-    "vanilla-2oz": {
-      id: "vanilla-2oz",
-      name: "Uintah Valley Pure Vanilla Extract",
-      size: "2 oz",
-      price: 18,
+    "vanilla-3oz": {
+      id: "vanilla-3oz",
+      name: "Pure Vanilla Extract",
+      size: "3 fl oz",
+      price: 32,
       line: "mainline",
       available: false
     },
-    "vanilla-6oz": {
-      id: "vanilla-6oz",
-      name: "Uintah Valley Pure Vanilla Extract",
-      size: "6 oz",
-      price: 42,
+    "gift-box": {
+      id: "gift-box",
+      name: "Uintah Valley Gift Box",
+      size: "Gift set",
+      price: 40,
       line: "mainline",
       available: false
     },
-    "exp-double-fold": {
-      id: "exp-double-fold",
-      name: "Double-Fold Madagascar",
-      size: "1 fl oz",
-      price: 16,
-      line: "experimental",
+    "dons-madagascar-dented-brick": {
+      id: "dons-madagascar-dented-brick",
+      name: "Madagascar Beans · Dented Brick Craft Rum",
+      size: "4 oz",
+      price: 40,
+      line: "dons-reserve",
       available: true
     },
-    "exp-mexican": {
-      id: "exp-mexican",
-      name: "Mexican Vanilla Trial",
-      size: "1 fl oz",
-      price: 14,
-      line: "experimental",
+    "dons-tahitian-barbarosi": {
+      id: "dons-tahitian-barbarosi",
+      name: "Tahitian Barbarosi Spiced Rum",
+      size: "4 oz",
+      price: 40,
+      line: "dons-reserve",
       available: true
     },
-    "exp-barrel": {
-      id: "exp-barrel",
-      name: "Bourbon-Barrel Rested",
-      size: "1 fl oz",
-      price: 18,
-      line: "experimental",
-      available: true
-    },
-    "exp-paste": {
-      id: "exp-paste",
-      name: "Vanilla Bean Paste (trial)",
-      size: "4 oz jar",
-      price: 22,
-      line: "experimental",
+    "dons-tahiti-five-wives": {
+      id: "dons-tahiti-five-wives",
+      name: "Tahiti Beans · Five Wives Vodka",
+      size: "4 oz",
+      price: 40,
+      line: "dons-reserve",
       available: true
     }
   };
@@ -102,7 +94,7 @@
   }
 
   function lineLabel(product) {
-    return product.line === "experimental" ? "Experimental" : "Mainline";
+    return product.line === "dons-reserve" ? "Don's Reserve" : "Uintah Valley";
   }
 
   function addItem(id, qty) {
@@ -171,7 +163,7 @@
     const lines = [
       "Hello Uintah Valley,",
       "",
-      "I would like to request the following Experimental batch items:",
+      "I would like to request the following Don's Reserve items:",
       ""
     ];
 
@@ -198,11 +190,12 @@
       lines.push("Notes: " + extra.notes);
     }
     lines.push("");
-    lines.push("I understand these are Experimental batches (not the mainline recipe).");
+    lines.push("I understand these are Don's Reserve batches (not the mainline recipe).");
     lines.push("I understand prices are provisional and there is no online payment yet.");
+    lines.push("I understand you can currently sell only to Utah residents.");
     lines.push("Please reply with availability and how to complete this order.");
 
-    const subject = encodeURIComponent("Experimental vanilla order request");
+    const subject = encodeURIComponent("Don's Reserve order request");
     const body = encodeURIComponent(lines.join("\n"));
     return "mailto:" + ORDER_EMAIL + "?subject=" + subject + "&body=" + body;
   }
@@ -216,8 +209,11 @@
       root.innerHTML =
         '<div class="empty-cart">' +
         "<p>Your request list is empty.</p>" +
-        '<p><a class="btn btn-primary" href="experimental.html">Browse Experimental batches</a></p>' +
+        '<p><a class="btn btn-primary" href="shop.html#dons-reserve">Browse Don\'s Reserve</a></p>' +
         "</div>";
+      document.querySelectorAll("[data-order-mail]").forEach(function (link) {
+        link.setAttribute("href", orderMailto());
+      });
       return;
     }
 
@@ -227,7 +223,7 @@
       return (
         "<tr>" +
         "<td>" + product.name +
-        "<div class='fine'><span class='pill pill-exp'>Experimental</span> " + product.size + "</div></td>" +
+        "<div class='fine'><span class='pill'>Don's Reserve</span> " + product.size + "</div></td>" +
         "<td>" + money(product.price) + "</td>" +
         "<td><input data-qty='" + product.id + "' type='number' min='1' max='24' value='" + item.qty + "' aria-label='Quantity for " + product.name + "'></td>" +
         "<td>" + money(product.price * item.qty) + "</td>" +
@@ -265,7 +261,7 @@
     event.preventDefault();
     if (addBtn.disabled || addBtn.getAttribute("aria-disabled") === "true") return;
     const id = addBtn.getAttribute("data-add");
-    const scope = addBtn.closest(".product-buy, .card, form") || document;
+    const scope = addBtn.closest(".product-buy, .product-card, .card, form") || document;
     const qtyField = scope.querySelector("[data-add-qty]");
     addItem(id, qtyField ? qtyField.value : 1);
   });
@@ -277,10 +273,27 @@
     const extra = {
       name: (form.querySelector("[name='name']") || {}).value || "",
       email: (form.querySelector("[name='email']") || {}).value || "",
-      notes: (form.querySelector("[name='notes']") || {}).value || ""
+      notes: (form.querySelector("[name='notes']") || form.querySelector("[name='body']") || {}).value || ""
     };
     window.location.href = orderMailto(extra);
   });
+
+  function requestSummary() {
+    const cart = loadCart();
+    if (!cart.items.length) return "";
+    const lines = ["Request list:"];
+    cart.items.forEach(function (item) {
+      const product = PRODUCTS[item.id];
+      if (!product) return;
+      lines.push(
+        "- [" + lineLabel(product) + "] " + product.name + " · " + product.size +
+        " × " + item.qty +
+        "  (" + money(product.price) + " each, provisional)"
+      );
+    });
+    lines.push("Provisional subtotal: " + money(cartTotal(cart)));
+    return lines.join("\n");
+  }
 
   window.UVCart = {
     PRODUCTS: PRODUCTS,
@@ -289,6 +302,7 @@
     addItem: addItem,
     isAvailable: isAvailable,
     orderMailto: orderMailto,
+    requestSummary: requestSummary,
     updateCartCount: updateCartCount,
     renderCartPage: renderCartPage
   };

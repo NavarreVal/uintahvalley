@@ -1,2 +1,8 @@
+# Old storefront paths → rebuild IA. Production cutover happens later.
+/experimental.html    /shop.html      302
+/experimental         /shop.html      302
+/product.html         /shop.html      302
+/product              /shop.html      302
+
 # Cloudflare Pages: serve the real 404 page for unknown paths.
 /*    /404.html   404
