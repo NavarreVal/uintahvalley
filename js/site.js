@@ -110,6 +110,15 @@
         ? window.UVCart.requestSummary()
         : "";
 
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        setStatus("error", "Please enter a valid email.");
+        return;
+      }
+      if (!notes.trim()) {
+        setStatus("error", "Please write a short message.");
+        return;
+      }
+
       if (button) button.disabled = true;
       setStatus("", "Sending…");
 
