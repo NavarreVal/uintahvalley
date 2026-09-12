@@ -133,10 +133,23 @@
           requestList: requestList
         })
       }).then(function (res) {
-        return res.json().then(function (data) {
-          return { ok: res.ok && data && data.ok, error: data && data.error };
-        }).catch(function () {
-          return { ok: false, error: "" };
+        return res.text().then(function (text) {
+          var data = null;
+          try {
+            data = text ? JSON.parse(text) : null;
+          } catch (err) {
+            return {
+              ok: false,
+              error: "The server returned an unexpected response. Write hello@uintahvalley.com."
+            };
+          }
+          if (data && data.ok) {
+            return { ok: true };
+          }
+          return {
+            ok: false,
+            error: (data && data.error) || "Could not send that message. Write hello@uintahvalley.com."
+          };
         });
       }).then(function (result) {
         if (result.ok) {
