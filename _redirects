@@ -1,4 +1,4 @@
-# Old storefront paths → rebuild IA. Production cutover happens later.
+# Old Experimental / product bookmarks → Shop.
 # Do not add a /* splat here — it can intercept POST /api/contact on the
 # custom domain (Pages still serves 404.html for unknown static paths).
 /experimental.html    /shop.html      302

@@ -23,9 +23,11 @@ Code cannot finish the send if Resend has not verified the domain:
 | Name | Type | Production | Preview | Value |
 | --- | --- | --- | --- | --- |
 | `RESEND_API_KEY` | Secret | **Required** | Required to send from preview | From Resend |
-| `EMAIL_TO` | Plain (optional) | Optional | Optional | `hello@uintahvalley.com` |
+| `EMAIL_TO` | Plain (optional) | Optional | Optional | `hello@uintahvalley.com` (bare address only — never `To: …`) |
 | `EMAIL_FROM` | Plain (optional) | Optional | Optional | `Uintah Valley <hello@uintahvalley.com>` |
 | `CONTACT_DEBUG` | Plain (optional) | Leave unset | Optional | `1` to include a non-sensitive Resend status/message in JSON errors |
+
+`EMAIL_TO` must be a **bare address** (`hello@uintahvalley.com`). Never set it to `To: hello@uintahvalley.com` — Resend rejects a `To:` prefix.
 
 `EMAIL_FROM` must use a domain verified in Resend. Do not commit API keys.
 
