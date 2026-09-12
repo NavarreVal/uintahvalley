@@ -80,5 +80,10 @@
         showFilter(btn.getAttribute("data-filter"));
       });
     });
+
+    const hash = (location.hash || "").replace("#", "");
+    if (hash === "dons-reserve" || hash === "mainline") {
+      showFilter(hash);
+    }
   }
 })();

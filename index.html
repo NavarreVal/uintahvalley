@@ -39,6 +39,7 @@
         <a href="shop.html">Shop</a>
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
+        <a class="cart-link" href="cart.html">Request list <span class="cart-count" data-cart-count>0</span></a>
       </nav>
     </div>
   </header>
@@ -79,18 +80,21 @@
               <h3>Pure Vanilla Extract - 1 fl oz</h3>
               <p>Made with Madagascar Vanilla beans and Utah distilled extractives.</p>
               <span class="sold-note">Sold out indefinitely</span>
+              <button class="btn" type="button" disabled aria-disabled="true">Unavailable</button>
             </article>
             <article class="product-card">
               <img class="product-photo" src="assets/product-mainline-3oz.jpg" width="1200" height="1395" alt="Three 1 fl oz bottles of Uintah Valley Pure Vanilla Extract">
               <h3>Pure Vanilla Extract - 3 fl oz</h3>
               <p>Three of our 1oz bottles. Made with Madagascar Vanilla beans and Utah distilled extractives.</p>
               <span class="sold-note">Sold out indefinitely</span>
+              <button class="btn" type="button" disabled aria-disabled="true">Unavailable</button>
             </article>
             <article class="product-card">
               <div class="placeholder-frame" role="img" aria-label="Gift box placeholder">Gift box</div>
               <h3>Uintah Valley Gift Box</h3>
               <p>Gift box, you pick what goes in! Made with Madagascar Vanilla beans and Utah distilled extractives. Handcrafted gift box.</p>
               <span class="sold-note">Sold out indefinitely</span>
+              <button class="btn" type="button" disabled aria-disabled="true">Unavailable</button>
             </article>
           </div>
         </div>
@@ -102,16 +106,22 @@
               <img class="product-photo" src="assets/product-dons-madagascar-dented-brick.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Madagascar Beans, Dented Brick Craft Rum">
               <h3>Madagascar Beans · Dented Brick Craft Rum</h3>
               <p>All Natural. Don's Reserve collaboration — Madagascar beans in Dented Brick craft rum.</p>
+              <p class="price">$16 <span class="provisional">Provisional</span></p>
+              <button class="btn btn-primary" type="button" data-add="dons-madagascar-dented-brick">Add to request</button>
             </article>
             <article class="product-card">
               <img class="product-photo" src="assets/product-dons-tahitian-barbarosi.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Tahitian Barbarosi Spiced Rum">
               <h3>Tahitian Barbarosi Spiced Rum</h3>
               <p>All Natural. Don's Reserve collaboration — Tahitian vanilla in Barbarosi spiced rum.</p>
+              <p class="price">$16 <span class="provisional">Provisional</span></p>
+              <button class="btn btn-primary" type="button" data-add="dons-tahitian-barbarosi">Add to request</button>
             </article>
             <article class="product-card">
               <img class="product-photo" src="assets/product-dons-tahiti-five-wives.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Tahiti Beans, Five Wives Vodka">
               <h3>Tahiti Beans · Five Wives Vodka</h3>
               <p>All Natural. Don's Reserve collaboration — Tahiti beans in Five Wives vodka.</p>
+              <p class="price">$16 <span class="provisional">Provisional</span></p>
+              <button class="btn btn-primary" type="button" data-add="dons-tahiti-five-wives">Add to request</button>
             </article>
           </div>
         </div>
@@ -149,7 +159,7 @@
         </div>
       </div>
       <div>
-        <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a></div>
+        <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
         <p>Orders: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a></p>
       </div>
     </div>
@@ -159,6 +169,7 @@
       <p class="footer-credit">Built by <a href="https://navarreval.com/">Navarre</a> and The <a href="https://x.ai/bot">Grok Bot</a> crew of the SS Argus - Gad Kyrath XO</p>
     </div>
   </footer>
+  <script src="js/cart.js"></script>
   <script src="js/site.js"></script>
 </body>
 </html>

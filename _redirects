@@ -3,8 +3,6 @@
 /experimental         /shop.html      302
 /product.html         /shop.html      302
 /product              /shop.html      302
-/cart.html            /contact.html   302
-/cart                 /contact.html   302
 
 # Cloudflare Pages: serve the real 404 page for unknown paths.
 /*    /404.html   404

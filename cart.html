@@ -3,9 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Page not found | Uintah Valley</title>
-  <meta name="description" content="That page is not on the Uintah Valley site.">
-  <meta name="robots" content="noindex">
+  <title>Request list | Uintah Valley</title>
+  <meta name="description" content="Review your Uintah Valley request list and email an order summary. No online payment.">
+  <meta property="og:title" content="Request list — Uintah Valley">
+  <meta property="og:description" content="Local request list plus mailto order summary for Uintah Valley LLC.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://uintahvalley.com/cart.html">
+  <meta property="og:image" content="https://uintahvalley.com/assets/logo-square.png">
   <meta name="theme-color" content="#144916">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/logo-square.png">
@@ -34,21 +38,28 @@
         <a href="shop.html">Shop</a>
         <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
-        <a class="cart-link" href="cart.html">Request list <span class="cart-count" data-cart-count>0</span></a>
+        <a class="cart-link" href="cart.html" aria-current="page">Request list <span class="cart-count" data-cart-count>0</span></a>
       </nav>
     </div>
   </header>
 
   <main id="main" class="wrap">
     <header class="page-hero">
-      <p class="eyebrow">404</p>
-      <h1>This trail peters out.</h1>
-      <p class="lede">That address is not a page on uintahvalley.com. Home, shop, about, and contact are still here.</p>
-      <div class="actions">
-        <a class="btn btn-primary" href="index.html">Back home</a>
-        <a class="btn" href="shop.html">See the shop</a>
-      </div>
+      <p class="crumbs"><a href="index.html">Home</a> / Request list</p>
+      <p class="eyebrow">No checkout yet</p>
+      <h1>Your request list</h1>
+      <p class="lede">Stored only in this browser. Don's Reserve items only — mainline extract cannot sit in this list. Send the summary by email and we will reply with availability, a confirmed total, and how to pay.</p>
     </header>
+
+    <section class="section" style="padding-top:1rem">
+      <p class="residents-note" role="note">Currently we can only sell to Utah residents</p>
+      <div data-cart-root></div>
+      <p class="note" style="margin-top:1rem">Prices are provisional. Sending a request is not a paid order.</p>
+      <div class="actions" style="margin-top:1rem">
+        <a class="btn btn-forest" data-order-mail href="mailto:hello@uintahvalley.com">Email this request</a>
+        <a class="btn" href="shop.html#dons-reserve">Keep browsing Don's Reserve</a>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -62,10 +73,12 @@
       </div>
       <div>
         <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
+        <p>Orders: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a></p>
       </div>
     </div>
     <div class="wrap legal">
-      <p>© <span data-year>2026</span> Uintah Valley LLC</p>
+      <p>Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol.</p>
+      <p>© <span data-year>2026</span> Uintah Valley LLC. Prices shown are provisional until confirmed in reply.</p>
       <p class="footer-credit">Built by <a href="https://navarreval.com/">Navarre</a> and The <a href="https://x.ai/bot">Grok Bot</a> crew of the SS Argus - Gad Kyrath XO</p>
     </div>
   </footer>

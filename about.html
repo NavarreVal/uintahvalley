@@ -38,6 +38,7 @@
         <a href="shop.html">Shop</a>
         <a href="about.html" aria-current="page">About</a>
         <a href="contact.html">Contact</a>
+        <a class="cart-link" href="cart.html">Request list <span class="cart-count" data-cart-count>0</span></a>
       </nav>
     </div>
   </header>
@@ -66,12 +67,22 @@
       </div>
     </section>
 
-    <section class="section founder" aria-labelledby="founder-name">
-      <div class="founder-card">
-        <img src="assets/about-founder-navarre.jpg" width="1080" height="1223" alt="Navarre Valdivieso">
-        <div>
-          <h2 id="founder-name">Navarre Valdivieso</h2>
-          <p class="founder-role">Founder and operator</p>
+    <section class="section team" aria-labelledby="team-heading">
+      <h2 id="team-heading" class="team-heading">Team</h2>
+      <div class="team-grid">
+        <div class="founder-card">
+          <img src="assets/about-founder-navarre.jpg" width="1080" height="1223" alt="Navarre Valdivieso">
+          <div>
+            <h3>Navarre Valdivieso</h3>
+            <p class="founder-role">Founder and operator</p>
+          </div>
+        </div>
+        <div class="founder-card">
+          <img src="assets/about-don-thornton.jpg" width="1080" height="1223" alt="Don Thornton Jr.">
+          <div>
+            <h3>Don Thornton Jr.</h3>
+            <p class="founder-role">Research &amp; Development</p>
+          </div>
         </div>
       </div>
     </section>
@@ -87,7 +98,7 @@
         </div>
       </div>
       <div>
-        <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a></div>
+        <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
         <p>Orders: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a></p>
       </div>
     </div>
@@ -97,6 +108,7 @@
       <p class="footer-credit">Built by <a href="https://navarreval.com/">Navarre</a> and The <a href="https://x.ai/bot">Grok Bot</a> crew of the SS Argus - Gad Kyrath XO</p>
     </div>
   </footer>
+  <script src="js/cart.js"></script>
   <script src="js/site.js"></script>
 </body>
 </html>
