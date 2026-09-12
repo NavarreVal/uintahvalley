@@ -18,7 +18,7 @@ Nav is only **Home / Shop / About / Contact**.
 | File | Purpose |
 | --- | --- |
 | `index.html` | Full-bleed mountain hero behind the header, plus Discover tabs |
-| `shop.html` | Vanilla line: mainline sold out; Experimental noted as request-only |
+| `shop.html` | Vanilla line: mainline sold out; Don's Reserve noted as request-only |
 | `about.html` | Short LLC / Utah kitchen note (named for the valley; not “located in the Uintah Basin”) |
 | `contact.html` | Mailto contact — no card checkout |
 | `404.html` | Cloudflare Pages not-found page |
@@ -29,16 +29,16 @@ Old Experimental / product / cart routes redirect here so bookmarks do not 404 a
 
 ## Honest stock
 
-**Uintah Valley Pure Vanilla Extract (mainline) is out of stock indefinitely.** There is no live checkout on this rebuild. Experimental batches can be requested by email.
+**Uintah Valley Pure Vanilla Extract (mainline) is out of stock indefinitely.** There is no live checkout on this rebuild. Don's Reserve batches can be requested by email.
 
 ## Discover section (home)
 
 Under the hero: **Discover Premium Vanilla Extract** with two selectors.
 
 - **Uintah Valley** — “This is our mainline product, made with locally distilled spirits and judiciously sourced Madagascar Vanilla.”
-- **Experimental** — “These are extractives, methods, and beans we're trying out.”
+- **Don's Reserve** — collaboration with Don Thornton Jr.; Madagascar / Tahitian / Tahiti bottles.
 
-Each tab shows three placeholder product cards. No fake buy buttons.
+Each tab shows three product cards. No fake buy buttons. Shop uses the same catalog with All / Uintah Valley / Don's Reserve filters.
 
 ## Brand
 

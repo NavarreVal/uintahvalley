@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shop | Uintah Valley</title>
-  <meta name="description" content="Uintah Valley vanilla shop. Mainline Pure Vanilla Extract is sold out indefinitely. Experimental batches can be requested.">
+  <meta name="description" content="Uintah Valley vanilla shop. Mainline Pure Vanilla Extract is sold out indefinitely. Don's Reserve batches can be requested.">
   <meta property="og:title" content="Shop Uintah Valley">
-  <meta property="og:description" content="Homemade vanilla from Utah. Mainline is out of stock; Experimental can be requested.">
+  <meta property="og:description" content="Homemade vanilla from Utah. Mainline is out of stock; Don's Reserve can be requested.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://uintahvalley.com/shop.html">
   <meta property="og:image" content="https://uintahvalley.com/assets/logo-square.png">
@@ -50,39 +50,51 @@
       <p class="lede">Vanilla is what we bottle today. There is no live checkout on this page — write us if you want a bottle when one exists.</p>
     </header>
 
-    <section class="section" id="mainline">
-      <h2>Uintah Valley · Pure Vanilla</h2>
+    <section class="section" id="catalog">
       <div class="callout">
-        <p style="margin:0"><strong>Mainline Pure Vanilla Extract is out of stock indefinitely.</strong> It cannot be ordered here.</p>
+        <p style="margin:0"><strong>Mainline Pure Vanilla Extract is out of stock indefinitely.</strong> It cannot be ordered here. Don's Reserve bottles can be requested.</p>
       </div>
       <p>The recipe is locally distilled spirits and Madagascar vanilla beans. No water, no chemical flavors, no added sugar or HFCS, NEVER castoreum!</p>
-      <div class="product-row" style="margin-top:1.4rem">
-        <article class="product-card">
-          <div class="placeholder-frame" role="img" aria-label="placeholder 01">placeholder 01</div>
-          <h3>Pure Vanilla Extract · 1 fl oz</h3>
-          <p>The mainline bottle. NET 1 FL OZ (29 mL).</p>
+      <div class="shop-filter" role="group" aria-label="Filter products" data-shop-filter>
+        <button type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="mainline">Uintah Valley</button>
+        <button type="button" data-filter="dons-reserve">Don's Reserve</button>
+      </div>
+      <div class="product-row shop-grid">
+        <article class="product-card" data-shop-card data-line="mainline">
+          <img class="product-photo" src="assets/product-mainline-1oz.jpg" width="1600" height="1066" alt="Jar and three labeled bottles of Uintah Valley Pure Vanilla Extract">
+          <h3>Pure Vanilla Extract - 1 fl oz</h3>
+          <p>Made with Madagascar Vanilla beans and Utah distilled extractives.</p>
           <span class="sold-note">Sold out indefinitely</span>
         </article>
-        <article class="product-card">
-          <div class="placeholder-frame" role="img" aria-label="placeholder 02">placeholder 02</div>
-          <h3>Pure Vanilla Extract · 6 oz</h3>
-          <p>A larger size that exists as a label draft only.</p>
+        <article class="product-card" data-shop-card data-line="mainline">
+          <img class="product-photo" src="assets/product-mainline-3oz.jpg" width="1200" height="1395" alt="Three 1 fl oz bottles of Uintah Valley Pure Vanilla Extract">
+          <h3>Pure Vanilla Extract - 3 fl oz</h3>
+          <p>Three of our 1oz bottles. Made with Madagascar Vanilla beans and Utah distilled extractives.</p>
           <span class="sold-note">Sold out indefinitely</span>
         </article>
-        <article class="product-card">
-          <div class="media media-studio">
-            <img src="assets/bottle-hero.jpg" alt="Three amber 1 fl oz bottles of Uintah Valley Pure Vanilla Extract">
-          </div>
-          <h3>The photographed bottle</h3>
-          <p>Kept for the brand story. Still not for sale.</p>
+        <article class="product-card" data-shop-card data-line="mainline">
+          <div class="placeholder-frame" role="img" aria-label="Gift box placeholder">Gift box</div>
+          <h3>Uintah Valley Gift Box</h3>
+          <p>Gift box, you pick what goes in! Made with Madagascar Vanilla beans and Utah distilled extractives. Handcrafted gift box.</p>
           <span class="sold-note">Sold out indefinitely</span>
+        </article>
+        <article class="product-card" data-shop-card data-line="dons-reserve">
+          <img class="product-photo" src="assets/product-dons-madagascar-dented-brick.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Madagascar Beans, Dented Brick Craft Rum">
+          <h3>Madagascar Beans · Dented Brick Craft Rum</h3>
+          <p>All Natural. Don's Reserve collaboration — Madagascar beans in Dented Brick craft rum.</p>
+        </article>
+        <article class="product-card" data-shop-card data-line="dons-reserve">
+          <img class="product-photo" src="assets/product-dons-tahitian-barbarosi.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Tahitian Barbarosi Spiced Rum">
+          <h3>Tahitian Barbarosi Spiced Rum</h3>
+          <p>All Natural. Don's Reserve collaboration — Tahitian vanilla in Barbarosi spiced rum.</p>
+        </article>
+        <article class="product-card" data-shop-card data-line="dons-reserve">
+          <img class="product-photo" src="assets/product-dons-tahiti-five-wives.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Tahiti Beans, Five Wives Vodka">
+          <h3>Tahiti Beans · Five Wives Vodka</h3>
+          <p>All Natural. Don's Reserve collaboration — Tahiti beans in Five Wives vodka.</p>
         </article>
       </div>
-    </section>
-
-    <section class="section" id="experimental">
-      <h2>Experimental</h2>
-      <p>Extractives, methods, and beans we’re trying out — not a restock of Pure Vanilla. Double-fold Madagascar, a Mexican bean trial, barrel rest, or a paste. Names and prices are provisional. If you want one, <a href="contact.html">send a request</a>.</p>
     </section>
   </main>
 

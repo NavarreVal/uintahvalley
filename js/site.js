@@ -37,25 +37,48 @@
   }
 
   const tablist = document.querySelector("[data-discover-tabs]");
-  if (!tablist) return;
+  if (tablist) {
+    const tabs = tablist.querySelectorAll("[role='tab']");
+    const panels = document.querySelectorAll("[data-discover-panel]");
 
-  const tabs = tablist.querySelectorAll("[role='tab']");
-  const panels = document.querySelectorAll("[data-discover-panel]");
+    function showLine(line) {
+      tabs.forEach(function (tab) {
+        const selected = tab.getAttribute("data-line") === line;
+        tab.setAttribute("aria-selected", selected ? "true" : "false");
+      });
+      panels.forEach(function (panel) {
+        const match = panel.getAttribute("data-discover-panel") === line;
+        panel.hidden = !match;
+      });
+    }
 
-  function showLine(line) {
     tabs.forEach(function (tab) {
-      const selected = tab.getAttribute("data-line") === line;
-      tab.setAttribute("aria-selected", selected ? "true" : "false");
-    });
-    panels.forEach(function (panel) {
-      const match = panel.getAttribute("data-discover-panel") === line;
-      panel.hidden = !match;
+      tab.addEventListener("click", function () {
+        showLine(tab.getAttribute("data-line"));
+      });
     });
   }
 
-  tabs.forEach(function (tab) {
-    tab.addEventListener("click", function () {
-      showLine(tab.getAttribute("data-line"));
+  const filterBar = document.querySelector("[data-shop-filter]");
+  if (filterBar) {
+    const buttons = filterBar.querySelectorAll("[data-filter]");
+    const cards = document.querySelectorAll("[data-shop-card]");
+
+    function showFilter(line) {
+      buttons.forEach(function (btn) {
+        const on = btn.getAttribute("data-filter") === line;
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      cards.forEach(function (card) {
+        const match = line === "all" || card.getAttribute("data-line") === line;
+        card.hidden = !match;
+      });
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        showFilter(btn.getAttribute("data-filter"));
+      });
     });
-  });
+  }
 })();
