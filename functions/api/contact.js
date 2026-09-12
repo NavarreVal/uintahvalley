@@ -28,7 +28,13 @@ function corsHeaders(origin) {
 }
 
 function json(status, body, origin) {
-  return new Response(JSON.stringify(body), {
+  let payload = "{\"ok\":false,\"error\":\"Could not send that message. Try again or email hello@uintahvalley.com.\"}";
+  try {
+    payload = JSON.stringify(body);
+  } catch (err) {
+    status = status || 500;
+  }
+  return new Response(payload, {
     status: status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
@@ -163,18 +169,45 @@ export function onRequestOptions(context) {
   }
 }
 
+function requestOrigin(request) {
+  try {
+    return request && request.headers ? request.headers.get("Origin") || "" : "";
+  } catch (err) {
+    return "";
+  }
+}
+
 export async function onRequestPost(context) {
   let origin = "";
   let env = {};
   try {
     const request = context && context.request;
     env = (context && context.env) || {};
-    try {
-      origin = request && request.headers ? request.headers.get("Origin") || "" : "";
-    } catch (err) {
-      origin = "";
-    }
+    origin = requestOrigin(request);
     return await handleContactPost(request, env, origin);
+  } catch (err) {
+    return fail(
+      500,
+      "Could not send that message. Try again or email hello@uintahvalley.com.",
+      origin,
+      env,
+      debugOn(env) ? String(err && err.message ? err.message : err) : ""
+    );
+  }
+}
+
+// Pages-compatible catch-all so GET/HEAD/etc. still return JSON, never a bare 502.
+export async function onRequest(context) {
+  let origin = "";
+  let env = {};
+  try {
+    const request = context && context.request;
+    env = (context && context.env) || {};
+    origin = requestOrigin(request);
+    const method = request && request.method ? String(request.method).toUpperCase() : "";
+    if (method === "OPTIONS") return onRequestOptions(context);
+    if (method === "POST") return await onRequestPost(context);
+    return json(405, { ok: false, error: "Method not allowed." }, origin);
   } catch (err) {
     return fail(
       500,

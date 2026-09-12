@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { prepareContact } from "./contact.js";
+import { onRequest, onRequestPost, prepareContact } from "../functions/api/contact.js";
 
 test("rejects invalid email", function () {
   const result = prepareContact({ email: "not-an-email", notes: "Hello" });
@@ -51,4 +51,57 @@ test("contact-only messages keep the contact subject", function () {
   });
   assert.equal(result.subject, "Uintah Valley contact from Ada");
   assert.equal(result.text.includes("When is mainline back?"), true);
+});
+
+function postContext(body, env) {
+  return {
+    request: new Request("https://uintahvalley.com/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }),
+    env: env || {}
+  };
+}
+
+async function readJson(res) {
+  const type = res.headers.get("Content-Type") || "";
+  assert.match(type, /application\/json/);
+  return JSON.parse(await res.text());
+}
+
+test("POST without RESEND_API_KEY returns JSON 503", async function () {
+  const res = await onRequestPost(postContext({
+    email: "guest@example.com",
+    notes: "Hello"
+  }));
+  assert.equal(res.status, 503);
+  const data = await readJson(res);
+  assert.equal(data.ok, false);
+  assert.equal(data.error, "Email is not configured yet.");
+});
+
+test("POST with invalid JSON still returns JSON", async function () {
+  const res = await onRequestPost({
+    request: new Request("https://uintahvalley.com/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{not-json"
+    }),
+    env: {}
+  });
+  assert.equal(res.status, 400);
+  const data = await readJson(res);
+  assert.equal(data.ok, false);
+});
+
+test("GET /api/contact returns JSON 405", async function () {
+  const res = await onRequest({
+    request: new Request("https://uintahvalley.com/api/contact", { method: "GET" }),
+    env: {}
+  });
+  assert.equal(res.status, 405);
+  const data = await readJson(res);
+  assert.equal(data.ok, false);
+  assert.equal(data.error, "Method not allowed.");
 });
