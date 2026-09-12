@@ -6,7 +6,7 @@
   <title>Contact | Uintah Valley</title>
   <meta name="description" content="Email Uintah Valley LLC about orders and questions. hello@uintahvalley.com">
   <meta property="og:title" content="Contact Uintah Valley">
-  <meta property="og:description" content="Order help and questions by email. No ticket system — just mailto.">
+  <meta property="og:description" content="Order help and questions by the on-site form. We reply by email.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://uintahvalley.com/contact.html">
   <meta property="og:image" content="https://uintahvalley.com/assets/logo-square.png">
@@ -48,26 +48,31 @@
       <p class="crumbs"><a href="index.html">Home</a> / Contact</p>
       <p class="eyebrow">Order help</p>
       <h1>Write us.</h1>
-      <p class="lede">This form opens your email app. If that fails, send a message directly to <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a>.</p>
+      <p class="lede">This form sends to us directly. If that fails, write <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a>.</p>
     </header>
 
     <section class="section" style="padding-top:1rem">
       <div class="split">
-        <form class="form card" data-order-form>
+        <form class="form card" data-contact-form novalidate>
+          <label class="hp" aria-hidden="true">
+            Company
+            <input name="company" type="text" tabindex="-1" autocomplete="off">
+          </label>
           <label>
             Name
             <input name="name" type="text" autocomplete="name">
           </label>
           <label>
             Email
-            <input name="email" type="email" autocomplete="email">
+            <input name="email" type="email" autocomplete="email" required>
           </label>
           <label>
             What do you need?
-            <textarea name="notes" rows="6" placeholder="A question about a batch, a restock, or a Don's Reserve bottle."></textarea>
+            <textarea name="notes" rows="6" required placeholder="A question about a batch, a restock, or a Don's Reserve bottle."></textarea>
           </label>
-          <p class="note">If your request list has bottles in it, those lines are included in the email body.</p>
-          <button class="btn btn-forest" type="submit">Open email draft</button>
+          <p class="note">If your request list has bottles in it, those lines are included in the message.</p>
+          <p class="form-status" data-contact-status role="status" hidden></p>
+          <button class="btn btn-forest" type="submit">Send message</button>
         </form>
         <div>
           <h2>What to expect</h2>

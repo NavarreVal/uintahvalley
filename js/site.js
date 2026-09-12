@@ -86,4 +86,61 @@
       showFilter(hash);
     }
   }
+
+  const contactForm = document.querySelector("[data-contact-form]");
+  if (contactForm) {
+    const status = contactForm.querySelector("[data-contact-status]");
+    const button = contactForm.querySelector("[type='submit']");
+
+    function setStatus(kind, message) {
+      if (!status) return;
+      status.hidden = !message;
+      status.textContent = message || "";
+      status.classList.toggle("is-error", kind === "error");
+      status.classList.toggle("is-ok", kind === "ok");
+    }
+
+    contactForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const name = (contactForm.querySelector("[name='name']") || {}).value || "";
+      const email = (contactForm.querySelector("[name='email']") || {}).value || "";
+      const notes = (contactForm.querySelector("[name='notes']") || {}).value || "";
+      const company = (contactForm.querySelector("[name='company']") || {}).value || "";
+      const requestList = window.UVCart && typeof window.UVCart.requestSummary === "function"
+        ? window.UVCart.requestSummary()
+        : "";
+
+      if (button) button.disabled = true;
+      setStatus("", "Sending…");
+
+      fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          notes: notes,
+          company: company,
+          requestList: requestList
+        })
+      }).then(function (res) {
+        return res.json().then(function (data) {
+          return { ok: res.ok && data && data.ok, error: data && data.error };
+        }).catch(function () {
+          return { ok: false, error: "" };
+        });
+      }).then(function (result) {
+        if (result.ok) {
+          contactForm.reset();
+          setStatus("ok", "Message sent. We will reply by email.");
+        } else {
+          setStatus("error", result.error || "Could not send that message. Write hello@uintahvalley.com.");
+        }
+      }).catch(function () {
+        setStatus("error", "Could not send that message. Write hello@uintahvalley.com.");
+      }).finally(function () {
+        if (button) button.disabled = false;
+      });
+    });
+  }
 })();

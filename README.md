@@ -20,7 +20,7 @@ Nav is **Home / Shop / About / Contact / Request list**.
 | `index.html` | Full-bleed mountain hero behind the header, plus Discover tabs |
 | `shop.html` | Vanilla line: mainline sold out; Don's Reserve can be added to a request list |
 | `about.html` | CAPT kitchen copy, Utah-residents callout, Team cards (Navarre + Don Thornton Jr.) |
-| `contact.html` | Mailto contact — request list lines can go into the email |
+| `contact.html` | On-site form posts to `/api/contact` (Resend). Request-list lines are included when present. |
 | `cart.html` | Request list (localStorage + mailto). No live payment. |
 | `404.html` | Cloudflare Pages not-found page |
 
@@ -73,6 +73,8 @@ Open [http://localhost:8080](http://localhost:8080). Confirm the mountain photo 
 4. To preview this rebuild, attach the branch as a Pages preview, or temporarily switch production only when CAPT is ready.
 
 `404.html` is the not-found page. `_redirects` and `_headers` stay in the project root.
+
+Contact form secrets: see `CONTACT_FORM.md`. Set `RESEND_API_KEY` (and optional `EMAIL_FROM` / `EMAIL_TO`) in Cloudflare Pages for Production and Preview.
 
 ## Footer
 

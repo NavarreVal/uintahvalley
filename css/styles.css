@@ -798,6 +798,7 @@ h3,
 }
 
 .form {
+  position: relative;
   display: grid;
   gap: 0.9rem;
 }
@@ -815,6 +816,27 @@ h3,
   background: #fff;
   padding: 0.7rem 0.75rem;
   font: inherit;
+}
+
+.form .hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form-status {
+  margin: 0;
+  font-weight: 650;
+}
+
+.form-status.is-ok {
+  color: var(--forest-deep);
+}
+
+.form-status.is-error {
+  color: #8a2a2a;
 }
 
 /* Footer */
