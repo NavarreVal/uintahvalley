@@ -370,6 +370,16 @@ h3,
   border-color: currentColor;
 }
 
+.btn-danger {
+  background: #8a2a2a;
+  color: var(--cream);
+}
+
+.btn-danger:hover {
+  background: #a43434;
+  color: var(--cream);
+}
+
 .btn[disabled],
 .btn[aria-disabled="true"] {
   opacity: 0.55;

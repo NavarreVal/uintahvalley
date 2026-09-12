@@ -171,7 +171,6 @@
     document.querySelectorAll("[data-request-empty-hint]").forEach(function (el) {
       el.hidden = !empty;
     });
-    if (empty) closeRequestModal();
   }
 
   function renderCartPage() {
@@ -258,7 +257,6 @@
   const requestStatus = requestForm ? requestForm.querySelector("[data-request-status]") : null;
   const requestSubmit = requestForm ? requestForm.querySelector("[type='submit']") : null;
   let requestLastFocus = null;
-  let requestCloseTimer = 0;
 
   function requestFocusables() {
     if (!requestOverlay) return [];
@@ -281,7 +279,6 @@
     if (!requestOverlay || requestOverlay.hidden) return;
     requestOverlay.hidden = true;
     document.body.classList.remove("modal-open");
-    window.clearTimeout(requestCloseTimer);
     if (requestLastFocus && typeof requestLastFocus.focus === "function") {
       requestLastFocus.focus();
     }
@@ -295,7 +292,6 @@
       syncRequestMailButton();
       return;
     }
-    window.clearTimeout(requestCloseTimer);
     requestLastFocus = document.activeElement;
     if (requestForm) requestForm.reset();
     setRequestStatus("", "");
@@ -334,18 +330,8 @@
   });
 
   if (requestOverlay) {
-    requestOverlay.addEventListener("click", function (event) {
-      if (event.target === requestOverlay) closeRequestModal();
-    });
     requestOverlay.addEventListener("keydown", trapRequestFocus);
   }
-
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && requestOverlay && !requestOverlay.hidden) {
-      event.preventDefault();
-      closeRequestModal();
-    }
-  });
 
   if (requestForm) {
     requestForm.addEventListener("submit", function (event) {
@@ -403,7 +389,6 @@
         if (result.ok) {
           requestForm.reset();
           setRequestStatus("ok", "Request sent. We will reply by email.");
-          requestCloseTimer = window.setTimeout(closeRequestModal, 1800);
         } else {
           setRequestStatus("error", result.error || "Could not send that request. Write hello@uintahvalley.com.");
         }
