@@ -839,6 +839,46 @@ h3,
   color: #8a2a2a;
 }
 
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgba(20, 25, 22, 0.55);
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal {
+  width: min(100%, 32rem);
+  max-height: calc(100vh - 2.5rem);
+  overflow: auto;
+  padding: 1.4rem 1.45rem 1.35rem;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  box-shadow: 0 16px 48px rgba(20, 25, 22, 0.28);
+}
+
+.modal h2 {
+  margin: 0 0 0.35rem;
+}
+
+.modal .form {
+  margin-top: 1rem;
+}
+
+.modal .fine {
+  font-weight: 500;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
 /* Footer */
 
 .site-footer {

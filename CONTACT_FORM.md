@@ -1,6 +1,8 @@
 # Contact form (Resend + Pages Function)
 
-The Contact page posts to `POST /api/contact` (`functions/api/contact.js`). It does **not** open the visitor’s email client.
+The Contact page and the Request list “Email this request” modal both post to `POST /api/contact` (`functions/api/contact.js`). They do **not** open the visitor’s email client.
+
+A request-list submit must include `requestList` (the full cart summary from `UVCart.requestSummary()`). Notes may be empty when `requestList` is present; the inbound subject is then `Uintah Valley request list from …`. The optional modal message is extra notes, not a substitute for the item lines.
 
 Set these in **Cloudflare Pages → Settings → Environment variables** for **Production and Preview**:
 

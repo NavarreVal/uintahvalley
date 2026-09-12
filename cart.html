@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Request list | Uintah Valley</title>
-  <meta name="description" content="Review your Uintah Valley request list and email an order summary. No online payment.">
+  <meta name="description" content="Review your Uintah Valley request list and send it to us from this page. No online payment.">
   <meta property="og:title" content="Request list — Uintah Valley">
-  <meta property="og:description" content="Local request list plus mailto order summary for Uintah Valley LLC.">
+  <meta property="og:description" content="Local request list plus on-site send to hello@uintahvalley.com. No online payment.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://uintahvalley.com/cart.html">
   <meta property="og:image" content="https://uintahvalley.com/assets/logo-square.png">
@@ -48,7 +48,7 @@
       <p class="crumbs"><a href="index.html">Home</a> / Request list</p>
       <p class="eyebrow">No checkout yet</p>
       <h1>Your request list</h1>
-      <p class="lede">Stored only in this browser. Don's Reserve items only — mainline extract cannot sit in this list. Send the summary by email and we will reply with availability, a confirmed total, and how to pay.</p>
+      <p class="lede">Stored only in this browser. Don's Reserve items only — mainline extract cannot sit in this list. Send the list from this page and we will reply with availability, a confirmed total, and how to pay.</p>
     </header>
 
     <section class="section" style="padding-top:1rem">
@@ -56,9 +56,10 @@
       <div data-cart-root></div>
       <p class="note" style="margin-top:1rem">Prices are provisional. Sending a request is not a paid order.</p>
       <div class="actions" style="margin-top:1rem">
-        <a class="btn btn-forest" data-order-mail href="mailto:hello@uintahvalley.com">Email this request</a>
+        <button type="button" class="btn btn-forest" data-request-mail disabled aria-disabled="true" aria-haspopup="dialog" aria-controls="request-modal">Email this request</button>
         <a class="btn" href="shop.html#dons-reserve">Keep browsing Don's Reserve</a>
       </div>
+      <p class="note" data-request-empty-hint>Add Don's Reserve items to your list first.</p>
     </section>
   </main>
 
@@ -82,6 +83,31 @@
       <p class="footer-credit">Built by <a href="https://navarreval.com/">Navarre</a> and The <a href="https://x.ai/bot">Grok Bot</a> crew of the SS Argus - Gad Kyrath XO</p>
     </div>
   </footer>
+  <div class="modal-overlay" data-request-modal hidden>
+    <div class="modal" id="request-modal" role="dialog" aria-modal="true" aria-labelledby="request-modal-title">
+      <h2 id="request-modal-title">Email this request</h2>
+      <p class="note">We’ll send your request list to hello@uintahvalley.com. You will get a confirmation email.</p>
+      <form class="form" data-request-form novalidate>
+        <label class="hp" aria-hidden="true">
+          Company
+          <input name="company" type="text" tabindex="-1" autocomplete="off">
+        </label>
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" required>
+        </label>
+        <label>
+          Message <span class="fine">(optional)</span>
+          <textarea name="notes" rows="4" placeholder="Anything we should know about this request."></textarea>
+        </label>
+        <p class="form-status" data-request-status role="status" hidden></p>
+        <div class="actions">
+          <button class="btn btn-forest" type="submit">Send request</button>
+          <button class="btn" type="button" data-request-cancel>Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <script src="js/cart.js"></script>
   <script src="js/site.js"></script>
 </body>

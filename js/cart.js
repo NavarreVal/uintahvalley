@@ -1,6 +1,6 @@
 (function () {
   const STORAGE_KEY = "uintahvalley-cart-v1";
-  const ORDER_EMAIL = "hello@uintahvalley.com";
+  const DEFAULT_REQUEST_NOTES = "Please review my request list.";
   const PRODUCTS = {
     "vanilla-1oz": {
       id: "vanilla-1oz",
@@ -158,46 +158,20 @@
     }, 2600);
   }
 
-  function orderMailto(extra) {
-    const cart = loadCart();
-    const lines = [
-      "Hello Uintah Valley,",
-      "",
-      "I would like to request the following Don's Reserve items:",
-      ""
-    ];
+  function cartHasItems() {
+    return loadCart().items.length > 0;
+  }
 
-    if (!cart.items.length) {
-      lines.push("(No bottles selected yet.)");
-    } else {
-      cart.items.forEach(function (item) {
-        const product = PRODUCTS[item.id];
-        if (!product) return;
-        lines.push(
-          "- [" + lineLabel(product) + "] " + product.name + " · " + product.size +
-          " × " + item.qty +
-          "  (" + money(product.price) + " each, provisional)"
-        );
-      });
-      lines.push("");
-      lines.push("Provisional subtotal: " + money(cartTotal(cart)));
-    }
-
-    lines.push("");
-    if (extra && extra.name) lines.push("Name: " + extra.name);
-    if (extra && extra.email) lines.push("Email: " + extra.email);
-    if (extra && extra.notes) {
-      lines.push("Notes: " + extra.notes);
-    }
-    lines.push("");
-    lines.push("I understand these are Don's Reserve batches (not the mainline recipe).");
-    lines.push("I understand prices are provisional and there is no online payment yet.");
-    lines.push("I understand you can currently sell only to Utah residents.");
-    lines.push("Please reply with availability and how to complete this order.");
-
-    const subject = encodeURIComponent("Don's Reserve order request");
-    const body = encodeURIComponent(lines.join("\n"));
-    return "mailto:" + ORDER_EMAIL + "?subject=" + subject + "&body=" + body;
+  function syncRequestMailButton() {
+    const empty = !cartHasItems();
+    document.querySelectorAll("[data-request-mail]").forEach(function (btn) {
+      btn.disabled = empty;
+      btn.setAttribute("aria-disabled", empty ? "true" : "false");
+    });
+    document.querySelectorAll("[data-request-empty-hint]").forEach(function (el) {
+      el.hidden = !empty;
+    });
+    if (empty) closeRequestModal();
   }
 
   function renderCartPage() {
@@ -211,9 +185,7 @@
         "<p>Your request list is empty.</p>" +
         '<p><a class="btn btn-primary" href="shop.html#dons-reserve">Browse Don\'s Reserve</a></p>' +
         "</div>";
-      document.querySelectorAll("[data-order-mail]").forEach(function (link) {
-        link.setAttribute("href", orderMailto());
-      });
+      syncRequestMailButton();
       return;
     }
 
@@ -250,9 +222,7 @@
       });
     });
 
-    document.querySelectorAll("[data-order-mail]").forEach(function (link) {
-      link.setAttribute("href", orderMailto());
-    });
+    syncRequestMailButton();
   }
 
   document.addEventListener("click", function (event) {
@@ -264,18 +234,6 @@
     const scope = addBtn.closest(".product-buy, .product-card, .card, form") || document;
     const qtyField = scope.querySelector("[data-add-qty]");
     addItem(id, qtyField ? qtyField.value : 1);
-  });
-
-  document.addEventListener("submit", function (event) {
-    const form = event.target.closest("[data-order-form]");
-    if (!form) return;
-    event.preventDefault();
-    const extra = {
-      name: (form.querySelector("[name='name']") || {}).value || "",
-      email: (form.querySelector("[name='email']") || {}).value || "",
-      notes: (form.querySelector("[name='notes']") || form.querySelector("[name='body']") || {}).value || ""
-    };
-    window.location.href = orderMailto(extra);
   });
 
   function requestSummary() {
@@ -295,13 +253,173 @@
     return lines.join("\n");
   }
 
+  const requestOverlay = document.querySelector("[data-request-modal]");
+  const requestForm = document.querySelector("[data-request-form]");
+  const requestStatus = requestForm ? requestForm.querySelector("[data-request-status]") : null;
+  const requestSubmit = requestForm ? requestForm.querySelector("[type='submit']") : null;
+  let requestLastFocus = null;
+  let requestCloseTimer = 0;
+
+  function requestFocusables() {
+    if (!requestOverlay) return [];
+    return Array.prototype.slice.call(requestOverlay.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled])'
+    )).filter(function (el) {
+      return !el.closest(".hp") && el.getAttribute("tabindex") !== "-1";
+    });
+  }
+
+  function setRequestStatus(kind, message) {
+    if (!requestStatus) return;
+    requestStatus.hidden = !message;
+    requestStatus.textContent = message || "";
+    requestStatus.classList.toggle("is-error", kind === "error");
+    requestStatus.classList.toggle("is-ok", kind === "ok");
+  }
+
+  function closeRequestModal() {
+    if (!requestOverlay || requestOverlay.hidden) return;
+    requestOverlay.hidden = true;
+    document.body.classList.remove("modal-open");
+    window.clearTimeout(requestCloseTimer);
+    if (requestLastFocus && typeof requestLastFocus.focus === "function") {
+      requestLastFocus.focus();
+    }
+    requestLastFocus = null;
+  }
+
+  function openRequestModal() {
+    if (!requestOverlay) return;
+    if (!cartHasItems()) {
+      showToast("Add Don's Reserve items to your list first.");
+      syncRequestMailButton();
+      return;
+    }
+    window.clearTimeout(requestCloseTimer);
+    requestLastFocus = document.activeElement;
+    if (requestForm) requestForm.reset();
+    setRequestStatus("", "");
+    if (requestSubmit) requestSubmit.disabled = false;
+    requestOverlay.hidden = false;
+    document.body.classList.add("modal-open");
+    const emailField = requestForm && requestForm.querySelector("[name='email']");
+    if (emailField) emailField.focus();
+  }
+
+  function trapRequestFocus(event) {
+    if (event.key !== "Tab" || !requestOverlay || requestOverlay.hidden) return;
+    const nodes = requestFocusables();
+    if (!nodes.length) return;
+    const first = nodes[0];
+    const last = nodes[nodes.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  document.querySelectorAll("[data-request-mail]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      openRequestModal();
+    });
+  });
+
+  document.querySelectorAll("[data-request-cancel]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      closeRequestModal();
+    });
+  });
+
+  if (requestOverlay) {
+    requestOverlay.addEventListener("click", function (event) {
+      if (event.target === requestOverlay) closeRequestModal();
+    });
+    requestOverlay.addEventListener("keydown", trapRequestFocus);
+  }
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && requestOverlay && !requestOverlay.hidden) {
+      event.preventDefault();
+      closeRequestModal();
+    }
+  });
+
+  if (requestForm) {
+    requestForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const requestList = requestSummary();
+      if (!requestList) {
+        setRequestStatus("error", "Add Don's Reserve items to your list first.");
+        syncRequestMailButton();
+        return;
+      }
+
+      const email = (requestForm.querySelector("[name='email']") || {}).value || "";
+      const notes = ((requestForm.querySelector("[name='notes']") || {}).value || "").trim() || DEFAULT_REQUEST_NOTES;
+      const company = (requestForm.querySelector("[name='company']") || {}).value || "";
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        setRequestStatus("error", "Please enter a valid email.");
+        const emailField = requestForm.querySelector("[name='email']");
+        if (emailField) emailField.focus();
+        return;
+      }
+
+      if (requestSubmit) requestSubmit.disabled = true;
+      setRequestStatus("", "Sending…");
+
+      fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          notes: notes,
+          company: company,
+          requestList: requestList
+        })
+      }).then(function (res) {
+        return res.text().then(function (text) {
+          var data = null;
+          try {
+            data = text ? JSON.parse(text) : null;
+          } catch (err) {
+            return {
+              ok: false,
+              error: "The server returned an unexpected response. Write hello@uintahvalley.com."
+            };
+          }
+          if (data && data.ok) {
+            return { ok: true };
+          }
+          return {
+            ok: false,
+            error: (data && data.error) || "Could not send that request. Write hello@uintahvalley.com."
+          };
+        });
+      }).then(function (result) {
+        if (result.ok) {
+          requestForm.reset();
+          setRequestStatus("ok", "Request sent. We will reply by email.");
+          requestCloseTimer = window.setTimeout(closeRequestModal, 1800);
+        } else {
+          setRequestStatus("error", result.error || "Could not send that request. Write hello@uintahvalley.com.");
+        }
+      }).catch(function () {
+        setRequestStatus("error", "Could not send that request. Write hello@uintahvalley.com.");
+      }).finally(function () {
+        if (requestSubmit) requestSubmit.disabled = false;
+      });
+    });
+  }
+
   window.UVCart = {
     PRODUCTS: PRODUCTS,
-    ORDER_EMAIL: ORDER_EMAIL,
     loadCart: loadCart,
     addItem: addItem,
     isAvailable: isAvailable,
-    orderMailto: orderMailto,
     requestSummary: requestSummary,
     updateCartCount: updateCartCount,
     renderCartPage: renderCartPage
