@@ -206,6 +206,11 @@
     renderCartPage();
   }
 
+  function clearCart() {
+    saveCart({ items: [] });
+    renderCartPage();
+  }
+
   function updateCartCount() {
     const count = cartCount(loadCart());
     document.querySelectorAll("[data-cart-count]").forEach(function (el) {
@@ -235,7 +240,7 @@
 
   function syncRequestMailButton() {
     const empty = !cartHasItems();
-    document.querySelectorAll("[data-request-mail]").forEach(function (btn) {
+    document.querySelectorAll("[data-request-mail], [data-request-clear]").forEach(function (btn) {
       btn.disabled = empty;
       btn.setAttribute("aria-disabled", empty ? "true" : "false");
     });
@@ -400,6 +405,14 @@
     });
   });
 
+  document.querySelectorAll("[data-request-clear]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      if (!cartHasItems()) return;
+      if (!window.confirm("Clear list?")) return;
+      clearCart();
+    });
+  });
+
   function requestSendSucceeded() {
     return !!(requestStatus && !requestStatus.hidden && requestStatus.classList.contains("is-ok"));
   }
@@ -445,6 +458,7 @@
       }).then(function (result) {
         if (result.ok) {
           requestForm.reset();
+          clearCart();
           setRequestStatus("ok", "Request sent. We will reply by email.");
         } else {
           setRequestStatus("error", result.error || "Could not send that request. Write hello@uintahvalley.com.");
@@ -461,6 +475,7 @@
     PRODUCTS: PRODUCTS,
     loadCart: loadCart,
     addItem: addItem,
+    clearCart: clearCart,
     isAvailable: isAvailable,
     requestSummary: requestSummary,
     updateCartCount: updateCartCount,

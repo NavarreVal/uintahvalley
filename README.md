@@ -12,7 +12,7 @@ Nav is **Home / Shop / About / Contact / Request list**.
 | `shop.html` | Vanilla line: mainline sold out; Don's Reserve can be added to a request list |
 | `about.html` | Kitchen copy, Utah-residents callout, Team cards (Navarre + Don Thornton Jr.) |
 | `contact.html` | On-site form posts to `/api/contact` (Resend). Request-list lines are included when present. |
-| `cart.html` | Request list (localStorage). Email this request posts to `/api/contact`. No live payment. |
+| `cart.html` | Request list (localStorage). Email this request posts to `/api/contact`. Clear empties the list; a successful send does the same. No live payment. |
 | `404.html` | Cloudflare Pages not-found page |
 
 Shared styles: `css/styles.css`. Menu, year, home header scroll, Discover tabs, and shop filters: `js/site.js`. Request list: `js/cart.js`.
