@@ -105,3 +105,59 @@ test("GET /api/contact returns JSON 405", async function () {
   assert.equal(data.ok, false);
   assert.equal(data.error, "Method not allowed.");
 });
+
+test("Resend success returns JSON ok true", async function () {
+  const original = globalThis.fetch;
+  globalThis.fetch = async function () {
+    return new Response(JSON.stringify({ id: "email_123" }), { status: 200 });
+  };
+  try {
+    const res = await onRequestPost(postContext({
+      email: "guest@example.com",
+      notes: "Hello"
+    }, { RESEND_API_KEY: "re_test" }));
+    assert.equal(res.status, 200);
+    const data = await readJson(res);
+    assert.equal(data.ok, true);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("Resend 401 still returns JSON, never a bare 502", async function () {
+  const original = globalThis.fetch;
+  globalThis.fetch = async function () {
+    return new Response(JSON.stringify({ message: "invalid" }), { status: 401 });
+  };
+  try {
+    const res = await onRequestPost(postContext({
+      email: "guest@example.com",
+      notes: "Hello"
+    }, { RESEND_API_KEY: "re_test" }));
+    assert.equal(res.status, 502);
+    const data = await readJson(res);
+    assert.equal(data.ok, false);
+    assert.equal(data.error, "Email is not configured correctly.");
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("Resend fetch throw still returns JSON", async function () {
+  const original = globalThis.fetch;
+  globalThis.fetch = async function () {
+    throw new Error("network down");
+  };
+  try {
+    const res = await onRequestPost(postContext({
+      email: "guest@example.com",
+      notes: "Hello"
+    }, { RESEND_API_KEY: "re_test" }));
+    assert.equal(res.status, 502);
+    const data = await readJson(res);
+    assert.equal(data.ok, false);
+    assert.equal(typeof data.error, "string");
+  } finally {
+    globalThis.fetch = original;
+  }
+});
