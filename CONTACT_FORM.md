@@ -6,6 +6,16 @@ A request-list submit must include `requestList` (the full cart summary from `UV
 
 `POST /api/contact` always returns JSON (`{ ok: true }` or `{ ok: false, error: "…" }`). A bare Cloudflare `error code: 502` (non-JSON) means the Function did not run.
 
+## CAPT still needs (dashboard)
+
+Code cannot finish the send if Resend has not verified the domain:
+
+1. **Resend → Domains → add and verify `uintahvalley.com`**, then send from `Uintah Valley <hello@uintahvalley.com>` to `hello@uintahvalley.com`.
+2. Until that verify lands, either set **`EMAIL_TO`** to the Resend *account* inbox (the address a dashboard test send works to) or expect onboarding-from to reject `hello@`.
+3. **`RESEND_API_KEY`** on Pages **Production** (not only Preview). Re-paste if it was copied with quotes. Retry the Production deployment after any secret change.
+4. Optional: **`CONTACT_DEBUG=1`** on Production until mail works, then unset it.
+5. Zone **uintahvalley.com** → skip Bot Fight / WAF for `POST /api/contact` so the apex is not an HTML challenge.
+
 ## Production secret (required)
 
 `RESEND_API_KEY` **must exist on Production**, not only Preview. Set it in **Cloudflare Pages → uintahvalley → Settings → Environment variables**, environment **Production**. Also set it on Preview if you test preview URLs.
@@ -19,7 +29,11 @@ A request-list submit must include `requestList` (the full cart summary from `UV
 
 `EMAIL_FROM` must use a domain verified in Resend. Do not commit API keys.
 
-If Resend rejects the custom from (unverified domain), the Function retries once from `Uintah Valley <beth.t@example.com>` so a valid API key still delivers mail. Verify `uintahvalley.com` in Resend to send as hello@.
+The Function trims `RESEND_API_KEY` (quotes, `Bearer ` prefix, BOM/newlines). If Resend rejects `hello@uintahvalley.com` (unverified domain), it retries `Uintah Valley <beth.t@example.com>` and then bare `beth.t@example.com`.
+
+**Resend testing limit:** `beth.t@example.com` can only send **to the email of the Resend account** until `uintahvalley.com` is verified. A key that works in the Resend dashboard (to your own inbox) will still fail here if `EMAIL_TO` is `hello@uintahvalley.com` and the domain is not verified.
+
+Set `CONTACT_DEBUG=1` on Production to put a non-secret `detail` on JSON errors (`reason`, `hint`, from-addresses tried, Resend status/name/message, key length/`re_` prefix only). The form appends that text so CAPT can read it in the browser. Leave it unset once mail works.
 
 After changing Production secrets, **retry the latest Production deployment** so the Function picks up the new values.
 
@@ -58,6 +72,6 @@ The browser shows that when `/api/contact` is not JSON.
 | --- | --- |
 | JSON `{ ok: true }` | Mail accepted |
 | JSON 503 | `RESEND_API_KEY` missing on that environment |
-| JSON 502 | Function ran; Resend rejected the send (`EMAIL_FROM` domain, or set `CONTACT_DEBUG=1`) |
+| JSON 502 | Function ran; Resend rejected the send. Set `CONTACT_DEBUG=1` and retry — `detail.reason` / `detail.hint` name the Resend restriction |
 | HTML “Just a moment…” / challenge | Bot Fight / WAF is challenging `POST /api/contact` — skip that path |
 | `text/plain` `error code: 502` | Function did not run (zone rules in front of Pages, or a Function crash) |
