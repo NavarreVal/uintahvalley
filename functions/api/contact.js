@@ -100,21 +100,54 @@ async function sendResend(key, payload) {
   };
 }
 
-function confirmationText(name, notes) {
+function confirmationText(name, notes, requestList) {
   const who = name || "there";
   const echo = notes.length > 280 ? notes.slice(0, 277) + "…" : notes;
-  return [
+  const lines = [
     "Hi " + who + ",",
     "",
-    "We got your message. Thanks for writing Uintah Valley — we will reply by email.",
+    requestList
+      ? "We got your request list. Thanks for writing Uintah Valley — we will reply by email."
+      : "We got your message. Thanks for writing Uintah Valley — we will reply by email.",
     "Currently we can only sell to Utah residents.",
+    ""
+  ];
+  if (echo) {
+    lines.push("Your message:", echo, "");
+  }
+  if (requestList) {
+    lines.push(requestList, "");
+  }
+  lines.push("Uintah Valley", "hello@uintahvalley.com");
+  return lines.join("\n");
+}
+
+export function prepareContact(data) {
+  const name = String((data && data.name) || "").trim();
+  const email = String((data && data.email) || "").trim();
+  const notes = String((data && (data.notes || data.message)) || "").trim();
+  const requestList = String((data && (data.requestList || data.request_list)) || "").trim();
+
+  if (!isEmail(email)) {
+    return { error: "Please enter a valid email." };
+  }
+  if (!notes && !requestList) {
+    return { error: "Please write a short message." };
+  }
+
+  const subject = requestList
+    ? "Uintah Valley request list from " + (name || email || "the site")
+    : "Uintah Valley contact from " + (name || "the site");
+
+  const text = [
+    name ? "Name: " + name : "Name: (not given)",
+    "Email: " + email,
     "",
-    "Your message:",
-    echo,
-    "",
-    "Uintah Valley",
-    "hello@uintahvalley.com"
-  ].join("\n");
+    notes,
+    requestList ? "\n" + requestList : ""
+  ].filter(Boolean).join("\n");
+
+  return { name, email, notes, requestList, subject, text };
 }
 
 export function onRequestOptions(context) {
@@ -170,17 +203,11 @@ async function handleContactPost(request, env, origin) {
     return json(200, { ok: true }, origin);
   }
 
-  const name = String(data.name || "").trim();
-  const email = String(data.email || "").trim();
-  const notes = String(data.notes || data.message || "").trim();
-  const requestList = String(data.requestList || data.request_list || "").trim();
-
-  if (!isEmail(email)) {
-    return json(400, { ok: false, error: "Please enter a valid email." }, origin);
+  const prepared = prepareContact(data);
+  if (prepared.error) {
+    return json(400, { ok: false, error: prepared.error }, origin);
   }
-  if (!notes) {
-    return json(400, { ok: false, error: "Please write a short message." }, origin);
-  }
+  const { name, email, notes, requestList, subject, text } = prepared;
 
   const key = env.RESEND_API_KEY;
   if (!key) {
@@ -189,14 +216,6 @@ async function handleContactPost(request, env, origin) {
 
   const to = String(env.EMAIL_TO || DEFAULT_TO).trim();
   const from = String(env.EMAIL_FROM || DEFAULT_FROM).trim();
-  const subject = "Uintah Valley contact from " + (name || "the site");
-  const text = [
-    name ? "Name: " + name : "Name: (not given)",
-    "Email: " + email,
-    "",
-    notes,
-    requestList ? "\n" + requestList : ""
-  ].filter(Boolean).join("\n");
 
   let inbound;
   try {
@@ -223,7 +242,7 @@ async function handleContactPost(request, env, origin) {
         from: from,
         to: [email],
         subject: "We got your message — Uintah Valley",
-        text: confirmationText(name, notes)
+        text: confirmationText(name, notes, requestList)
       });
     } catch (err) {
       // Primary mail already went out; do not fail the form.
