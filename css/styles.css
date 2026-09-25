@@ -371,16 +371,6 @@ h3,
   z-index: 3;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-line-pure,
-  .hero-line-premium,
-  .hero-plate {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
-
 .btn {
   display: inline-flex;
   align-items: center;
