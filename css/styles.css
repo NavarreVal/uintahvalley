@@ -284,42 +284,33 @@ h3,
   display: block;
   white-space: nowrap;
   letter-spacing: -0.02em;
-  opacity: 0;
-  transform: scale(0.8);
-  transform-origin: center center;
-  animation-name: hero-pop;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-out;
-  animation-fill-mode: both;
-  animation-iteration-count: 1;
 }
 
 /* Quattrocento Bold advances. With -0.02em tracking these sizes span about 96vw. */
 .hero-line-pure {
   font-size: clamp(5.5rem, 38.77vw, 72rem);
-  animation-delay: 0s;
+  opacity: 1;
 }
 
 .hero-line-premium {
   margin-top: -0.02em;
   font-size: clamp(3.15rem, 20.61vw, 40rem);
+  opacity: 0;
+  animation-name: hero-appear;
+  animation-duration: 0.001s;
+  animation-timing-function: steps(1, end);
   animation-delay: 0.85s;
+  animation-fill-mode: both;
+  animation-iteration-count: 1;
 }
 
-@keyframes hero-pop {
-  0% {
+@keyframes hero-appear {
+  from {
     opacity: 0;
-    transform: scale(0.8);
   }
 
-  65% {
+  to {
     opacity: 1;
-    transform: scale(1.04);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 
