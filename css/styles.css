@@ -808,6 +808,9 @@ h3,
 
 .facts li {
   padding: 0.85rem 1rem;
+}
+
+.facts li:not(.callout) {
   background: #fff;
   border-left: 4px solid var(--lime);
 }
