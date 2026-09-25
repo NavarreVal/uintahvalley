@@ -301,7 +301,7 @@ h3,
 .hero-line-premium {
   margin-top: -0.02em;
   font-size: clamp(3.15rem, 20.61vw, 40rem);
-  animation-delay: 1.25s;
+  animation-delay: 0.8s;
 }
 
 @keyframes hero-appear {
@@ -342,7 +342,7 @@ h3,
   animation-name: hero-plate-in;
   animation-duration: 0.8s;
   animation-timing-function: ease-out;
-  animation-delay: 1.75s;
+  animation-delay: 1.1s;
   animation-fill-mode: both;
   animation-iteration-count: 1;
 }
