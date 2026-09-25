@@ -534,7 +534,28 @@ h3,
 }
 
 .shop-grid {
+  align-items: stretch;
   gap: 1rem;
+}
+
+.shop-grid .product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.shop-grid .product-card .product-photo,
+.shop-grid .product-card .placeholder-frame {
+  flex-shrink: 0;
+}
+
+.shop-grid .product-card .sold-note,
+.shop-grid .product-card .price {
+  margin-top: auto;
+}
+
+.shop-grid .product-card .btn {
+  align-self: flex-start;
 }
 
 .shop-grid .product-card h3 {
