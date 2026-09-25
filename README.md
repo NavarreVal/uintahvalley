@@ -46,7 +46,7 @@ Icons: `/assets/favicon-32.png` (tab), `/assets/favicon.svg`, `/assets/favicon-1
 
 The homepage uses a full-bleed `<img class="hero-photo">` of `assets/hero-home.jpg` behind a transparent header. A full-width dark scrim keeps the giant cream wordmark readable while the top of the frame stays light enough for the dark nav.
 
-The hero is one lockup: stacked Quattrocento lines **PURE** and **PREMIUM**, sized with `clamp()` / `vw` so each word spans the hero width. `assets/hero-product-plate.png` (orchid, beans, and bottles) sits centered on top of the type. The shop button stays under that composition. The plate still eases in (honors `prefers-reduced-motion`).
+The hero is one lockup: stacked Quattrocento lines **PURE** and **PREMIUM**, sized with `clamp()` / `vw` so each word spans the hero width. `assets/hero-product-plate.png` (orchid, beans, and bottles) sits centered on top of the type. The shop button stays under that composition. On load, PURE pops in, then PREMIUM, then the plate flies in from the right (CSS only; honors `prefers-reduced-motion`).
 
 ## Local preview
 
