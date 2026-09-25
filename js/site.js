@@ -21,21 +21,6 @@
     window.addEventListener("scroll", onScroll, { passive: true });
   }
 
-  const plate = document.querySelector(".hero-plate");
-  if (plate) {
-    const reveal = function () {
-      requestAnimationFrame(function () {
-        plate.classList.add("is-in");
-      });
-    };
-    if (plate.complete) {
-      reveal();
-    } else {
-      plate.addEventListener("load", reveal, { once: true });
-      plate.addEventListener("error", reveal, { once: true });
-    }
-  }
-
   const tablist = document.querySelector("[data-discover-tabs]");
   if (tablist) {
     const tabs = tablist.querySelectorAll("[role='tab']");
