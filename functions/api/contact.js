@@ -1,7 +1,4 @@
 const DEFAULT_TO = "hello@uintahvalley.com";
-const DEFAULT_FROM = "Uintah Valley <hello@uintahvalley.com>";
-const FALLBACK_FROM = "Uintah Valley <beth.t@example.com>";
-const FALLBACK_FROM_BARE = "beth.t@example.com";
 
 function allowedOrigin(origin) {
   if (!origin) return "";
@@ -123,15 +120,8 @@ function toHost(address) {
 }
 
 export function fromCandidates(preferred) {
-  const seen = {};
-  const list = [];
-  [preferred, FALLBACK_FROM, FALLBACK_FROM_BARE].forEach(function (from) {
-    if (from && !seen[from]) {
-      seen[from] = true;
-      list.push(from);
-    }
-  });
-  return list;
+  const from = String(preferred || "").trim();
+  return from ? [from] : [];
 }
 
 function debugHint(attempts, to) {
@@ -139,10 +129,10 @@ function debugHint(attempts, to) {
     return String(item.message || "") + " " + String(item.name || "");
   }).join(" ").toLowerCase();
   if (blob.indexOf("not verified") !== -1 || blob.indexOf("domain") !== -1) {
-    return "Verify uintahvalley.com in Resend, or leave EMAIL_FROM unset so the Function retries beth.t@example.com.";
+    return "Verify uintahvalley.com in Resend and set EMAIL_FROM to a sender on that domain.";
   }
   if (blob.indexOf("testing") !== -1 || blob.indexOf("own email") !== -1) {
-    return "beth.t@example.com can only send to the Resend account inbox until uintahvalley.com is verified. Set EMAIL_TO to that inbox, or verify the domain and send from hello@.";
+    return "Resend rejected a testing-mode send. Verify uintahvalley.com, and set EMAIL_TO to an inbox that account can send to.";
   }
   if (blob.indexOf("api key") !== -1 || blob.indexOf("unauthorized") !== -1) {
     return "RESEND_API_KEY on this Pages environment is missing, quoted, or not the live key. Re-paste it on Production and retry the deployment.";
@@ -350,35 +340,37 @@ async function handleContactPost(request, env, origin) {
   }
 
   const to = String(env.EMAIL_TO || DEFAULT_TO).trim();
-  const from = String(env.EMAIL_FROM || DEFAULT_FROM).trim();
+  const from = String(env.EMAIL_FROM || "").trim();
   const candidates = fromCandidates(from);
+  if (!candidates.length) {
+    return fail(
+      500,
+      "Email sender is not configured.",
+      origin,
+      env,
+      debugOn(env)
+        ? "EMAIL_FROM is missing on this Pages environment. Set it to a verified sender such as Uintah Valley <hello@uintahvalley.com>."
+        : ""
+    );
+  }
+  const sender = candidates[0];
 
   let inbound = { status: 0, id: "", name: "", message: "" };
-  let usedFrom = from;
   const attempts = [];
   try {
-    for (let i = 0; i < candidates.length; i++) {
-      inbound = await sendResend(key, {
-        from: candidates[i],
-        to: [to],
-        reply_to: email,
-        subject: subject,
-        text: text
-      });
-      attempts.push({
-        from: candidates[i],
-        status: inbound.status,
-        name: inbound.name,
-        message: inbound.message
-      });
-      if (inbound.id) {
-        usedFrom = candidates[i];
-        break;
-      }
-      // Invalid API key will fail every from-address; stop. 403 can be an
-      // unverified-domain / testing-recipient restriction — try the next from.
-      if (inbound.status === 401) break;
-    }
+    inbound = await sendResend(key, {
+      from: sender,
+      to: [to],
+      reply_to: email,
+      subject: subject,
+      text: text
+    });
+    attempts.push({
+      from: sender,
+      status: inbound.status,
+      name: inbound.name,
+      message: inbound.message
+    });
   } catch (err) {
     const detail = debugOn(env)
       ? buildDebugDetail(key, to, from, attempts, "fetch to api.resend.com failed")
@@ -395,7 +387,7 @@ async function handleContactPost(request, env, origin) {
   if (inbound.id) {
     try {
       await sendResend(key, {
-        from: usedFrom,
+        from: sender,
         to: [email],
         subject: "We got your message — Uintah Valley",
         text: confirmationText(name, notes, requestList)

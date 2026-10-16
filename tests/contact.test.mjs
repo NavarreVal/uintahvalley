@@ -8,7 +8,7 @@ test("rejects invalid email", function () {
 });
 
 test("rejects empty notes without a request list", function () {
-  const result = prepareContact({ email: "guest@example.com", notes: "  " });
+  const result = prepareContact({ email: "guest@uintahvalley.test", notes: "  " });
   assert.equal(result.error, "Please write a short message.");
 });
 
@@ -19,13 +19,13 @@ test("accepts empty notes when requestList is present and appends the list", fun
     "Provisional subtotal: $80"
   ].join("\n");
   const result = prepareContact({
-    email: "guest@example.com",
+    email: "guest@uintahvalley.test",
     notes: "",
     requestList: requestList
   });
   assert.equal(result.error, undefined);
-  assert.equal(result.subject, "Uintah Valley request list from guest@example.com");
-  assert.match(result.text, /Email: guest@example.com/);
+  assert.equal(result.subject, "Uintah Valley request list from guest@uintahvalley.test");
+  assert.match(result.text, /Email: guest@uintahvalley.test/);
   assert.match(result.text, /Madagascar Beans · Dented Brick Craft Rum · 4 oz × 2/);
   assert.match(result.text, /Provisional subtotal: \$80/);
   assert.equal(result.text.includes(requestList), true);
@@ -34,7 +34,7 @@ test("accepts empty notes when requestList is present and appends the list", fun
 test("keeps optional notes above the request list", function () {
   const requestList = "Request list:\n- [Don's Reserve] Tahiti Beans · Five Wives Vodka · 4 oz × 1  ($40 each, provisional)";
   const result = prepareContact({
-    email: "guest@example.com",
+    email: "guest@uintahvalley.test",
     notes: "Please hold for Saturday pickup.",
     requestList: requestList
   });
@@ -46,7 +46,7 @@ test("keeps optional notes above the request list", function () {
 test("contact-only messages keep the contact subject", function () {
   const result = prepareContact({
     name: "Ada",
-    email: "ada@example.com",
+    email: "ada@uintahvalley.test",
     notes: "When is mainline back?"
   });
   assert.equal(result.subject, "Uintah Valley contact from Ada");
@@ -60,7 +60,9 @@ function postContext(body, env) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     }),
-    env: env || {}
+    env: Object.assign({
+      EMAIL_FROM: "Uintah Valley <hello@uintahvalley.com>"
+    }, env || {})
   };
 }
 
@@ -72,7 +74,7 @@ async function readJson(res) {
 
 test("POST without RESEND_API_KEY returns JSON 503", async function () {
   const res = await onRequestPost(postContext({
-    email: "guest@example.com",
+    email: "guest@uintahvalley.test",
     notes: "Hello"
   }));
   assert.equal(res.status, 503);
@@ -113,7 +115,7 @@ test("Resend success returns JSON ok true", async function () {
   };
   try {
     const res = await onRequestPost(postContext({
-      email: "guest@example.com",
+      email: "guest@uintahvalley.test",
       notes: "Hello"
     }, { RESEND_API_KEY: "re_test" }));
     assert.equal(res.status, 200);
@@ -131,7 +133,7 @@ test("Resend 401 still returns JSON, never a bare 502", async function () {
   };
   try {
     const res = await onRequestPost(postContext({
-      email: "guest@example.com",
+      email: "guest@uintahvalley.test",
       notes: "Hello"
     }, { RESEND_API_KEY: "re_test" }));
     assert.equal(res.status, 502);
@@ -150,7 +152,7 @@ test("Resend fetch throw still returns JSON", async function () {
   };
   try {
     const res = await onRequestPost(postContext({
-      email: "guest@example.com",
+      email: "guest@uintahvalley.test",
       notes: "Hello"
     }, { RESEND_API_KEY: "re_test" }));
     assert.equal(res.status, 502);
@@ -162,27 +164,45 @@ test("Resend fetch throw still returns JSON", async function () {
   }
 });
 
-test("unverified custom from retries beth.t@example.com and returns ok", async function () {
+test("POST without EMAIL_FROM returns a server error and does not send", async function () {
+  const original = globalThis.fetch;
+  let called = false;
+  globalThis.fetch = async function () {
+    called = true;
+    return new Response(JSON.stringify({ id: "email_123" }), { status: 200 });
+  };
+  try {
+    const res = await onRequestPost(postContext({
+      email: "guest@uintahvalley.test",
+      notes: "Hello"
+    }, { RESEND_API_KEY: "re_test", EMAIL_FROM: "" }));
+    assert.equal(res.status, 500);
+    const data = await readJson(res);
+    assert.equal(data.ok, false);
+    assert.equal(data.error, "Email sender is not configured.");
+    assert.equal(called, false);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("rejected sender is not retried with another address", async function () {
   const original = globalThis.fetch;
   const froms = [];
   globalThis.fetch = async function (url, opts) {
     const payload = JSON.parse(opts.body);
     froms.push(payload.from);
-    if (String(payload.from).includes("hello@uintahvalley.com")) {
-      return new Response(JSON.stringify({ message: "The uintahvalley.com domain is not verified." }), { status: 422 });
-    }
-    return new Response(JSON.stringify({ id: "email_fallback" }), { status: 200 });
+    return new Response(JSON.stringify({ message: "The uintahvalley.com domain is not verified." }), { status: 422 });
   };
   try {
     const res = await onRequestPost(postContext({
-      email: "guest@example.com",
+      email: "guest@uintahvalley.test",
       notes: "Hello"
-    }, { RESEND_API_KEY: "re_test" }));
-    assert.equal(res.status, 200);
+    }, { RESEND_API_KEY: "re_test", EMAIL_FROM: "Uintah Valley <hello@uintahvalley.com>" }));
+    assert.equal(res.status, 502);
     const data = await readJson(res);
-    assert.equal(data.ok, true);
-    assert.equal(froms[0].includes("hello@uintahvalley.com"), true);
-    assert.equal(froms.some(function (from) { return from.includes("beth.t@example.com"); }), true);
+    assert.equal(data.ok, false);
+    assert.deepEqual(froms, ["Uintah Valley <hello@uintahvalley.com>"]);
   } finally {
     globalThis.fetch = original;
   }
@@ -193,36 +213,36 @@ test("normalizeKey strips BOM, quotes, Bearer, and newlines", function () {
   assert.equal(normalizeKey("\"re_live\""), "re_live");
 });
 
-test("fromCandidates always includes the Resend onboarding addresses", function () {
-  const list = fromCandidates("Uintah Valley <hello@uintahvalley.com>");
-  assert.equal(list[0].includes("hello@uintahvalley.com"), true);
-  assert.equal(list.some(function (from) { return from.includes("beth.t@example.com"); }), true);
-  assert.equal(list.indexOf("beth.t@example.com") !== -1, true);
+test("fromCandidates returns only the configured sender", function () {
+  assert.deepEqual(
+    fromCandidates("Uintah Valley <hello@uintahvalley.com>"),
+    ["Uintah Valley <hello@uintahvalley.com>"]
+  );
+  assert.deepEqual(fromCandidates("  "), []);
+  assert.deepEqual(fromCandidates(""), []);
 });
 
-test("403 on custom from still retries beth.t@example.com", async function () {
+test("403 on the configured sender is not retried", async function () {
   const original = globalThis.fetch;
   const froms = [];
   globalThis.fetch = async function (url, opts) {
     const payload = JSON.parse(opts.body);
     froms.push(payload.from);
-    if (String(payload.from).includes("hello@uintahvalley.com")) {
-      return new Response(JSON.stringify({
-        name: "validation_error",
-        message: "The uintahvalley.com domain is not verified."
-      }), { status: 403 });
-    }
-    return new Response(JSON.stringify({ id: "email_fallback" }), { status: 200 });
+    return new Response(JSON.stringify({
+      name: "validation_error",
+      message: "The uintahvalley.com domain is not verified."
+    }), { status: 403 });
   };
   try {
     const res = await onRequestPost(postContext({
-      email: "guest@example.com",
+      email: "guest@uintahvalley.test",
       notes: "Hello"
     }, { RESEND_API_KEY: "re_test" }));
-    assert.equal(res.status, 200);
+    assert.equal(res.status, 502);
     const data = await readJson(res);
-    assert.equal(data.ok, true);
-    assert.equal(froms.some(function (from) { return from.includes("beth.t@example.com"); }), true);
+    assert.equal(data.ok, false);
+    assert.equal(data.error, "Email is not configured correctly.");
+    assert.deepEqual(froms, ["Uintah Valley <hello@uintahvalley.com>"]);
   } finally {
     globalThis.fetch = original;
   }
@@ -238,7 +258,7 @@ test("CONTACT_DEBUG=1 includes attempts, reason, and a config hint", async funct
   };
   try {
     const res = await onRequestPost(postContext({
-      email: "guest@example.com",
+      email: "guest@uintahvalley.test",
       notes: "Hello"
     }, { RESEND_API_KEY: "re_test", CONTACT_DEBUG: "1" }));
     assert.equal(res.status, 502);
@@ -265,7 +285,7 @@ test("trims Bearer prefix and whitespace on RESEND_API_KEY", async function () {
   };
   try {
     const res = await onRequestPost(postContext({
-      email: "guest@example.com",
+      email: "guest@uintahvalley.test",
       notes: "Hello"
     }, { RESEND_API_KEY: "  Bearer re_test  " }));
     assert.equal(res.status, 200);
