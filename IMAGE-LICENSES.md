@@ -4,15 +4,15 @@ Internal log of every image in `/assets`. This file is not linked from the site.
 
 | File | Description | Source | License / owner | Date added |
 | --- | --- | --- | --- | --- |
-| about-beans-trays.jpg | Vanilla beans drying on wooden curing trays outdoors on grass | SOURCE TO CONFIRM | SOURCE TO CONFIRM | 2026-09-12 |
+| about-beans-trays.jpg | Vanilla beans drying on wooden curing trays outdoors on grass | SOURCE TO CONFIRM. Owner tracking down source | SOURCE TO CONFIRM | 2026-09-12 |
 | about-don-thornton.jpg | Portrait of Don Thornton Jr. | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
 | about-founder-navarre.jpg | Portrait of Navarre Valdivieso | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
 | favicon-180.png | 180×180 apple-touch icon from the color mark | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
 | favicon-32.png | 32×32 PNG site icon | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
 | favicon.svg | SVG site icon | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-10 |
 | gift-box.jpg | Three bottles of Uintah Valley Pure Vanilla Extract in a wooden gift box with vanilla beans and orchid flowers | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-25 |
-| hero-home.jpg | Forested mountain valley with snow-patched peaks under a blue sky | SOURCE TO CONFIRM | SOURCE TO CONFIRM | 2026-09-11 |
-| hero-product-plate.png | Vanilla orchid, three Uintah Valley extract bottles, and vanilla beans | SOURCE TO CONFIRM | SOURCE TO CONFIRM | 2026-09-11 |
+| hero-home.jpg | Forested mountain valley with snow-patched peaks under a blue sky | Original photo by Navarre Valdivieso | Owned by Uintah Valley LLC | 2026-09-11 |
+| hero-product-plate.png | Vanilla orchid, three Uintah Valley extract bottles, and vanilla beans | Original photo by Navarre Valdivieso | Owned by Uintah Valley LLC | 2026-09-11 |
 | logo-color.png | Official color mark, PNG fallback | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-10 |
 | logo-color.svg | Official color mark | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-10 |
 | logo-square.png | Square color logo used as a large icon and social image | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-10 |
