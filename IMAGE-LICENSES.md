@@ -4,7 +4,7 @@ Internal log of every image in `/assets`. This file is not linked from the site.
 
 | File | Description | Source | License / owner | Date added |
 | --- | --- | --- | --- | --- |
-| about-beans-trays.jpg | Vanilla beans drying on wooden curing trays outdoors on grass | SOURCE TO CONFIRM. Owner tracking down source | SOURCE TO CONFIRM | 2026-09-12 |
+| about-beans-trays.jpg | Vanilla beans drying on wooden curing trays outdoors on grass | Shutterstock (purchased by Navarre Valdivieso) | Shutterstock Standard Image License | 2026-09-12 |
 | about-don-thornton.jpg | Portrait of Don Thornton Jr. | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
 | about-founder-navarre.jpg | Portrait of Navarre Valdivieso | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
 | favicon-180.png | 180×180 apple-touch icon from the color mark | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
@@ -21,3 +21,9 @@ Internal log of every image in `/assets`. This file is not linked from the site.
 | product-dons-tahitian-barbarosi.jpg | All Natural bottle: Vanilla Tahitian Barbarosi Spiced Rum | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
 | product-mainline-1oz.jpg | Jar and three labeled bottles of Uintah Valley Pure Vanilla Extract | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
 | product-mainline-3oz.jpg | Three 1 fl oz bottles of Uintah Valley Pure Vanilla Extract | Uintah Valley LLC | Uintah Valley LLC original | 2026-09-12 |
+
+Note for `about-beans-trays.jpg`: Believed Shutterstock per owner; Shutterstock image ID and license record to be added.
+
+## Other Shutterstock licenses
+
+The owner holds additional Shutterstock Standard licenses. None of those other images are used on the site, so no files are listed here.
