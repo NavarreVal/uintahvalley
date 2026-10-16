@@ -11,7 +11,7 @@ A request-list submit must include `requestList` (the full cart summary from `UV
 Code cannot finish the send if Resend has not verified the domain:
 
 1. **Resend → Domains → add and verify `uintahvalley.com`**, then send from `Uintah Valley <hello@uintahvalley.com>` to `hello@uintahvalley.com`.
-2. Until that verify lands, either set **`EMAIL_TO`** to the Resend *account* inbox (the address a dashboard test send works to) or expect onboarding-from to reject `hello@`.
+2. Set **`EMAIL_FROM`** to that verified sender. The Function does not substitute another from-address. Until the domain is verified, set **`EMAIL_TO`** to the Resend account inbox (the address a dashboard test send works to).
 3. **`RESEND_API_KEY`** on Pages **Production** (not only Preview). Re-paste if it was copied with quotes. Retry the Production deployment after any secret change.
 4. Optional: **`CONTACT_DEBUG=1`** on Production until mail works, then unset it.
 5. Zone **uintahvalley.com** → skip Bot Fight / WAF for `POST /api/contact` so the apex is not an HTML challenge.
@@ -24,16 +24,16 @@ Code cannot finish the send if Resend has not verified the domain:
 | --- | --- | --- | --- | --- |
 | `RESEND_API_KEY` | Secret | **Required** | Required to send from preview | From Resend |
 | `EMAIL_TO` | Plain (optional) | Optional | Optional | `hello@uintahvalley.com` (bare address only — never `To: …`) |
-| `EMAIL_FROM` | Plain (optional) | Optional | Optional | `Uintah Valley <hello@uintahvalley.com>` |
+| `EMAIL_FROM` | Plain | **Required** | **Required** | `Uintah Valley <hello@uintahvalley.com>` |
 | `CONTACT_DEBUG` | Plain (optional) | Leave unset | Optional | `1` to include a non-sensitive Resend status/message in JSON errors |
 
 `EMAIL_TO` must be a **bare address** (`hello@uintahvalley.com`). Never set it to `To: hello@uintahvalley.com` — Resend rejects a `To:` prefix.
 
 `EMAIL_FROM` must use a domain verified in Resend. Do not commit API keys.
 
-The Function trims `RESEND_API_KEY` (quotes, `Bearer ` prefix, BOM/newlines). If Resend rejects `hello@uintahvalley.com` (unverified domain), it retries `Uintah Valley <beth.t@example.com>` and then bare `beth.t@example.com`.
+The Function trims `RESEND_API_KEY` (quotes, `Bearer ` prefix, BOM/newlines). The sender is `EMAIL_FROM` only. If `EMAIL_FROM` is missing, the Function returns HTTP 500 (`Email sender is not configured.`) and does not send.
 
-**Resend testing limit:** `beth.t@example.com` can only send **to the email of the Resend account** until `uintahvalley.com` is verified. A key that works in the Resend dashboard (to your own inbox) will still fail here if `EMAIL_TO` is `hello@uintahvalley.com` and the domain is not verified.
+`EMAIL_FROM` must be a verified Resend sender, such as `Uintah Valley <hello@uintahvalley.com>`. There is no placeholder from-address. Until `uintahvalley.com` is verified, a key that works in the Resend dashboard (to your own inbox) will still fail here if `EMAIL_TO` is `hello@uintahvalley.com`.
 
 Set `CONTACT_DEBUG=1` on Production to put a non-secret `detail` on JSON errors (`reason`, `hint`, from-addresses tried, Resend status/name/message, key length/`re_` prefix only). The form appends that text so CAPT can read it in the browser. Leave it unset once mail works.
 

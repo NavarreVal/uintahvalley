@@ -14,6 +14,8 @@ Nav is **Home / Shop / About / Contact / Request list**.
 | `contact.html` | On-site form posts to `/api/contact` (Resend). Request-list lines are included when present. |
 | `cart.html` | Request list (localStorage). Email this request posts to `/api/contact`. Clear empties the list; a successful send does the same. No live payment. |
 | `404.html` | Cloudflare Pages not-found page |
+| `privacy.html` | Privacy policy |
+| `copyright.html` | Copyright notice |
 
 Shared styles: `css/styles.css`. Menu, year, home header scroll, Discover tabs, and shop filters: `js/site.js`. Request list: `js/cart.js`.
 
@@ -36,7 +38,7 @@ Each tab shows three product cards. Mainline is sold out; Don's Reserve cards ha
 
 Header uses the official color mark: SVG preferred, CLR PNG fallback (`assets/logo-color.svg` / `assets/logo-color.png`).
 
-Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`, cream `#fff6d2`, taupe `#777a69`. Display type is Quattrocento; body is Source Sans 3.
+Palette from the logo: lime `#72a813`, forest `#5e8924` / `#2e6423` / `#144916`, cream `#fff6d2`, taupe `#777a69`. Display type is Quattrocento; body is Source Sans 3. Both families are self-hosted from `/assets/fonts/` (OFL).
 
 Icons: `/assets/favicon-32.png` (tab), `/assets/favicon.svg`, `/assets/favicon-180.png` (apple-touch), `/favicon.ico` (root), `/assets/logo-square.png` (192×192 / OG).
 
@@ -64,10 +66,10 @@ Open [http://localhost:8080](http://localhost:8080). Confirm the mountain photo 
 
 `404.html` is the not-found page. `_redirects` and `_headers` stay in the project root.
 
-Contact form secrets: see `CONTACT_FORM.md`. **`RESEND_API_KEY` must exist on Production** (and Preview). Optional: `EMAIL_FROM` / `EMAIL_TO` (`EMAIL_TO` must be a bare address such as `hello@uintahvalley.com`, never `To: …`). Tests: `node --test tests/contact.test.mjs`.
+Contact form secrets: see `CONTACT_FORM.md`. **`RESEND_API_KEY` must exist on Production** (and Preview). **`EMAIL_FROM` is required** (a verified sender such as `Uintah Valley <hello@uintahvalley.com>`). Optional: `EMAIL_TO` (a bare address such as `hello@uintahvalley.com`, never `To: …`). Tests: `node --test tests/contact.test.mjs`.
 
 ## Footer
 
-Every page keeps the SS Argus credit and a simple © Uintah Valley LLC line.
+Every page keeps the SS Argus credit, a simple © Uintah Valley LLC line, and Privacy and Copyright links.
 
 Homemade product, sold for home use, not for resale; prepared without state or local inspection; contains alcohol.
