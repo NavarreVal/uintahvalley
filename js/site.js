@@ -91,11 +91,15 @@
       const email = (contactForm.querySelector("[name='email']") || {}).value || "";
       const notes = (contactForm.querySelector("[name='notes']") || {}).value || "";
       const company = (contactForm.querySelector("[name='company']") || {}).value || "";
-      const requestList = window.UVCart && typeof window.UVCart.requestSummary === "function"
-        ? window.UVCart.requestSummary()
-        : "";
+      const requestList = window.UVCart && typeof window.UVCart.requestItems === "function"
+        ? window.UVCart.requestItems()
+        : [];
 
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      if (name.trim().length > 100) {
+        setStatus("error", "Name is too long.");
+        return;
+      }
+      if (email.trim().length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
         setStatus("error", "Please enter a valid email.");
         return;
       }
@@ -103,52 +107,73 @@
         setStatus("error", "Please write a short message.");
         return;
       }
+      if (notes.trim().length > 2000) {
+        setStatus("error", "Message is too long.");
+        return;
+      }
 
       if (button) button.disabled = true;
       setStatus("", "Sending…");
 
-      const payload = {
-        name: name,
-        email: email,
-        notes: notes,
-        company: company,
-        requestList: requestList
-      };
-      const send = window.UVContact && typeof window.UVContact.post === "function"
-        ? window.UVContact.post(payload)
-        : fetch("/api/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        }).then(function (res) {
-          return res.text().then(function (text) {
-            var data = null;
-            try {
-              data = text ? JSON.parse(text) : null;
-            } catch (err) {
+      const turnstileSlot = contactForm.querySelector("[data-turnstile]");
+      const ready = window.UVTurnstile && typeof window.UVTurnstile.prepare === "function"
+        ? window.UVTurnstile.prepare(turnstileSlot)
+        : Promise.resolve({ required: false, token: "", widgetId: null });
+
+      ready.then(function (check) {
+        if (check.required && !check.token) {
+          setStatus("error", "Please complete the security check and try again.");
+          if (button) button.disabled = false;
+          return null;
+        }
+        const payload = {
+          name: name,
+          email: email,
+          notes: notes,
+          company: company,
+          requestList: requestList,
+          "cf-turnstile-response": check.token || ""
+        };
+        const send = window.UVContact && typeof window.UVContact.post === "function"
+          ? window.UVContact.post(payload)
+          : fetch("/api/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }).then(function (res) {
+            return res.text().then(function (text) {
+              var data = null;
+              try {
+                data = text ? JSON.parse(text) : null;
+              } catch (err) {
+                return {
+                  ok: false,
+                  error: "The server returned an unexpected response. Write hello@uintahvalley.com."
+                };
+              }
+              if (data && data.ok) return { ok: true };
               return {
                 ok: false,
-                error: "The server returned an unexpected response. Write hello@uintahvalley.com."
+                error: (data && data.error) || "Could not send that message. Write hello@uintahvalley.com."
               };
-            }
-            if (data && data.ok) return { ok: true };
-            return {
-              ok: false,
-              error: (data && data.error) || "Could not send that message. Write hello@uintahvalley.com."
-            };
+            });
           });
-        });
 
-      send.then(function (result) {
-        if (result.ok) {
-          contactForm.reset();
-          setStatus("ok", "Message sent. We will reply by email.");
-        } else {
-          setStatus("error", result.error || "Could not send that message. Write hello@uintahvalley.com.");
-        }
+        return send.then(function (result) {
+          if (result.ok) {
+            contactForm.reset();
+            setStatus("ok", "Message sent. We will reply by email.");
+          } else {
+            setStatus("error", result.error || "Could not send that message. Write hello@uintahvalley.com.");
+          }
+        }).finally(function () {
+          if (window.UVTurnstile && typeof window.UVTurnstile.reset === "function") {
+            window.UVTurnstile.reset(check.widgetId);
+          }
+          if (button) button.disabled = false;
+        });
       }).catch(function () {
         setStatus("error", "Could not send that message. Write hello@uintahvalley.com.");
-      }).finally(function () {
         if (button) button.disabled = false;
       });
     });

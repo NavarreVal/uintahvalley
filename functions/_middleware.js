@@ -147,7 +147,10 @@ async function notFoundResponse(context) {
   const security = {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "X-Frame-Options": "DENY",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' https://challenges.cloudflare.com; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://uintahvalley.pages.dev; frame-src https://challenges.cloudflare.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://uintahvalley.pages.dev; object-src 'none'"
   };
   try {
     const asset = await fetchNotFoundHtml(context);
@@ -155,9 +158,9 @@ async function notFoundResponse(context) {
       const headers = new Headers(asset.headers);
       if (!headers.get("Content-Type")) headers.set("Content-Type", "text/html; charset=utf-8");
       headers.set("Cache-Control", "no-store");
-      headers.set("X-Content-Type-Options", security["X-Content-Type-Options"]);
-      headers.set("Referrer-Policy", security["Referrer-Policy"]);
-      headers.set("Permissions-Policy", security["Permissions-Policy"]);
+      Object.keys(security).forEach(function (name) {
+        headers.set(name, security[name]);
+      });
       return new Response(asset.body, { status: 404, headers: headers });
     }
   } catch (err) {

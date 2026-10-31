@@ -2,7 +2,11 @@
 
 The Contact page and the Request list “Email this request” modal both post to `POST /api/contact` (`functions/api/contact.js`). They do **not** open the visitor’s email client.
 
-A request-list submit must include `requestList` (the full cart summary from `UVCart.requestSummary()`). Notes may be empty when `requestList` is present; the inbound subject is then `Uintah Valley request list from …`. The optional modal message is extra notes, not a substitute for the item lines. After `{ ok: true }`, the request list is cleared in this browser; the success status stays in the modal until Cancel or overlay dismiss.
+A request-list submit must include `requestList` as an array of `{ id, qty }` from `UVCart.requestItems()` (at most 20 lines). Each `id` has to be a product in the server catalog, and each `qty` is an integer from 1 to 99. The Function rebuilds the lines the owner sees from that catalog. A free-text `requestList` is rejected. Notes may be empty when the array has items; the inbound subject is then `Uintah Valley request list from …`. The optional modal message is extra notes, not a substitute for the item lines. After `{ ok: true }`, the request list is cleared in this browser; the success status stays in the modal until Cancel or overlay dismiss.
+
+The visitor confirmation is not a copy of the form. It is sent only after Turnstile Siteverify passes, and the body is only: “Thanks for contacting Uintah Valley. We received your message and will reply soon.” plus `https://uintahvalley.com`. Name, notes, and request lines stay in the owner email.
+
+`POST /api/contact` requires an `Origin` header. Allowed values are `https://uintahvalley.com`, `https://www.uintahvalley.com`, `https://uintahvalley.pages.dev`, and `https://<one-label>.uintahvalley.pages.dev`. Missing, `http://`, and any other host are rejected. Field caps: name 100, email 254, message 2000. A body over 16 KB is rejected.
 
 `POST /api/contact` always returns JSON (`{ ok: true }` or `{ ok: false, error: "…" }`). A bare Cloudflare `error code: 502` (non-JSON) means the Function did not run.
 
@@ -26,8 +30,27 @@ Code cannot finish the send if Resend has not verified the domain:
 | `EMAIL_TO` | Plain (optional) | Optional | Optional | `hello@uintahvalley.com` (bare address only — never `To: …`) |
 | `EMAIL_FROM` | Plain | **Required** | **Required** | `Uintah Valley <hello@uintahvalley.com>` |
 | `CONTACT_DEBUG` | Plain (optional) | Leave unset | Optional | `1` to include a non-sensitive Resend status/message in JSON errors |
+| `TURNSTILE_SITE_KEY` | Plain | Set with the secret | Set with the secret | Public site key. `GET /api/turnstile` returns `{ siteKey }`. Empty hides the widget. |
+| `TURNSTILE_SECRET_KEY` | Secret | Set with the site key | Set with the site key | Siteverify secret. If unset, the owner still gets the message and the visitor gets no mail. |
 
 `EMAIL_TO` must be a **bare address** (`hello@uintahvalley.com`). Never set it to `To: hello@uintahvalley.com` — Resend rejects a `To:` prefix.
+
+## Turnstile
+
+1. Cloudflare dashboard → **Turnstile** → **Add widget**.
+2. Hostnames: `uintahvalley.com` and `uintahvalley.pages.dev`. Add a preview hostname only if that preview should pass the check. Do not add `localhost`.
+3. Mode: **Managed**. Create the widget.
+4. Put the site key in `TURNSTILE_SITE_KEY` and the secret in `TURNSTILE_SECRET_KEY` (Production and Preview). Retry the deployment.
+5. The pages load Turnstile only from `https://challenges.cloudflare.com/turnstile/v0/api.js`. Both forms use widget action `contact`.
+6. Siteverify checks `success`, action `contact`, and hostname `uintahvalley.com`, `www.uintahvalley.com`, `uintahvalley.pages.dev`, or `<branch>.uintahvalley.pages.dev`. The client IP sent to Siteverify is `CF-Connecting-IP`.
+
+If `TURNSTILE_SECRET_KEY` is missing, the submission still goes to `EMAIL_TO` and no message is sent to the address the visitor typed. If the secret is set, a missing or failed token returns “Please complete the security check and try again.” and nothing is sent.
+
+## Rate limit
+
+No in-app throttle: this project has no rate-limit binding, and a memory counter would not hold across isolates. On the **uintahvalley.com** zone, add **Security → WAF → Rate limiting rules** for `POST` `/api/contact` (for example 10 requests per minute per IP, action Block). That zone rule does not cover `https://uintahvalley.pages.dev/api/contact`. Turnstile covers that backup host once the secret is set.
+
+Also skip Bot Fight / WAF challenges for `POST /api/contact` and `GET /api/turnstile`, or the apex answers with HTML instead of JSON.
 
 `EMAIL_FROM` must use a domain verified in Resend. Do not commit API keys.
 
@@ -49,7 +72,7 @@ If the secret is missing, the form returns JSON 503 (`Email is not configured ye
 
 1. Cloudflare Dashboard → the **uintahvalley.com** zone (not only the Pages project).
 2. Security → Bots (and WAF / custom rules if present).
-3. Skip or disable the challenge for `POST /api/contact` (or the whole `/api/*` path).
+3. Skip or disable the challenge for `POST /api/contact` and `GET /api/turnstile` (or the whole `/api/*` path).
 4. If the zone orange-clouds a record that points at Pages, either grey-cloud it or use the Pages custom-domain target so zone rules do not sit in front of Functions.
 
 Until that skip exists, the site posts to `/api/contact` first, then retries `https://uintahvalley.pages.dev/api/contact` when the apex response is not JSON.

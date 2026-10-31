@@ -71,7 +71,7 @@
   window.UVContact = { post: postContact };
 
   const STORAGE_KEY = "uintahvalley-cart-v1";
-  const DEFAULT_REQUEST_NOTES = "Please review my request list.";
+  const MAX_QTY = 99;
   const PRODUCTS = {
     "vanilla-1oz": {
       id: "vanilla-1oz",
@@ -175,10 +175,10 @@
       return;
     }
     const cart = loadCart();
-    const nextQty = Math.max(1, parseInt(qty, 10) || 1);
+    const nextQty = Math.max(1, Math.min(MAX_QTY, parseInt(qty, 10) || 1));
     const existing = cart.items.find(function (item) { return item.id === id; });
     if (existing) {
-      existing.qty += nextQty;
+      existing.qty = Math.min(MAX_QTY, existing.qty + nextQty);
     } else {
       cart.items.push({ id: id, qty: nextQty });
     }
@@ -189,7 +189,7 @@
   function setQty(id, qty) {
     if (!isAvailable(PRODUCTS[id])) return;
     const cart = loadCart();
-    const nextQty = Math.max(0, parseInt(qty, 10) || 0);
+    const nextQty = Math.max(0, Math.min(MAX_QTY, parseInt(qty, 10) || 0));
     cart.items = cart.items
       .map(function (item) {
         return item.id === id ? { id: id, qty: nextQty } : item;
@@ -272,7 +272,7 @@
         "<td>" + product.name +
         "<div class='fine'><span class='pill'>Don's Reserve</span> " + product.size + "</div></td>" +
         "<td>" + money(product.price) + "</td>" +
-        "<td><input data-qty='" + product.id + "' type='number' min='1' max='24' value='" + item.qty + "' aria-label='Quantity for " + product.name + "'></td>" +
+        "<td><input data-qty='" + product.id + "' type='number' min='1' max='99' value='" + item.qty + "' aria-label='Quantity for " + product.name + "'></td>" +
         "<td>" + money(product.price * item.qty) + "</td>" +
         "<td><button class='btn' type='button' data-remove='" + product.id + "'>Remove</button></td>" +
         "</tr>"
@@ -328,6 +328,15 @@
     return lines.join("\n");
   }
 
+  function requestItems() {
+    return loadCart().items.map(function (item) {
+      var qty = parseInt(item.qty, 10);
+      if (!qty || qty < 1) qty = 1;
+      if (qty > MAX_QTY) qty = MAX_QTY;
+      return { id: item.id, qty: qty };
+    }).slice(0, 20);
+  }
+
   const requestOverlay = document.querySelector("[data-request-modal]");
   const requestForm = document.querySelector("[data-request-form]");
   const requestStatus = requestForm ? requestForm.querySelector("[data-request-status]") : null;
@@ -337,7 +346,7 @@
   function requestFocusables() {
     if (!requestOverlay) return [];
     return Array.prototype.slice.call(requestOverlay.querySelectorAll(
-      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled])'
+      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), iframe'
     )).filter(function (el) {
       return !el.closest(".hp") && el.getAttribute("tabindex") !== "-1";
     });
@@ -374,6 +383,10 @@
     if (requestSubmit) requestSubmit.disabled = false;
     requestOverlay.hidden = false;
     document.body.classList.add("modal-open");
+    const turnstileSlot = requestForm && requestForm.querySelector("[data-turnstile]");
+    if (turnstileSlot && window.UVTurnstile && typeof window.UVTurnstile.mount === "function") {
+      window.UVTurnstile.mount(turnstileSlot);
+    }
     const emailField = requestForm && requestForm.querySelector("[name='email']");
     if (emailField) emailField.focus();
   }
@@ -429,43 +442,64 @@
   if (requestForm) {
     requestForm.addEventListener("submit", function (event) {
       event.preventDefault();
-      const requestList = requestSummary();
-      if (!requestList) {
+      const items = requestItems();
+      if (!items.length) {
         setRequestStatus("error", "Add items to your list first.");
         syncRequestMailButton();
         return;
       }
 
       const email = (requestForm.querySelector("[name='email']") || {}).value || "";
-      const notes = ((requestForm.querySelector("[name='notes']") || {}).value || "").trim() || DEFAULT_REQUEST_NOTES;
+      const notes = ((requestForm.querySelector("[name='notes']") || {}).value || "").trim();
       const company = (requestForm.querySelector("[name='company']") || {}).value || "";
 
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      if (email.trim().length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
         setRequestStatus("error", "Please enter a valid email.");
         const emailField = requestForm.querySelector("[name='email']");
         if (emailField) emailField.focus();
+        return;
+      }
+      if (notes.length > 2000) {
+        setRequestStatus("error", "Message is too long.");
         return;
       }
 
       if (requestSubmit) requestSubmit.disabled = true;
       setRequestStatus("", "Sending…");
 
-      postContact({
-        email: email.trim(),
-        notes: notes,
-        company: company,
-        requestList: requestList
-      }).then(function (result) {
-        if (result.ok) {
-          requestForm.reset();
-          clearCart();
-          setRequestStatus("ok", "Request sent. We will reply by email.");
-        } else {
-          setRequestStatus("error", result.error || "Could not send that request. Write hello@uintahvalley.com.");
+      const turnstileSlot = requestForm.querySelector("[data-turnstile]");
+      const ready = window.UVTurnstile && typeof window.UVTurnstile.prepare === "function"
+        ? window.UVTurnstile.prepare(turnstileSlot)
+        : Promise.resolve({ required: false, token: "", widgetId: null });
+
+      ready.then(function (check) {
+        if (check.required && !check.token) {
+          setRequestStatus("error", "Please complete the security check and try again.");
+          if (requestSubmit) requestSubmit.disabled = false;
+          return null;
         }
+        return postContact({
+          email: email.trim(),
+          notes: notes,
+          company: company,
+          requestList: items,
+          "cf-turnstile-response": check.token || ""
+        }).then(function (result) {
+          if (result.ok) {
+            requestForm.reset();
+            clearCart();
+            setRequestStatus("ok", "Request sent. We will reply by email.");
+          } else {
+            setRequestStatus("error", result.error || "Could not send that request. Write hello@uintahvalley.com.");
+          }
+        }).finally(function () {
+          if (window.UVTurnstile && typeof window.UVTurnstile.reset === "function") {
+            window.UVTurnstile.reset(check.widgetId);
+          }
+          if (requestSubmit) requestSubmit.disabled = false;
+        });
       }).catch(function () {
         setRequestStatus("error", "Could not send that request. Write hello@uintahvalley.com.");
-      }).finally(function () {
         if (requestSubmit) requestSubmit.disabled = false;
       });
     });
@@ -478,6 +512,7 @@
     clearCart: clearCart,
     isAvailable: isAvailable,
     requestSummary: requestSummary,
+    requestItems: requestItems,
     updateCartCount: updateCartCount,
     renderCartPage: renderCartPage
   };

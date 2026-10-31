@@ -1,18 +1,92 @@
 const DEFAULT_TO = "hello@uintahvalley.com";
+const MAX_BODY_BYTES = 16 * 1024;
+const MAX_NAME = 100;
+const MAX_EMAIL = 254;
+const MAX_NOTES = 2000;
+const MAX_ITEMS = 20;
+const MAX_QTY = 99;
+const MAX_TOKEN = 2048;
+const TURNSTILE_ACTION = "contact";
+const VISITOR_SUBJECT = "Thanks for contacting Uintah Valley";
+const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+
+// Keep this aligned with PRODUCTS in js/cart.js. The owner email is rebuilt
+// from this map so a visitor cannot put arbitrary text in the request list.
+const PRODUCTS = {
+  "vanilla-1oz": {
+    name: "Pure Vanilla Extract",
+    size: "1 fl oz",
+    price: 12,
+    line: "Uintah Valley"
+  },
+  "vanilla-3oz": {
+    name: "Pure Vanilla Extract",
+    size: "3 fl oz",
+    price: 32,
+    line: "Uintah Valley"
+  },
+  "gift-box": {
+    name: "Uintah Valley Gift Box",
+    size: "Gift set",
+    price: 40,
+    line: "Uintah Valley"
+  },
+  "dons-madagascar-dented-brick": {
+    name: "Madagascar Beans · Dented Brick Craft Rum",
+    size: "4 oz",
+    price: 40,
+    line: "Don's Reserve"
+  },
+  "dons-tahitian-barbarosi": {
+    name: "Tahitian Barbarosi Spiced Rum",
+    size: "4 oz",
+    price: 40,
+    line: "Don's Reserve"
+  },
+  "dons-tahiti-five-wives": {
+    name: "Tahiti Beans · Five Wives Vodka",
+    size: "4 oz",
+    price: 40,
+    line: "Don's Reserve"
+  }
+};
+
+// One extra label only: https://<preview>.uintahvalley.pages.dev
+const PREVIEW_HOST = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.uintahvalley\.pages\.dev$/;
 
 function allowedOrigin(origin) {
-  if (!origin) return "";
+  if (!origin || typeof origin !== "string" || origin.length > 200) return "";
+  let url;
   try {
-    const { hostname, protocol } = new URL(origin);
-    const https = protocol === "https:" || protocol === "http:";
-    if (!https) return "";
-    if (hostname === "uintahvalley.com" || hostname === "www.uintahvalley.com") return origin;
-    if (hostname.endsWith(".pages.dev")) return origin;
-    if (hostname === "localhost" || hostname === "127.0.0.1") return origin;
-    return "";
+    url = new URL(origin);
   } catch (err) {
     return "";
   }
+  if (url.protocol !== "https:") return "";
+  if (url.username || url.password) return "";
+  if (url.origin !== origin) return "";
+  const host = url.hostname;
+  if (
+    host === "uintahvalley.com" ||
+    host === "www.uintahvalley.com" ||
+    host === "uintahvalley.pages.dev"
+  ) {
+    return url.origin;
+  }
+  if (PREVIEW_HOST.test(host)) return url.origin;
+  return "";
+}
+
+export function turnstileHostnameOk(hostname) {
+  const host = String(hostname || "").trim().toLowerCase().replace(/\.$/, "");
+  if (
+    host === "uintahvalley.com" ||
+    host === "www.uintahvalley.com" ||
+    host === "uintahvalley.pages.dev"
+  ) {
+    return true;
+  }
+  return PREVIEW_HOST.test(host);
 }
 
 function corsHeaders(origin) {
@@ -51,24 +125,92 @@ function fail(status, error, origin, env, detail) {
 }
 
 function isEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+  const email = String(value || "").trim();
+  if (!email || email.length > MAX_EMAIL) return false;
+  if (/[\u0000-\u001F\u007F]/.test(email)) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 function debugOn(env) {
   return !!(env && env.CONTACT_DEBUG === "1");
 }
 
+function codedError(code) {
+  const err = new Error(code);
+  err.code = code;
+  return err;
+}
+
+function declaredBodyTooLarge(request) {
+  const declared = request && request.headers ? request.headers.get("content-length") : "";
+  if (declared == null || declared === "") return false;
+  if (!/^\d+$/.test(declared)) return true;
+  return Number(declared) > MAX_BODY_BYTES;
+}
+
+async function readBounded(request) {
+  const body = request && request.body;
+  if (!body || typeof body.getReader !== "function") {
+    const raw = await request.text();
+    if (raw.length > MAX_BODY_BYTES) throw codedError("too-large");
+    return raw;
+  }
+  const reader = body.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const step = await reader.read();
+      if (step.done) break;
+      const value = step.value;
+      const size = value ? value.byteLength : 0;
+      total += size;
+      if (total > MAX_BODY_BYTES) {
+        try { await reader.cancel(); } catch (err) { /* already over the cap */ }
+        throw codedError("too-large");
+      }
+      if (value) chunks.push(value);
+    }
+  } catch (err) {
+    if (err && err.code === "too-large") throw err;
+    throw codedError("bad-body");
+  }
+  const merged = new Uint8Array(total);
+  let offset = 0;
+  for (let i = 0; i < chunks.length; i++) {
+    merged.set(chunks[i], offset);
+    offset += chunks[i].byteLength;
+  }
+  return new TextDecoder().decode(merged);
+}
+
 async function readPayload(request) {
   const type = request.headers.get("content-type") || "";
-  if (type.includes("application/json")) {
-    const data = await request.json();
-    return data && typeof data === "object" ? data : {};
-  }
-  if (type.includes("application/x-www-form-urlencoded") || type.includes("multipart/form-data")) {
+  if (type.includes("multipart/form-data")) {
+    if (declaredBodyTooLarge(request) || !request.headers.get("content-length")) {
+      throw codedError("too-large");
+    }
     const form = await request.formData();
     const data = {};
     form.forEach(function (value, key) {
       data[key] = typeof value === "string" ? value : "";
+    });
+    return data;
+  }
+  const raw = await readBounded(request);
+  if (type.includes("application/json")) {
+    if (!raw) return {};
+    try {
+      const data = JSON.parse(raw);
+      return data && typeof data === "object" ? data : {};
+    } catch (err) {
+      throw codedError("bad-json");
+    }
+  }
+  if (type.includes("application/x-www-form-urlencoded")) {
+    const data = {};
+    new URLSearchParams(raw).forEach(function (value, key) {
+      data[key] = value;
     });
     return data;
   }
@@ -192,54 +334,146 @@ async function sendResend(key, payload) {
   };
 }
 
-function confirmationText(name, notes, requestList) {
-  const who = name || "there";
-  const echo = notes.length > 280 ? notes.slice(0, 277) + "…" : notes;
-  const lines = [
-    "Hi " + who + ",",
+export function headerSafe(value) {
+  return String(value == null ? "" : value)
+    .replace(/[\u0000-\u001F\u007F\u2028\u2029]+/g, " ")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+export function confirmationText() {
+  return [
+    "Thanks for contacting Uintah Valley. We received your message and will reply soon.",
     "",
-    requestList
-      ? "We got your request list. Thanks for writing Uintah Valley — we will reply by email."
-      : "We got your message. Thanks for writing Uintah Valley — we will reply by email.",
-    "Currently we can only sell to Utah residents.",
-    ""
-  ];
-  if (echo) {
-    lines.push("Your message:", echo, "");
+    "https://uintahvalley.com"
+  ].join("\n");
+}
+
+function money(n) {
+  return "$" + Number(n).toFixed(2).replace(/\.00$/, "");
+}
+
+function parseQty(value) {
+  let qty = value;
+  if (typeof qty === "string" && /^[1-9][0-9]?$/.test(qty)) qty = Number(qty);
+  if (typeof qty !== "number" || !Number.isInteger(qty) || qty < 1 || qty > MAX_QTY) return null;
+  return qty;
+}
+
+function parseRequestList(value) {
+  if (value == null || value === "") return { items: [] };
+  if (typeof value === "string" || !Array.isArray(value)) {
+    return { error: "Could not read that request list." };
   }
-  if (requestList) {
-    lines.push(requestList, "");
+  if (value.length > MAX_ITEMS) return { error: "That request list is too long." };
+  const items = [];
+  const seen = new Set();
+  for (let i = 0; i < value.length; i++) {
+    const entry = value[i];
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      return { error: "Could not read that request list." };
+    }
+    const id = typeof entry.id === "string" ? entry.id.trim() : "";
+    if (!Object.prototype.hasOwnProperty.call(PRODUCTS, id)) {
+      return { error: "That request list has an item we don't sell." };
+    }
+    if (seen.has(id)) return { error: "That request list has a duplicate item." };
+    const qty = parseQty(entry.qty);
+    if (qty == null) return { error: "Quantity must be between 1 and 99." };
+    seen.add(id);
+    items.push({ id: id, qty: qty });
   }
-  lines.push("Uintah Valley", "hello@uintahvalley.com");
+  return { items: items };
+}
+
+function formatRequestList(items) {
+  if (!items.length) return "";
+  const lines = ["Request list:"];
+  let subtotal = 0;
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const product = PRODUCTS[item.id];
+    subtotal += product.price * item.qty;
+    lines.push(
+      "- [" + product.line + "] " + product.name + " · " + product.size +
+      " × " + item.qty +
+      "  (" + money(product.price) + " each, provisional)"
+    );
+  }
+  lines.push("Provisional subtotal: " + money(subtotal));
   return lines.join("\n");
 }
 
 export function prepareContact(data) {
-  const name = String((data && data.name) || "").trim();
+  const nameRaw = String((data && data.name) || "").trim();
+  if (nameRaw.length > MAX_NAME) return { error: "Name is too long." };
+  const name = headerSafe(nameRaw);
+
   const email = String((data && data.email) || "").trim();
+  if (!isEmail(email)) return { error: "Please enter a valid email." };
+
   const notes = String((data && (data.notes || data.message)) || "").trim();
-  const requestList = String((data && (data.requestList || data.request_list)) || "").trim();
+  if (notes.length > MAX_NOTES) return { error: "Message is too long." };
 
-  if (!isEmail(email)) {
-    return { error: "Please enter a valid email." };
-  }
-  if (!notes && !requestList) {
-    return { error: "Please write a short message." };
-  }
+  const parsed = parseRequestList(data && (data.requestList != null ? data.requestList : data.request_list));
+  if (parsed.error) return { error: parsed.error };
+  const items = parsed.items;
+  if (!notes && !items.length) return { error: "Please write a short message." };
 
-  const subject = requestList
-    ? "Uintah Valley request list from " + (name || email || "the site")
+  const requestList = formatRequestList(items);
+  const safeEmail = headerSafe(email);
+  const subject = items.length
+    ? "Uintah Valley request list from " + (name || safeEmail || "the site")
     : "Uintah Valley contact from " + (name || "the site");
 
   const text = [
     name ? "Name: " + name : "Name: (not given)",
-    "Email: " + email,
+    "Email: " + safeEmail,
     "",
     notes,
     requestList ? "\n" + requestList : ""
   ].filter(Boolean).join("\n");
 
-  return { name, email, notes, requestList, subject, text };
+  return { name: name, email: safeEmail, notes: notes, items: items, requestList: requestList, subject: headerSafe(subject), text: text };
+}
+
+function turnstileSecret(env) {
+  const raw = env && env.TURNSTILE_SECRET_KEY;
+  if (typeof raw !== "string") return "";
+  return raw.trim();
+}
+
+async function verifyTurnstile(request, env, token) {
+  const secret = turnstileSecret(env);
+  if (!secret) return { enforced: false, ok: false };
+
+  if (typeof token !== "string" || token.length === 0 || token.length > MAX_TOKEN) {
+    return { enforced: true, ok: false };
+  }
+
+  const remoteip = request && request.headers ? (request.headers.get("CF-Connecting-IP") || "") : "";
+  let result;
+  try {
+    const response = await fetch(SITEVERIFY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      signal: AbortSignal.timeout(10000),
+      body: new URLSearchParams({
+        secret: secret,
+        response: token,
+        remoteip: remoteip
+      })
+    });
+    if (!response.ok) return { enforced: true, ok: false, unavailable: true };
+    result = await response.json();
+  } catch (err) {
+    return { enforced: true, ok: false, unavailable: true };
+  }
+
+  if (!result || result.success !== true || result.action !== TURNSTILE_ACTION || !turnstileHostnameOk(result.hostname)) {
+    return { enforced: true, ok: false };
+  }
+  return { enforced: true, ok: true };
 }
 
 export function onRequestOptions(context) {
@@ -251,7 +485,7 @@ export function onRequestOptions(context) {
     }
     return new Response(null, { status: 204, headers: corsHeaders(origin) });
   } catch (err) {
-    return new Response(null, { status: 204 });
+    return new Response(null, { status: 403 });
   }
 }
 
@@ -306,14 +540,21 @@ export async function onRequest(context) {
 }
 
 async function handleContactPost(request, env, origin) {
-  if (origin && !allowedOrigin(origin)) {
+  if (!allowedOrigin(origin)) {
     return json(403, { ok: false, error: "Forbidden." }, origin);
+  }
+
+  if (declaredBodyTooLarge(request)) {
+    return json(413, { ok: false, error: "That message is too large." }, origin);
   }
 
   let data;
   try {
     data = await readPayload(request);
   } catch (err) {
+    if (err && err.code === "too-large") {
+      return json(413, { ok: false, error: "That message is too large." }, origin);
+    }
     return json(400, { ok: false, error: "Could not read that form." }, origin);
   }
 
@@ -326,7 +567,21 @@ async function handleContactPost(request, env, origin) {
   if (prepared.error) {
     return json(400, { ok: false, error: prepared.error }, origin);
   }
-  const { name, email, notes, requestList, subject, text } = prepared;
+  const { email, subject, text } = prepared;
+
+  const turnstile = await verifyTurnstile(request, env, data["cf-turnstile-response"]);
+  if (turnstile.enforced && !turnstile.ok) {
+    return json(
+      turnstile.unavailable ? 503 : 400,
+      {
+        ok: false,
+        error: turnstile.unavailable
+          ? "The security check could not be completed. Try again in a moment."
+          : "Please complete the security check and try again."
+      },
+      origin
+    );
+  }
 
   const key = normalizeKey(env.RESEND_API_KEY);
   if (!key) {
@@ -339,8 +594,8 @@ async function handleContactPost(request, env, origin) {
     return json(503, { ok: false, error: "Email is not configured yet." }, origin);
   }
 
-  const to = String(env.EMAIL_TO || DEFAULT_TO).trim();
-  const from = String(env.EMAIL_FROM || "").trim();
+  const to = headerSafe(env.EMAIL_TO || DEFAULT_TO);
+  const from = headerSafe(env.EMAIL_FROM || "");
   const candidates = fromCandidates(from);
   if (!candidates.length) {
     return fail(
@@ -385,15 +640,18 @@ async function handleContactPost(request, env, origin) {
   }
 
   if (inbound.id) {
-    try {
-      await sendResend(key, {
-        from: sender,
-        to: [email],
-        subject: "We got your message — Uintah Valley",
-        text: confirmationText(name, notes, requestList)
-      });
-    } catch (err) {
-      // Primary mail already went out; do not fail the form.
+    // Visitor mail only after Siteverify. The body is a fixed template.
+    if (turnstile.ok) {
+      try {
+        await sendResend(key, {
+          from: sender,
+          to: [email],
+          subject: VISITOR_SUBJECT,
+          text: confirmationText()
+        });
+      } catch (err) {
+        // Primary mail already went out; do not fail the form.
+      }
     }
     return json(200, { ok: true }, origin);
   }
@@ -412,3 +670,5 @@ async function handleContactPost(request, env, origin) {
   }
   return fail(502, error, origin, env, detail);
 }
+
+export { PRODUCTS };

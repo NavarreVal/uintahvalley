@@ -56,7 +56,7 @@ The hero is one lockup: stacked Quattrocento lines **PURE** and **PREMIUM**, siz
 python3 -m http.server 8080
 ```
 
-Open [http://localhost:8080](http://localhost:8080). Confirm the mountain photo sits behind the logo and nav, the Discover tabs swap copy and cards, and the footer credit is on every page.
+Open [http://localhost:8080](http://localhost:8080). Confirm the mountain photo sits behind the logo and nav, the Discover tabs swap copy and cards, and the footer credit is on every page. `POST /api/contact` rejects `http://localhost` on purpose. Use `node --test tests/contact.test.mjs` to exercise the handler.
 
 ## Deploy
 
@@ -66,7 +66,33 @@ Open [http://localhost:8080](http://localhost:8080). Confirm the mountain photo 
 
 `404.html` is the not-found page. `_redirects` and `_headers` stay in the project root.
 
-Contact form secrets: see `CONTACT_FORM.md`. **`RESEND_API_KEY` must exist on Production** (and Preview). **`EMAIL_FROM` is required** (a verified sender such as `Uintah Valley <hello@uintahvalley.com>`). Optional: `EMAIL_TO` (a bare address such as `hello@uintahvalley.com`, never `To: …`). Tests: `node --test tests/contact.test.mjs`.
+Contact form secrets: see `CONTACT_FORM.md`. **`RESEND_API_KEY` must exist on Production** (and Preview). **`EMAIL_FROM` is required** (a verified sender such as `Uintah Valley <hello@uintahvalley.com>`). Optional: `EMAIL_TO` (a bare address such as `hello@uintahvalley.com`, never `To: …`).
+
+Turnstile (set both, or neither):
+
+| Name | Type | Purpose |
+| --- | --- | --- |
+| `TURNSTILE_SITE_KEY` | Plain | Public site key. Pages read it from `GET /api/turnstile`. If it is empty, the widget stays hidden. |
+| `TURNSTILE_SECRET_KEY` | Secret | Server-side Siteverify only. Never put this in the page. |
+
+Until `TURNSTILE_SECRET_KEY` is set, a valid submission still emails the owner and does **not** email the visitor. After it is set, a missing or invalid token is rejected and nothing is sent. A passing token emails the owner the real message and emails the visitor only this fixed note: “Thanks for contacting Uintah Valley. We received your message and will reply soon.” plus `https://uintahvalley.com`.
+
+### Turnstile widget
+
+1. Cloudflare dashboard → **Turnstile** → **Add widget**.
+2. Name it `Uintah Valley contact`. Add hostnames **`uintahvalley.com`** and **`uintahvalley.pages.dev`**. Add a preview hostname only if that preview should solve the check. Do not add `localhost`.
+3. Widget mode: **Managed**.
+4. Copy the site key into `TURNSTILE_SITE_KEY` and the secret into `TURNSTILE_SECRET_KEY` on the Pages project (**Settings → Environment variables**, Production and Preview).
+5. Retry the deployment after saving them.
+6. On the **uintahvalley.com** zone, skip Bot Fight / WAF challenges for `POST /api/contact` and `GET /api/turnstile` so those paths return JSON.
+
+The widget action is `contact`. Siteverify must return `success` and a hostname of `uintahvalley.com`, `www.uintahvalley.com`, `uintahvalley.pages.dev`, or a single-label preview host `<branch>.uintahvalley.pages.dev`.
+
+### WAF rate limit
+
+This project has no rate-limit binding. An in-memory counter would not be shared across isolates, so the Function does not throttle. Add a rule on the **uintahvalley.com** zone: **Security → WAF → Rate limiting rules**. Match URI Path equals `/api/contact` and method POST, for example 10 requests per minute per IP, action Block. That rule does not cover the `uintahvalley.pages.dev` backup host; Turnstile does, once the secret is set.
+
+Tests: `node --test tests/contact.test.mjs tests/middleware.test.mjs tests/seo.test.mjs`.
 
 ## Footer
 

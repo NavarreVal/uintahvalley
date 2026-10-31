@@ -477,6 +477,10 @@ h3,
   gap: 0.75rem;
 }
 
+.stack-gap {
+  margin-top: 1rem;
+}
+
 .cart-link {
   display: inline-flex;
   align-items: center;
@@ -693,6 +697,10 @@ h3,
   padding: 2.8rem 0;
 }
 
+.section.section-tight {
+  padding-top: 1rem;
+}
+
 #catalog {
   padding-top: 0;
 }
@@ -863,6 +871,10 @@ h3,
   margin: 0;
 }
 
+.lean-points.three {
+  margin-top: 1.6rem;
+}
+
 .lean-points div {
   margin: 0;
   padding: 1.1rem 1.15rem 1.2rem;
@@ -885,6 +897,10 @@ h3,
   padding: 1rem 1.15rem;
   background: #f8d4d6;
   border: 1px solid #c76a70;
+}
+
+.callout p {
+  margin: 0;
 }
 
 .media {
@@ -949,6 +965,15 @@ h3,
 
 .form-status.is-error {
   color: #8a2a2a;
+}
+
+.turnstile {
+  min-height: 65px;
+}
+
+.turnstile[hidden] {
+  display: none;
+  min-height: 0;
 }
 
 .modal-overlay {

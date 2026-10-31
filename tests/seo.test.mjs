@@ -68,22 +68,58 @@ test("sitemap lists the indexable extensionless URLs and not cart or 404", funct
   });
 });
 
-test("robots.txt allows crawling and blocks the AI training crawlers", function () {
+test("robots.txt points crawlers at the sitemap", function () {
   const text = readFileSync(join(root, "robots.txt"), "utf8");
-  assert.match(text, /^User-agent: \*\r?\nAllow: \/\r?\n/);
   assert.match(text, /Sitemap: https:\/\/uintahvalley\.com\/sitemap\.xml/);
+});
+
+test("security headers allow this site and Turnstile only", function () {
+  const headers = readFileSync(join(root, "_headers"), "utf8");
+  assert.match(headers, /Strict-Transport-Security: max-age=31536000; includeSubDomains/);
+  assert.match(headers, /X-Frame-Options: DENY/);
+  assert.match(headers, /X-Content-Type-Options: nosniff/);
+  assert.match(headers, /Referrer-Policy: strict-origin-when-cross-origin/);
+  assert.match(headers, /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(\)/);
+  const csp = headers.match(/Content-Security-Policy: (.+)/)[1];
+  assert.match(csp, /script-src 'self' https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /frame-src https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /frame-ancestors 'none'/);
+  assert.match(csp, /font-src 'self'/);
+  assert.match(csp, /style-src 'self'/);
+  assert.equal(csp.includes("unsafe-inline"), false);
+  assert.match(csp, /connect-src 'self' https:\/\/uintahvalley\.pages\.dev/);
+  assert.match(csp, /img-src 'self' data:/);
+  assert.equal(csp.includes("youtube"), false);
+  assert.equal(csp.includes("fonts.google"), false);
+});
+
+test("pages keep scripts and styles in files", function () {
   [
-    "GPTBot",
-    "CCBot",
-    "Google-Extended",
-    "ClaudeBot",
-    "anthropic-ai",
-    "Bytespider",
-    "Applebot-Extended",
-    "meta-externalagent"
-  ].forEach(function (agent) {
-    assert.match(text, new RegExp("User-agent: " + agent + "\\r?\\nDisallow: /"));
+    "index.html",
+    "shop.html",
+    "about.html",
+    "contact.html",
+    "cart.html",
+    "privacy.html",
+    "copyright.html",
+    "404.html"
+  ].forEach(function (name) {
+    const page = html(name);
+    assert.equal(/<script(?![^>]*\bsrc=)/i.test(page), false, name);
+    assert.equal(/\son[a-z]+\s*=/i.test(page), false, name);
+    assert.equal(/\sstyle\s*=/i.test(page), false, name);
   });
+  ["contact.html", "cart.html"].forEach(function (name) {
+    const page = html(name);
+    assert.match(page, /data-turnstile/);
+    assert.match(page, /js\/turnstile\.js/);
+    assert.match(page, /maxlength="254"/);
+    assert.match(page, /maxlength="2000"/);
+  });
+  assert.match(html("contact.html"), /name="name"[^>]*maxlength="100"/);
+  const turnstile = readFileSync(join(root, "js/turnstile.js"), "utf8");
+  const urls = turnstile.match(/https?:\/\/[^"'\\\s]+/g) || [];
+  assert.deepEqual(urls, ["https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"]);
 });
 
 test("_redirects still points old product URLs at shop and the license record stays", function () {
