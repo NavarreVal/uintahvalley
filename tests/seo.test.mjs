@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { contentSecurityPolicy } from "../functions/_middleware.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -80,17 +81,25 @@ test("security headers allow this site and Turnstile only", function () {
   assert.match(headers, /X-Content-Type-Options: nosniff/);
   assert.match(headers, /Referrer-Policy: strict-origin-when-cross-origin/);
   assert.match(headers, /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(\)/);
-  const csp = headers.match(/Content-Security-Policy: (.+)/)[1];
-  assert.match(csp, /script-src 'self' https:\/\/challenges\.cloudflare\.com/);
+  assert.equal(headers.includes("Content-Security-Policy:"), false);
+  assert.equal(headers.includes("pages.dev"), false);
+  const csp = contentSecurityPolicy("abc+/=xyz");
+  assert.match(csp, /script-src 'self' 'nonce-abc\+\/=xyz' https:\/\/challenges\.cloudflare\.com/);
   assert.match(csp, /frame-src https:\/\/challenges\.cloudflare\.com/);
   assert.match(csp, /frame-ancestors 'none'/);
   assert.match(csp, /font-src 'self'/);
   assert.match(csp, /style-src 'self'/);
   assert.equal(csp.includes("unsafe-inline"), false);
-  assert.match(csp, /connect-src 'self' https:\/\/uintahvalley\.pages\.dev/);
+  assert.match(csp, /connect-src 'self'/);
+  assert.match(csp, /form-action 'self'/);
+  assert.equal(csp.includes("pages.dev"), false);
   assert.match(csp, /img-src 'self' data:/);
   assert.equal(csp.includes("youtube"), false);
   assert.equal(csp.includes("fonts.google"), false);
+  const cart = readFileSync(join(root, "js/cart.js"), "utf8");
+  const site = readFileSync(join(root, "js/site.js"), "utf8");
+  assert.equal(cart.includes("pages.dev"), false);
+  assert.equal(site.includes("pages.dev"), false);
 });
 
 test("pages keep scripts and styles in files", function () {

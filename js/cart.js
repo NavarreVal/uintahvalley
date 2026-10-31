@@ -1,9 +1,11 @@
 (function () {
-  const PAGES_CONTACT = "https://uintahvalley.pages.dev/api/contact";
+  const FORM_UNAVAILABLE = "The contact form is temporarily unavailable. Please email hello@uintahvalley.com.";
 
-  function isCustomDomain() {
-    const host = location.hostname;
-    return host === "uintahvalley.com" || host === "www.uintahvalley.com";
+  function visitorEmailOk(value) {
+    const email = String(value || "").trim();
+    if (!email || email.length > 254) return false;
+    if (/[\s,;<>"()[\]\\]/.test(email)) return false;
+    return /^[^@]+@[^@]+\.[^@]+$/.test(email);
   }
 
   function formatContactDetail(detail) {
@@ -57,14 +59,6 @@
           parsed: false,
           error: "The server returned an unexpected response. Write hello@uintahvalley.com."
         };
-      })
-      .then(function (result) {
-        if (result.ok || result.parsed || !isCustomDomain()) return result;
-        return fetch(PAGES_CONTACT, { method: "POST", headers: headers, body: body })
-          .then(parseContactResponse)
-          .catch(function () {
-            return result;
-          });
       });
   }
 
@@ -378,9 +372,16 @@
       return;
     }
     requestLastFocus = document.activeElement;
+    const unavailable = requestForm && requestForm.getAttribute("data-form-unavailable") === "true";
     if (requestForm) requestForm.reset();
-    setRequestStatus("", "");
-    if (requestSubmit) requestSubmit.disabled = false;
+    if (unavailable && requestForm) requestForm.setAttribute("data-form-unavailable", "true");
+    if (unavailable) {
+      setRequestStatus("error", FORM_UNAVAILABLE);
+      if (requestSubmit) requestSubmit.disabled = true;
+    } else {
+      setRequestStatus("", "");
+      if (requestSubmit) requestSubmit.disabled = false;
+    }
     requestOverlay.hidden = false;
     document.body.classList.add("modal-open");
     const turnstileSlot = requestForm && requestForm.querySelector("[data-turnstile]");
@@ -453,7 +454,13 @@
       const notes = ((requestForm.querySelector("[name='notes']") || {}).value || "").trim();
       const company = (requestForm.querySelector("[name='company']") || {}).value || "";
 
-      if (email.trim().length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      if (requestForm.getAttribute("data-form-unavailable") === "true") {
+        setRequestStatus("error", FORM_UNAVAILABLE);
+        if (requestSubmit) requestSubmit.disabled = true;
+        return;
+      }
+
+      if (!visitorEmailOk(email)) {
         setRequestStatus("error", "Please enter a valid email.");
         const emailField = requestForm.querySelector("[name='email']");
         if (emailField) emailField.focus();
@@ -470,9 +477,15 @@
       const turnstileSlot = requestForm.querySelector("[data-turnstile]");
       const ready = window.UVTurnstile && typeof window.UVTurnstile.prepare === "function"
         ? window.UVTurnstile.prepare(turnstileSlot)
-        : Promise.resolve({ required: false, token: "", widgetId: null });
+        : Promise.resolve({ required: false, siteKey: "", token: "", widgetId: null });
 
       ready.then(function (check) {
+        if (!check.siteKey) {
+          requestForm.setAttribute("data-form-unavailable", "true");
+          setRequestStatus("error", FORM_UNAVAILABLE);
+          if (requestSubmit) requestSubmit.disabled = true;
+          return null;
+        }
         if (check.required && !check.token) {
           setRequestStatus("error", "Please complete the security check and try again.");
           if (requestSubmit) requestSubmit.disabled = false;
@@ -496,11 +509,15 @@
           if (window.UVTurnstile && typeof window.UVTurnstile.reset === "function") {
             window.UVTurnstile.reset(check.widgetId);
           }
-          if (requestSubmit) requestSubmit.disabled = false;
+          if (requestSubmit && requestForm.getAttribute("data-form-unavailable") !== "true") {
+            requestSubmit.disabled = false;
+          }
         });
       }).catch(function () {
         setRequestStatus("error", "Could not send that request. Write hello@uintahvalley.com.");
-        if (requestSubmit) requestSubmit.disabled = false;
+        if (requestSubmit && requestForm.getAttribute("data-form-unavailable") !== "true") {
+          requestSubmit.disabled = false;
+        }
       });
     });
   }

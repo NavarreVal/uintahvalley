@@ -53,6 +53,29 @@ test("contact-only messages keep the contact subject", function () {
   assert.equal(result.text.includes("When is mainline back?"), true);
 });
 
+const FORM_UNAVAILABLE = "The contact form is temporarily unavailable. Please email hello@uintahvalley.com.";
+
+function withTurnstile(env) {
+  return Object.assign({ TURNSTILE_SECRET_KEY: "turnstile-secret" }, env || {});
+}
+
+function withToken(body) {
+  return Object.assign({ "cf-turnstile-response": "token-ok" }, body || {});
+}
+
+function allowTurnstile(resend) {
+  return async function (url, opts) {
+    if (String(url).indexOf("/turnstile/v0/siteverify") !== -1) {
+      return new Response(JSON.stringify({
+        success: true,
+        action: "contact",
+        hostname: "uintahvalley.com"
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    return resend(url, opts);
+  };
+}
+
 function postContext(body, env, headers) {
   return {
     request: new Request("https://uintahvalley.com/api/contact", {
@@ -76,14 +99,25 @@ async function readJson(res) {
 }
 
 test("POST without RESEND_API_KEY returns JSON 503", async function () {
-  const res = await onRequestPost(postContext({
-    email: "guest@uintahvalley.test",
-    notes: "Hello"
-  }));
-  assert.equal(res.status, 503);
-  const data = await readJson(res);
-  assert.equal(data.ok, false);
-  assert.equal(data.error, "Email is not configured yet.");
+  const original = globalThis.fetch;
+  let resendCalled = false;
+  globalThis.fetch = allowTurnstile(async function () {
+    resendCalled = true;
+    return new Response("{}", { status: 500 });
+  });
+  try {
+    const res = await onRequestPost(postContext(withToken({
+      email: "guest@uintahvalley.test",
+      notes: "Hello"
+    }), withTurnstile()));
+    assert.equal(res.status, 503);
+    const data = await readJson(res);
+    assert.equal(data.ok, false);
+    assert.equal(data.error, "Email is not configured yet.");
+    assert.equal(resendCalled, false);
+  } finally {
+    globalThis.fetch = original;
+  }
 });
 
 test("POST with invalid JSON still returns JSON", async function () {
@@ -93,7 +127,7 @@ test("POST with invalid JSON still returns JSON", async function () {
       headers: { "Content-Type": "application/json", Origin: "https://uintahvalley.com" },
       body: "{not-json"
     }),
-    env: {}
+    env: { TURNSTILE_SECRET_KEY: "turnstile-secret" }
   });
   assert.equal(res.status, 400);
   const data = await readJson(res);
@@ -111,12 +145,11 @@ test("GET /api/contact returns JSON 405", async function () {
   assert.equal(data.error, "Method not allowed.");
 });
 
-test("Resend success without Turnstile emails only the owner", async function () {
+test("missing Turnstile secret sends nothing", async function () {
   const original = globalThis.fetch;
-  const messages = [];
-  globalThis.fetch = async function (url, opts) {
-    assert.equal(String(url).includes("siteverify"), false);
-    messages.push(JSON.parse(opts.body));
+  let called = false;
+  globalThis.fetch = async function () {
+    called = true;
     return new Response(JSON.stringify({ id: "email_123" }), { status: 200 });
   };
   try {
@@ -124,16 +157,12 @@ test("Resend success without Turnstile emails only the owner", async function ()
       name: "Ada",
       email: "guest@uintahvalley.test",
       notes: "Hello from Ada"
-    }, { RESEND_API_KEY: "re_test" }));
-    assert.equal(res.status, 200);
+    }, { RESEND_API_KEY: "re_test", TURNSTILE_SECRET_KEY: "   ", TURNSTILE_SITE_KEY: "" }));
+    assert.equal(res.status, 503);
     const data = await readJson(res);
-    assert.equal(data.ok, true);
-    assert.equal(messages.length, 1);
-    assert.deepEqual(messages[0].to, ["hello@uintahvalley.com"]);
-    assert.equal(messages[0].reply_to, "guest@uintahvalley.test");
-    assert.match(messages[0].text, /Hello from Ada/);
-    assert.equal(messages[0].subject.includes("\n"), false);
-    assert.equal(messages[0].subject.includes("\r"), false);
+    assert.equal(data.ok, false);
+    assert.equal(data.error, FORM_UNAVAILABLE);
+    assert.equal(called, false);
   } finally {
     globalThis.fetch = original;
   }
@@ -141,14 +170,14 @@ test("Resend success without Turnstile emails only the owner", async function ()
 
 test("Resend 401 still returns JSON, never a bare 502", async function () {
   const original = globalThis.fetch;
-  globalThis.fetch = async function () {
+  globalThis.fetch = allowTurnstile(async function () {
     return new Response(JSON.stringify({ message: "invalid" }), { status: 401 });
-  };
+  });
   try {
-    const res = await onRequestPost(postContext({
+    const res = await onRequestPost(postContext(withToken({
       email: "guest@uintahvalley.test",
       notes: "Hello"
-    }, { RESEND_API_KEY: "re_test" }));
+    }), withTurnstile({ RESEND_API_KEY: "re_test" })));
     assert.equal(res.status, 502);
     const data = await readJson(res);
     assert.equal(data.ok, false);
@@ -160,14 +189,14 @@ test("Resend 401 still returns JSON, never a bare 502", async function () {
 
 test("Resend fetch throw still returns JSON", async function () {
   const original = globalThis.fetch;
-  globalThis.fetch = async function () {
+  globalThis.fetch = allowTurnstile(async function () {
     throw new Error("network down");
-  };
+  });
   try {
-    const res = await onRequestPost(postContext({
+    const res = await onRequestPost(postContext(withToken({
       email: "guest@uintahvalley.test",
       notes: "Hello"
-    }, { RESEND_API_KEY: "re_test" }));
+    }), withTurnstile({ RESEND_API_KEY: "re_test" })));
     assert.equal(res.status, 502);
     const data = await readJson(res);
     assert.equal(data.ok, false);
@@ -179,21 +208,21 @@ test("Resend fetch throw still returns JSON", async function () {
 
 test("POST without EMAIL_FROM returns a server error and does not send", async function () {
   const original = globalThis.fetch;
-  let called = false;
-  globalThis.fetch = async function () {
-    called = true;
+  let resendCalled = false;
+  globalThis.fetch = allowTurnstile(async function () {
+    resendCalled = true;
     return new Response(JSON.stringify({ id: "email_123" }), { status: 200 });
-  };
+  });
   try {
-    const res = await onRequestPost(postContext({
+    const res = await onRequestPost(postContext(withToken({
       email: "guest@uintahvalley.test",
       notes: "Hello"
-    }, { RESEND_API_KEY: "re_test", EMAIL_FROM: "" }));
+    }), withTurnstile({ RESEND_API_KEY: "re_test", EMAIL_FROM: "" })));
     assert.equal(res.status, 500);
     const data = await readJson(res);
     assert.equal(data.ok, false);
     assert.equal(data.error, "Email sender is not configured.");
-    assert.equal(called, false);
+    assert.equal(resendCalled, false);
   } finally {
     globalThis.fetch = original;
   }
@@ -202,16 +231,16 @@ test("POST without EMAIL_FROM returns a server error and does not send", async f
 test("rejected sender is not retried with another address", async function () {
   const original = globalThis.fetch;
   const froms = [];
-  globalThis.fetch = async function (url, opts) {
+  globalThis.fetch = allowTurnstile(async function (url, opts) {
     const payload = JSON.parse(opts.body);
     froms.push(payload.from);
     return new Response(JSON.stringify({ message: "The uintahvalley.com domain is not verified." }), { status: 422 });
-  };
+  });
   try {
-    const res = await onRequestPost(postContext({
+    const res = await onRequestPost(postContext(withToken({
       email: "guest@uintahvalley.test",
       notes: "Hello"
-    }, { RESEND_API_KEY: "re_test", EMAIL_FROM: "Uintah Valley <hello@uintahvalley.com>" }));
+    }), withTurnstile({ RESEND_API_KEY: "re_test", EMAIL_FROM: "Uintah Valley <hello@uintahvalley.com>" })));
     assert.equal(res.status, 502);
     const data = await readJson(res);
     assert.equal(data.ok, false);
@@ -238,19 +267,19 @@ test("fromCandidates returns only the configured sender", function () {
 test("403 on the configured sender is not retried", async function () {
   const original = globalThis.fetch;
   const froms = [];
-  globalThis.fetch = async function (url, opts) {
+  globalThis.fetch = allowTurnstile(async function (url, opts) {
     const payload = JSON.parse(opts.body);
     froms.push(payload.from);
     return new Response(JSON.stringify({
       name: "validation_error",
       message: "The uintahvalley.com domain is not verified."
     }), { status: 403 });
-  };
+  });
   try {
-    const res = await onRequestPost(postContext({
+    const res = await onRequestPost(postContext(withToken({
       email: "guest@uintahvalley.test",
       notes: "Hello"
-    }, { RESEND_API_KEY: "re_test" }));
+    }), withTurnstile({ RESEND_API_KEY: "re_test" })));
     assert.equal(res.status, 502);
     const data = await readJson(res);
     assert.equal(data.ok, false);
@@ -263,17 +292,17 @@ test("403 on the configured sender is not retried", async function () {
 
 test("CONTACT_DEBUG=1 includes attempts, reason, and a config hint", async function () {
   const original = globalThis.fetch;
-  globalThis.fetch = async function () {
+  globalThis.fetch = allowTurnstile(async function () {
     return new Response(JSON.stringify({
       name: "validation_error",
       message: "You can only send testing emails to your own email address."
     }), { status: 403 });
-  };
+  });
   try {
-    const res = await onRequestPost(postContext({
+    const res = await onRequestPost(postContext(withToken({
       email: "guest@uintahvalley.test",
       notes: "Hello"
-    }, { RESEND_API_KEY: "re_test", CONTACT_DEBUG: "1" }));
+    }), withTurnstile({ RESEND_API_KEY: "re_test", CONTACT_DEBUG: "1" })));
     assert.equal(res.status, 502);
     const data = await readJson(res);
     assert.equal(data.ok, false);
@@ -292,15 +321,15 @@ test("CONTACT_DEBUG=1 includes attempts, reason, and a config hint", async funct
 test("trims Bearer prefix and whitespace on RESEND_API_KEY", async function () {
   const original = globalThis.fetch;
   let auth = "";
-  globalThis.fetch = async function (url, opts) {
+  globalThis.fetch = allowTurnstile(async function (url, opts) {
     auth = opts.headers.Authorization;
     return new Response(JSON.stringify({ id: "email_123" }), { status: 200 });
-  };
+  });
   try {
-    const res = await onRequestPost(postContext({
+    const res = await onRequestPost(postContext(withToken({
       email: "guest@uintahvalley.test",
       notes: "Hello"
-    }, { RESEND_API_KEY: "  Bearer re_test  " }));
+    }), withTurnstile({ RESEND_API_KEY: "  Bearer re_test  " })));
     assert.equal(res.status, 200);
     assert.equal(auth, "Bearer re_test");
   } finally {
@@ -330,6 +359,70 @@ test("strips CR and LF from the subject", function () {
   assert.equal(result.subject.includes("\r"), false);
   assert.equal(result.subject, "Uintah Valley contact from Ada Bcc: evil@example.com");
   assert.equal(headerSafe("a\nb"), "a b");
+});
+
+test("rejects emails with header-like characters or without a domain", function () {
+  [
+    "ada,bcc@uintahvalley.test",
+    "ada;bcc@uintahvalley.test",
+    "Ada <ada@uintahvalley.test>",
+    "ada>bcc@uintahvalley.test",
+    "\"ada\"@uintahvalley.test",
+    "ada(note)@uintahvalley.test",
+    "ada[note]@uintahvalley.test",
+    "ada\\bcc@uintahvalley.test",
+    "ada @uintahvalley.test",
+    "ada@uintah valley.test",
+    "ada@uintahvalley",
+    "ada@uintahvalley.",
+    "@uintahvalley.test",
+    "ada@.test"
+  ].forEach(function (email) {
+    assert.equal(prepareContact({ email: email, notes: "Hello" }).error, "Please enter a valid email.", email);
+  });
+  assert.equal(prepareContact({
+    email: "guest@uintahvalley.test",
+    notes: "Hello"
+  }).error, undefined);
+});
+
+test("POST on a pages.dev host sends nothing", async function () {
+  const original = globalThis.fetch;
+  let called = false;
+  globalThis.fetch = async function () {
+    called = true;
+    return new Response(JSON.stringify({ id: "email_1", success: true, action: "contact", hostname: "uintahvalley.com" }), { status: 200 });
+  };
+  try {
+    for (const host of [
+      "https://uintahvalley.pages.dev/api/contact",
+      "https://abc123.uintahvalley.pages.dev/api/contact"
+    ]) {
+      called = false;
+      const res = await onRequestPost({
+        request: new Request(host, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Origin: "https://uintahvalley.com"
+          },
+          body: JSON.stringify(withToken({
+            email: "guest@uintahvalley.test",
+            notes: "Hello"
+          }))
+        }),
+        env: withTurnstile({
+          RESEND_API_KEY: "re_test",
+          EMAIL_FROM: "Uintah Valley <hello@uintahvalley.com>"
+        })
+      });
+      assert.equal(res.status, 403, host);
+      assert.equal((await readJson(res)).ok, false);
+      assert.equal(called, false, host);
+    }
+  } finally {
+    globalThis.fetch = original;
+  }
 });
 
 test("rejects oversized fields and a free-text request list", function () {
@@ -387,7 +480,7 @@ function originStatus(origin) {
   const headers = { "Content-Type": "application/json" };
   if (origin !== undefined) headers.Origin = origin;
   return onRequestPost({
-    request: new Request("https://uintahvalley.pages.dev/api/contact", {
+    request: new Request("https://uintahvalley.com/api/contact", {
       method: "POST",
       headers: headers,
       body: JSON.stringify({ email: "guest@uintahvalley.test", notes: "Hello" })
@@ -405,8 +498,14 @@ test("missing Origin is rejected and foreign origins are rejected", async functi
   assert.equal(await originStatus("https://a.b.uintahvalley.pages.dev"), 403);
   assert.equal(await originStatus("https://uintahvalley.com"), 503);
   assert.equal(await originStatus("https://www.uintahvalley.com"), 503);
-  assert.equal(await originStatus("https://uintahvalley.pages.dev"), 503);
-  assert.equal(await originStatus("https://cursor-seo.uintahvalley.pages.dev"), 503);
+  assert.equal(await originStatus("https://uintahvalley.pages.dev"), 403);
+  assert.equal(await originStatus("https://cursor-seo.uintahvalley.pages.dev"), 403);
+  const apex = await onRequestPost(postContext({
+    email: "guest@uintahvalley.test",
+    notes: "Hello"
+  }));
+  assert.equal(apex.status, 503);
+  assert.equal((await readJson(apex)).error, FORM_UNAVAILABLE);
 });
 
 test("a declared oversized body is rejected before it is read", async function () {
@@ -421,7 +520,7 @@ test("a declared oversized body is rejected before it is read", async function (
       text: async function () { read = true; return ""; },
       body: { getReader: function () { read = true; throw new Error("read"); } }
     },
-    env: { RESEND_API_KEY: "re_test", EMAIL_FROM: "Uintah Valley <hello@uintahvalley.com>" }
+    env: { RESEND_API_KEY: "re_test", EMAIL_FROM: "Uintah Valley <hello@uintahvalley.com>", TURNSTILE_SECRET_KEY: "turnstile-secret" }
   });
   assert.equal(res.status, 413);
   const data = await readJson(res);
@@ -440,7 +539,7 @@ test("an oversized JSON body is rejected and nothing is sent", async function ()
     const res = await onRequestPost(postContext({
       email: "guest@uintahvalley.test",
       notes: "A".repeat(17000)
-    }, { RESEND_API_KEY: "re_test" }));
+    }, withTurnstile({ RESEND_API_KEY: "re_test" })));
     assert.equal(res.status, 413);
     assert.equal(called, false);
   } finally {
@@ -518,7 +617,7 @@ test("a valid Turnstile token sends the owner email and a fixed visitor template
   }
 });
 
-test("preview and pages.dev hostnames pass Siteverify and a foreign hostname does not", async function () {
+test("only the apex hostnames pass Siteverify", async function () {
   const original = globalThis.fetch;
   async function post(hostname) {
     const sent = [];
@@ -537,8 +636,8 @@ test("preview and pages.dev hostnames pass Siteverify and a foreign hostname doe
     return { status: res.status, sent: sent.length };
   }
   try {
-    assert.deepEqual(await post("uintahvalley.pages.dev"), { status: 200, sent: 2 });
-    assert.deepEqual(await post("branch.uintahvalley.pages.dev"), { status: 200, sent: 2 });
+    assert.deepEqual(await post("uintahvalley.pages.dev"), { status: 400, sent: 0 });
+    assert.deepEqual(await post("branch.uintahvalley.pages.dev"), { status: 400, sent: 0 });
     assert.deepEqual(await post("www.uintahvalley.com"), { status: 200, sent: 2 });
     assert.deepEqual(await post("evil.example"), { status: 400, sent: 0 });
     assert.deepEqual(await post("notuintahvalley.pages.dev"), { status: 400, sent: 0 });

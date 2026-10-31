@@ -81,10 +81,15 @@
     }
   }
 
+  var FORM_UNAVAILABLE = "The contact form is temporarily unavailable. Please email hello@uintahvalley.com.";
+
   function prepare(container) {
-    return mount(container).then(function (widgetId) {
-      if (widgetId == null) return { required: false, token: "", widgetId: null };
-      return { required: true, token: tokenFor(widgetId), widgetId: widgetId };
+    return loadSiteKey().then(function (siteKey) {
+      if (!siteKey) return { required: false, siteKey: "", token: "", widgetId: null };
+      return mount(container).then(function (widgetId) {
+        if (widgetId == null) return { required: true, siteKey: siteKey, token: "", widgetId: null };
+        return { required: true, siteKey: siteKey, token: tokenFor(widgetId), widgetId: widgetId };
+      });
     });
   }
 
@@ -97,15 +102,40 @@
     }
   }
 
+  function whenReady() {
+    return loadSiteKey();
+  }
+
+  function markUnavailable(form, statusSelector) {
+    if (!form) return;
+    var status = form.querySelector(statusSelector);
+    var submit = form.querySelector("[type='submit']");
+    form.setAttribute("data-form-unavailable", "true");
+    if (submit) submit.disabled = true;
+    if (!status) return;
+    status.hidden = false;
+    status.textContent = FORM_UNAVAILABLE;
+    status.classList.add("is-error");
+    status.classList.remove("is-ok");
+  }
+
   window.UVTurnstile = {
     mount: mount,
     prepare: prepare,
-    reset: reset
+    reset: reset,
+    whenReady: whenReady,
+    unavailableMessage: FORM_UNAVAILABLE
   };
 
   document.querySelectorAll("[data-turnstile]").forEach(function (container) {
     var parent = container.parentElement;
     if (parent && parent.closest("[hidden]")) return;
     mount(container);
+  });
+
+  whenReady().then(function (siteKey) {
+    if (siteKey) return;
+    markUnavailable(document.querySelector("[data-contact-form]"), "[data-contact-status]");
+    markUnavailable(document.querySelector("[data-request-form]"), "[data-request-status]");
   });
 })();

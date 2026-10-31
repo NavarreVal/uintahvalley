@@ -77,6 +77,15 @@
     const status = contactForm.querySelector("[data-contact-status]");
     const button = contactForm.querySelector("[type='submit']");
 
+    const FORM_UNAVAILABLE = "The contact form is temporarily unavailable. Please email hello@uintahvalley.com.";
+
+    function visitorEmailOk(value) {
+      const email = String(value || "").trim();
+      if (!email || email.length > 254) return false;
+      if (/[\s,;<>"()[\]\\]/.test(email)) return false;
+      return /^[^@]+@[^@]+\.[^@]+$/.test(email);
+    }
+
     function setStatus(kind, message) {
       if (!status) return;
       status.hidden = !message;
@@ -99,7 +108,12 @@
         setStatus("error", "Name is too long.");
         return;
       }
-      if (email.trim().length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      if (contactForm.getAttribute("data-form-unavailable") === "true") {
+        setStatus("error", FORM_UNAVAILABLE);
+        if (button) button.disabled = true;
+        return;
+      }
+      if (!visitorEmailOk(email)) {
         setStatus("error", "Please enter a valid email.");
         return;
       }
@@ -118,9 +132,15 @@
       const turnstileSlot = contactForm.querySelector("[data-turnstile]");
       const ready = window.UVTurnstile && typeof window.UVTurnstile.prepare === "function"
         ? window.UVTurnstile.prepare(turnstileSlot)
-        : Promise.resolve({ required: false, token: "", widgetId: null });
+        : Promise.resolve({ required: false, siteKey: "", token: "", widgetId: null });
 
       ready.then(function (check) {
+        if (!check.siteKey) {
+          contactForm.setAttribute("data-form-unavailable", "true");
+          setStatus("error", FORM_UNAVAILABLE);
+          if (button) button.disabled = true;
+          return null;
+        }
         if (check.required && !check.token) {
           setStatus("error", "Please complete the security check and try again.");
           if (button) button.disabled = false;
@@ -170,11 +190,15 @@
           if (window.UVTurnstile && typeof window.UVTurnstile.reset === "function") {
             window.UVTurnstile.reset(check.widgetId);
           }
-          if (button) button.disabled = false;
+          if (button && contactForm.getAttribute("data-form-unavailable") !== "true") {
+            button.disabled = false;
+          }
         });
       }).catch(function () {
         setStatus("error", "Could not send that message. Write hello@uintahvalley.com.");
-        if (button) button.disabled = false;
+        if (button && contactForm.getAttribute("data-form-unavailable") !== "true") {
+          button.disabled = false;
+        }
       });
     });
   }

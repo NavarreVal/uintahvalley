@@ -9,6 +9,7 @@ const MAX_TOKEN = 2048;
 const TURNSTILE_ACTION = "contact";
 const VISITOR_SUBJECT = "Thanks for contacting Uintah Valley";
 const SITEVERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+const FORM_UNAVAILABLE = "The contact form is temporarily unavailable. Please email hello@uintahvalley.com.";
 
 // Keep this aligned with PRODUCTS in js/cart.js. The owner email is rebuilt
 // from this map so a visitor cannot put arbitrary text in the request list.
@@ -51,9 +52,6 @@ const PRODUCTS = {
   }
 };
 
-// One extra label only: https://<preview>.uintahvalley.pages.dev
-const PREVIEW_HOST = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.uintahvalley\.pages\.dev$/;
-
 function allowedOrigin(origin) {
   if (!origin || typeof origin !== "string" || origin.length > 200) return "";
   let url;
@@ -66,27 +64,25 @@ function allowedOrigin(origin) {
   if (url.username || url.password) return "";
   if (url.origin !== origin) return "";
   const host = url.hostname;
-  if (
-    host === "uintahvalley.com" ||
-    host === "www.uintahvalley.com" ||
-    host === "uintahvalley.pages.dev"
-  ) {
-    return url.origin;
-  }
-  if (PREVIEW_HOST.test(host)) return url.origin;
+  if (host === "uintahvalley.com" || host === "www.uintahvalley.com") return url.origin;
   return "";
 }
 
 export function turnstileHostnameOk(hostname) {
   const host = String(hostname || "").trim().toLowerCase().replace(/\.$/, "");
-  if (
-    host === "uintahvalley.com" ||
-    host === "www.uintahvalley.com" ||
-    host === "uintahvalley.pages.dev"
-  ) {
-    return true;
+  return host === "uintahvalley.com" || host === "www.uintahvalley.com";
+}
+
+function requestHost(request) {
+  try {
+    return new URL(request.url).hostname.toLowerCase().replace(/\.$/, "");
+  } catch (err) {
+    return "";
   }
-  return PREVIEW_HOST.test(host);
+}
+
+function isPagesDevHost(host) {
+  return host === "pages.dev" || host.endsWith(".pages.dev");
 }
 
 function corsHeaders(origin) {
@@ -125,10 +121,11 @@ function fail(status, error, origin, env, detail) {
 }
 
 function isEmail(value) {
-  const email = String(value || "").trim();
+  const email = String(value || "");
   if (!email || email.length > MAX_EMAIL) return false;
+  if (/[\s,;<>"()[\]\\]/.test(email)) return false;
   if (/[\u0000-\u001F\u007F]/.test(email)) return false;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^@]+@[^@]+\.[^@]+$/.test(email);
 }
 
 function debugOn(env) {
@@ -409,7 +406,7 @@ export function prepareContact(data) {
   if (nameRaw.length > MAX_NAME) return { error: "Name is too long." };
   const name = headerSafe(nameRaw);
 
-  const email = String((data && data.email) || "").trim();
+  const email = String((data && data.email) || "");
   if (!isEmail(email)) return { error: "Please enter a valid email." };
 
   const notes = String((data && (data.notes || data.message)) || "").trim();
@@ -445,7 +442,7 @@ function turnstileSecret(env) {
 
 async function verifyTurnstile(request, env, token) {
   const secret = turnstileSecret(env);
-  if (!secret) return { enforced: false, ok: false };
+  if (!secret) return { enforced: true, ok: false, unconfigured: true };
 
   if (typeof token !== "string" || token.length === 0 || token.length > MAX_TOKEN) {
     return { enforced: true, ok: false };
@@ -540,8 +537,16 @@ export async function onRequest(context) {
 }
 
 async function handleContactPost(request, env, origin) {
+  if (isPagesDevHost(requestHost(request))) {
+    return json(403, { ok: false, error: "Forbidden." }, origin);
+  }
+
   if (!allowedOrigin(origin)) {
     return json(403, { ok: false, error: "Forbidden." }, origin);
+  }
+
+  if (!turnstileSecret(env)) {
+    return json(503, { ok: false, error: FORM_UNAVAILABLE }, origin);
   }
 
   if (declaredBodyTooLarge(request)) {
@@ -570,7 +575,10 @@ async function handleContactPost(request, env, origin) {
   const { email, subject, text } = prepared;
 
   const turnstile = await verifyTurnstile(request, env, data["cf-turnstile-response"]);
-  if (turnstile.enforced && !turnstile.ok) {
+  if (turnstile.unconfigured) {
+    return json(503, { ok: false, error: FORM_UNAVAILABLE }, origin);
+  }
+  if (!turnstile.ok) {
     return json(
       turnstile.unavailable ? 503 : 400,
       {
