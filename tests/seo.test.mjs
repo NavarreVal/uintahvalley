@@ -102,6 +102,44 @@ test("security headers allow this site and Turnstile only", function () {
   assert.equal(site.includes("pages.dev"), false);
 });
 
+test("html routes are private and uncached while assets stay public", function () {
+  const text = readFileSync(join(root, "_headers"), "utf8");
+  const blocks = [];
+  let current = null;
+  text.split(/\r?\n/).forEach(function (line) {
+    if (!line || /^\s*#/.test(line)) return;
+    if (!/^\s/.test(line)) {
+      current = { pattern: line.trim(), headers: {} };
+      blocks.push(current);
+      return;
+    }
+    const header = line.match(/^\s+([^:]+):\s*(.*)$/);
+    if (current && header) current.headers[header[1]] = header[2];
+  });
+
+  function cacheControl(pathname) {
+    const values = [];
+    blocks.forEach(function (block) {
+      const expression = new RegExp("^" + block.pattern.split("*").map(function (part) {
+        return part.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+      }).join(".*") + "$");
+      if (expression.test(pathname) && block.headers["Cache-Control"]) {
+        values.push(block.headers["Cache-Control"]);
+      }
+    });
+    return values.join(", ");
+  }
+
+  ["/", "/index.html", "/shop", "/shop.html", "/about", "/about.html", "/contact", "/contact.html", "/cart", "/cart.html", "/privacy", "/privacy.html", "/copyright", "/copyright.html", "/404", "/404.html"].forEach(function (pathname) {
+    assert.equal(cacheControl(pathname), "private, no-cache", pathname);
+  });
+  assert.equal(cacheControl("/assets/hero-home.jpg"), "public, max-age=604800");
+  assert.equal(cacheControl("/assets/fonts/quattrocento-400.woff2"), "public, max-age=604800");
+  assert.equal(cacheControl("/css/styles.css"), "");
+  assert.equal(cacheControl("/js/site.js"), "");
+  assert.equal(cacheControl("/js/cart.js"), "");
+});
+
 test("pages keep scripts and styles in files", function () {
   [
     "index.html",

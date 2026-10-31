@@ -5,5 +5,32 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Frame-Options: DENY
 
+/
+  Cache-Control: private, no-cache
+
+/*.html
+  Cache-Control: private, no-cache
+
+/shop
+  Cache-Control: private, no-cache
+
+/about
+  Cache-Control: private, no-cache
+
+/contact
+  Cache-Control: private, no-cache
+
+/cart
+  Cache-Control: private, no-cache
+
+/privacy
+  Cache-Control: private, no-cache
+
+/copyright
+  Cache-Control: private, no-cache
+
+/404
+  Cache-Control: private, no-cache
+
 /assets/*
   Cache-Control: public, max-age=604800
