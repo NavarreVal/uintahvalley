@@ -233,6 +233,15 @@ test("hidden files serve 404.html with status 404 when ASSETS has it", async fun
   assert.equal(res.status, 404);
   assert.match(res.headers.get("Content-Type"), /text\/html/);
   assert.equal(res.headers.get("X-Content-Type-Options"), "nosniff");
+  assert.equal(res.headers.get("X-Frame-Options"), "DENY");
+  assert.match(res.headers.get("Strict-Transport-Security"), /max-age=31536000; includeSubDomains/);
+  const csp = res.headers.get("Content-Security-Policy");
+  assert.match(csp, /script-src 'self' 'nonce-[A-Za-z0-9+/=]+' https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /connect-src 'self'/);
+  assert.match(csp, /form-action 'self'/);
+  assert.match(csp, /frame-ancestors 'none'/);
+  assert.equal(csp.includes("pages.dev"), false);
+  assert.equal(csp.includes("unsafe-inline"), false);
   assert.equal(await res.text(), html);
   assert.equal(context.nextCalls(), 0);
 });

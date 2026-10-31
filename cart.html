@@ -54,10 +54,10 @@
       <p class="lede">Send the list from this page and we will reply with availability, a confirmed total, and how to pay.</p>
     </header>
 
-    <section class="section" style="padding-top:1rem">
+    <section class="section section-tight">
       <div data-cart-root></div>
-      <p class="note" style="margin-top:1rem">Prices are provisional. Sending a request is not a paid order.</p>
-      <div class="actions" style="margin-top:1rem">
+      <p class="note stack-gap">Prices are provisional. Sending a request is not a paid order.</p>
+      <div class="actions stack-gap">
         <button type="button" class="btn btn-forest" data-request-mail disabled aria-disabled="true" aria-haspopup="dialog" aria-controls="request-modal">Email this request</button>
         <button type="button" class="btn btn-ghost" data-request-clear disabled aria-disabled="true">Clear</button>
         <a class="btn" href="shop.html#dons-reserve">Keep browsing Don's Reserve</a>
@@ -90,7 +90,7 @@
   <div class="modal-overlay" data-request-modal hidden>
     <div class="modal" id="request-modal" role="dialog" aria-modal="true" aria-labelledby="request-modal-title">
       <h2 id="request-modal-title">Email this request</h2>
-      <p class="note">We’ll send your request list to hello@uintahvalley.com. You will get a confirmation email.</p>
+      <p class="note">We’ll send your request list to hello@uintahvalley.com.</p>
       <form class="form" data-request-form novalidate>
         <label class="hp" aria-hidden="true">
           Company
@@ -98,12 +98,13 @@
         </label>
         <label>
           Your Email
-          <input name="email" type="email" autocomplete="email" required>
+          <input name="email" type="email" autocomplete="email" maxlength="254" required>
         </label>
         <label>
           Message <span class="fine">(optional)</span>
-          <textarea name="notes" rows="4" placeholder="Anything we should know about this request."></textarea>
+          <textarea name="notes" rows="4" maxlength="2000" placeholder="Anything we should know about this request."></textarea>
         </label>
+        <div class="turnstile" data-turnstile hidden></div>
         <p class="form-status" data-request-status role="status" hidden></p>
         <div class="actions">
           <button class="btn btn-forest" type="submit">Send request</button>
@@ -113,6 +114,7 @@
     </div>
   </div>
   <script src="js/cart.js"></script>
+  <script src="js/turnstile.js"></script>
   <script src="js/site.js"></script>
 </body>
 </html>

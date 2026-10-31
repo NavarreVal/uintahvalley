@@ -7,6 +7,35 @@ const APEX_ORIGIN = "https://uintahvalley.com";
 const WWW_HOST = "www.uintahvalley.com";
 const PRODUCTION_PAGES_HOST = "uintahvalley.pages.dev";
 
+// HTML responses get a fresh script nonce so Cloudflare can stamp it onto the
+// JavaScript Detections inline script. 'self' still allows /cdn-cgi/challenge-platform/.
+export function contentSecurityPolicy(nonce) {
+  const scriptSrc = nonce
+    ? "script-src 'self' 'nonce-" + nonce + "' https://challenges.cloudflare.com"
+    : "script-src 'self' https://challenges.cloudflare.com";
+  return [
+    "default-src 'self'",
+    scriptSrc,
+    "style-src 'self'",
+    "img-src 'self' data:",
+    "font-src 'self'",
+    "connect-src 'self'",
+    "frame-src https://challenges.cloudflare.com",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'"
+  ].join("; ");
+}
+
+export function cspNonce() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
 // Repo-root names that are not site pages. The _* files are Pages config
 // (usually not served). package.json and Wrangler files are not in this repo;
 // blocking the names keeps them unpublished if they are added later.
@@ -100,14 +129,42 @@ function redirectToApex(url) {
   });
 }
 
-function withPreviewRobots(response, host) {
-  if (!response || !isPreviewHost(host)) return response;
+function applyCsp(response) {
+  if (!response) return response;
+  let type = "";
   try {
-    response.headers.set("X-Robots-Tag", "noindex");
+    type = response.headers.get("Content-Type") || "";
+  } catch (err) {
+    type = "";
+  }
+  const nonce = /text\/html/i.test(type) ? cspNonce() : "";
+  const policy = contentSecurityPolicy(nonce);
+  try {
+    response.headers.set("Content-Security-Policy", policy);
     return response;
   } catch (err) {
     const headers = new Headers(response.headers);
+    headers.set("Content-Security-Policy", policy);
+    const status = response.status;
+    if (status === 101 || status === 204 || status === 205 || status === 304) {
+      return new Response(null, { status: status, statusText: response.statusText, headers: headers });
+    }
+    return new Response(response.body, { status: status, statusText: response.statusText, headers: headers });
+  }
+}
+
+function withPreviewRobots(response, host) {
+  if (!response) return response;
+  if (!isPreviewHost(host)) return applyCsp(response);
+  try {
+    response.headers.set("X-Robots-Tag", "noindex");
+    return applyCsp(response);
+  } catch (err) {
+    const headers = new Headers(response.headers);
     headers.set("X-Robots-Tag", "noindex");
+    const type = response.headers.get("Content-Type") || "";
+    const nonce = /text\/html/i.test(type) ? cspNonce() : "";
+    headers.set("Content-Security-Policy", contentSecurityPolicy(nonce));
     const status = response.status;
     if (status === 101 || status === 204 || status === 205 || status === 304) {
       return new Response(null, {
@@ -147,7 +204,9 @@ async function notFoundResponse(context) {
   const security = {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "X-Frame-Options": "DENY"
   };
   try {
     const asset = await fetchNotFoundHtml(context);
@@ -155,9 +214,9 @@ async function notFoundResponse(context) {
       const headers = new Headers(asset.headers);
       if (!headers.get("Content-Type")) headers.set("Content-Type", "text/html; charset=utf-8");
       headers.set("Cache-Control", "no-store");
-      headers.set("X-Content-Type-Options", security["X-Content-Type-Options"]);
-      headers.set("Referrer-Policy", security["Referrer-Policy"]);
-      headers.set("Permissions-Policy", security["Permissions-Policy"]);
+      Object.keys(security).forEach(function (name) {
+        headers.set(name, security[name]);
+      });
       return new Response(asset.body, { status: 404, headers: headers });
     }
   } catch (err) {
@@ -193,9 +252,8 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   const host = normalizeHost(url.hostname);
 
-  // Do not redirect /api/contact. The form retries POST
-  // https://uintahvalley.pages.dev/api/contact when the apex response is not
-  // JSON. A 301 would turn that POST into a GET and drop the fallback.
+  // Do not redirect /api/contact. The handler rejects pages.dev POSTs with
+  // JSON. A 301 would turn that POST into a GET before the rejection.
   if (isRedirectHost(host) && !isContactApi(url.pathname)) {
     return redirectToApex(url);
   }

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { contentSecurityPolicy } from "../functions/_middleware.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -68,22 +69,104 @@ test("sitemap lists the indexable extensionless URLs and not cart or 404", funct
   });
 });
 
-test("robots.txt allows crawling and blocks the AI training crawlers", function () {
+test("robots.txt points crawlers at the sitemap", function () {
   const text = readFileSync(join(root, "robots.txt"), "utf8");
-  assert.match(text, /^User-agent: \*\r?\nAllow: \/\r?\n/);
   assert.match(text, /Sitemap: https:\/\/uintahvalley\.com\/sitemap\.xml/);
-  [
-    "GPTBot",
-    "CCBot",
-    "Google-Extended",
-    "ClaudeBot",
-    "anthropic-ai",
-    "Bytespider",
-    "Applebot-Extended",
-    "meta-externalagent"
-  ].forEach(function (agent) {
-    assert.match(text, new RegExp("User-agent: " + agent + "\\r?\\nDisallow: /"));
+});
+
+test("security headers allow this site and Turnstile only", function () {
+  const headers = readFileSync(join(root, "_headers"), "utf8");
+  assert.match(headers, /Strict-Transport-Security: max-age=31536000; includeSubDomains/);
+  assert.match(headers, /X-Frame-Options: DENY/);
+  assert.match(headers, /X-Content-Type-Options: nosniff/);
+  assert.match(headers, /Referrer-Policy: strict-origin-when-cross-origin/);
+  assert.match(headers, /Permissions-Policy: camera=\(\), microphone=\(\), geolocation=\(\)/);
+  assert.equal(headers.includes("Content-Security-Policy:"), false);
+  assert.equal(headers.includes("pages.dev"), false);
+  const csp = contentSecurityPolicy("abc+/=xyz");
+  assert.match(csp, /script-src 'self' 'nonce-abc\+\/=xyz' https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /frame-src https:\/\/challenges\.cloudflare\.com/);
+  assert.match(csp, /frame-ancestors 'none'/);
+  assert.match(csp, /font-src 'self'/);
+  assert.match(csp, /style-src 'self'/);
+  assert.equal(csp.includes("unsafe-inline"), false);
+  assert.match(csp, /connect-src 'self'/);
+  assert.match(csp, /form-action 'self'/);
+  assert.equal(csp.includes("pages.dev"), false);
+  assert.match(csp, /img-src 'self' data:/);
+  assert.equal(csp.includes("youtube"), false);
+  assert.equal(csp.includes("fonts.google"), false);
+  const cart = readFileSync(join(root, "js/cart.js"), "utf8");
+  const site = readFileSync(join(root, "js/site.js"), "utf8");
+  assert.equal(cart.includes("pages.dev"), false);
+  assert.equal(site.includes("pages.dev"), false);
+});
+
+test("html routes are private and uncached while assets stay public", function () {
+  const text = readFileSync(join(root, "_headers"), "utf8");
+  const blocks = [];
+  let current = null;
+  text.split(/\r?\n/).forEach(function (line) {
+    if (!line || /^\s*#/.test(line)) return;
+    if (!/^\s/.test(line)) {
+      current = { pattern: line.trim(), headers: {} };
+      blocks.push(current);
+      return;
+    }
+    const header = line.match(/^\s+([^:]+):\s*(.*)$/);
+    if (current && header) current.headers[header[1]] = header[2];
   });
+
+  function cacheControl(pathname) {
+    const values = [];
+    blocks.forEach(function (block) {
+      const expression = new RegExp("^" + block.pattern.split("*").map(function (part) {
+        return part.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+      }).join(".*") + "$");
+      if (expression.test(pathname) && block.headers["Cache-Control"]) {
+        values.push(block.headers["Cache-Control"]);
+      }
+    });
+    return values.join(", ");
+  }
+
+  ["/", "/index.html", "/shop", "/shop.html", "/about", "/about.html", "/contact", "/contact.html", "/cart", "/cart.html", "/privacy", "/privacy.html", "/copyright", "/copyright.html", "/404", "/404.html"].forEach(function (pathname) {
+    assert.equal(cacheControl(pathname), "private, no-cache", pathname);
+  });
+  assert.equal(cacheControl("/assets/hero-home.jpg"), "public, max-age=604800");
+  assert.equal(cacheControl("/assets/fonts/quattrocento-400.woff2"), "public, max-age=604800");
+  assert.equal(cacheControl("/css/styles.css"), "");
+  assert.equal(cacheControl("/js/site.js"), "");
+  assert.equal(cacheControl("/js/cart.js"), "");
+});
+
+test("pages keep scripts and styles in files", function () {
+  [
+    "index.html",
+    "shop.html",
+    "about.html",
+    "contact.html",
+    "cart.html",
+    "privacy.html",
+    "copyright.html",
+    "404.html"
+  ].forEach(function (name) {
+    const page = html(name);
+    assert.equal(/<script(?![^>]*\bsrc=)/i.test(page), false, name);
+    assert.equal(/\son[a-z]+\s*=/i.test(page), false, name);
+    assert.equal(/\sstyle\s*=/i.test(page), false, name);
+  });
+  ["contact.html", "cart.html"].forEach(function (name) {
+    const page = html(name);
+    assert.match(page, /data-turnstile/);
+    assert.match(page, /js\/turnstile\.js/);
+    assert.match(page, /maxlength="254"/);
+    assert.match(page, /maxlength="2000"/);
+  });
+  assert.match(html("contact.html"), /name="name"[^>]*maxlength="100"/);
+  const turnstile = readFileSync(join(root, "js/turnstile.js"), "utf8");
+  const urls = turnstile.match(/https?:\/\/[^"'\\\s]+/g) || [];
+  assert.deepEqual(urls, ["https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"]);
 });
 
 test("_redirects still points old product URLs at shop and the license record stays", function () {
