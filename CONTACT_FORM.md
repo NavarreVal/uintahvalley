@@ -56,14 +56,16 @@ Until that skip exists, the site posts to `/api/contact` first, then retries `ht
 
 ## Deploy shape
 
-Only `functions/api/contact.js` is a Function route. Tests live in `tests/` so Pages does not treat `*.mjs` under `functions/` as Functions.
+`functions/api/contact.js` is the contact route. `functions/_middleware.js` runs for every path (`_routes.json` include `/*`) so it can redirect duplicate hosts and hide non-site files. Tests live in `tests/` so Pages does not treat `*.mjs` under `functions/` as Functions.
 
-- `_routes.json` invokes Functions only for `/api/contact` (static pages stay static).
-- `functions/_middleware.js` catches handler throws and still returns JSON.
+- `www.uintahvalley.com` and the production host `uintahvalley.pages.dev` 301 to `https://uintahvalley.com` with the same path and query. Preview hosts (`*.uintahvalley.pages.dev`) are not redirected; their responses get `X-Robots-Tag: noindex`.
+- `/api/contact` is not redirected on any host. The apex fallback `POST https://uintahvalley.pages.dev/api/contact` must still receive JSON. A 301 on that POST would turn it into a GET.
+- `functions/_middleware.js` still catches contact-handler throws and returns JSON.
+- Non-site files (`*.md`, `/tests/`, dotfiles, and repo-root config such as `_routes.json`) return 404. `IMAGE-LICENSES.md` stays in the repo.
 - `_redirects` has no `/*` splat (that can intercept the API on the custom domain).
 
 ```bash
-node --test tests/contact.test.mjs
+node --test tests/contact.test.mjs tests/middleware.test.mjs tests/seo.test.mjs
 ```
 
 ## If the form shows “unexpected response”
