@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Uintah Valley | Homemade vanilla from Utah</title>
-  <meta name="description" content="Uintah Valley LLC — homemade vanilla extract from a Utah kitchen. Mainline Pure Vanilla is sold out; Don's Reserve batches can be requested.">
+  <meta name="description" content="Uintah Valley LLC — homemade vanilla extract from a Utah kitchen. Mainline Pure Vanilla is sold out; available items can be requested.">
   <meta property="og:title" content="Uintah Valley LLC — homemade vanilla from Utah">
   <meta property="og:description" content="Locally distilled spirits and Madagascar beans. No additives and never watered down. Pure.">
   <meta property="og:type" content="website">
@@ -64,6 +64,29 @@
       </div>
     </section>
 
+    <section class="order-how" aria-labelledby="order-how-title">
+      <div class="wrap">
+        <div class="order-how-head">
+          <h2 id="order-how-title">How ordering works</h2>
+          <p class="order-how-utah">Utah residents only</p>
+        </div>
+        <ol class="order-steps">
+          <li>
+            <span class="order-step-index" aria-hidden="true">1</span>
+            <p>Add items to your request list.</p>
+          </li>
+          <li>
+            <span class="order-step-index" aria-hidden="true">2</span>
+            <p>Email the request. No payment info on the site.</p>
+          </li>
+          <li>
+            <span class="order-step-index" aria-hidden="true">3</span>
+            <p>We reply with availability, a confirmed total, and how to pay.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
     <section class="discover" id="discover" aria-labelledby="discover-title">
       <div class="wrap">
         <h2 id="discover-title">Discover Premium Vanilla Extract</h2>
@@ -75,21 +98,21 @@
         <div class="discover-panel" id="panel-mainline" role="tabpanel" aria-labelledby="tab-mainline" data-discover-panel="mainline" hidden>
           <p class="discover-desc">This is our mainline product, made with locally distilled spirits and judiciously sourced Madagascar Vanilla.</p>
           <div class="product-row">
-            <article class="product-card">
+            <article class="product-card reveal">
               <img class="product-photo" src="assets/product-mainline-1oz.jpg" width="1600" height="1066" alt="Jar and three labeled bottles of Uintah Valley Pure Vanilla Extract">
               <h3>Pure Vanilla Extract - 1 fl oz</h3>
               <p>Made with Madagascar Vanilla beans and Utah distilled extractives.</p>
               <span class="sold-note">Sold out indefinitely</span>
               <button class="btn" type="button" disabled aria-disabled="true">Unavailable</button>
             </article>
-            <article class="product-card">
+            <article class="product-card reveal">
               <img class="product-photo" src="assets/product-mainline-3oz.jpg" width="1200" height="1395" alt="Three 1 fl oz bottles of Uintah Valley Pure Vanilla Extract">
               <h3>Pure Vanilla Extract - 3 fl oz</h3>
               <p>Three of our 1oz bottles. Made with Madagascar Vanilla beans and Utah distilled extractives.</p>
               <span class="sold-note">Sold out indefinitely</span>
               <button class="btn" type="button" disabled aria-disabled="true">Unavailable</button>
             </article>
-            <article class="product-card">
+            <article class="product-card reveal">
               <img class="product-photo" src="assets/gift-box.jpg" width="1728" height="1152" alt="Three bottles of Uintah Valley Pure Vanilla Extract in a wooden gift box with vanilla beans and orchid flowers">
               <h3>Uintah Valley Gift Box</h3>
               <p>Gift box, you pick what goes in! Made with Madagascar Vanilla beans and Utah distilled extractives. Handcrafted gift box.</p>
@@ -102,26 +125,44 @@
         <div class="discover-panel" id="panel-dons-reserve" role="tabpanel" aria-labelledby="tab-dons-reserve" data-discover-panel="dons-reserve">
           <p class="discover-desc">Don's Reserve. These were developed in collaboration with Don Thornton Jr. using extractives, methods, and beans we're testing out. Still the highest quality, and still Pure Vanilla Extract.</p>
           <div class="product-row">
-            <article class="product-card">
+            <article class="product-card reveal spotlight-card">
               <img class="product-photo" src="assets/product-dons-madagascar-dented-brick.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Madagascar Beans, Dented Brick Craft Rum">
               <h3>Madagascar Beans · Dented Brick Craft Rum · 4 oz</h3>
               <p>All Natural. Don's Reserve collaboration — Madagascar beans in Dented Brick craft rum.</p>
               <p class="price">$40 <span class="provisional">Provisional</span></p>
-              <button class="btn btn-primary" type="button" data-add="dons-madagascar-dented-brick">Add to request</button>
+              <div class="add-slot">
+                <button class="btn btn-primary add-btn" type="button" data-add="dons-madagascar-dented-brick">
+                  <span class="add-btn-idle">Add to request</span>
+                  <span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>
+                </button>
+                <a class="add-view" href="cart.html" hidden>View request list</a>
+              </div>
             </article>
-            <article class="product-card">
+            <article class="product-card reveal spotlight-card">
               <img class="product-photo" src="assets/product-dons-tahitian-barbarosi.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Tahitian Barbarosi Spiced Rum">
               <h3>Tahitian Barbarosi Spiced Rum · 4 oz</h3>
               <p>All Natural. Don's Reserve collaboration — Tahitian vanilla in Barbarosi spiced rum.</p>
               <p class="price">$40 <span class="provisional">Provisional</span></p>
-              <button class="btn btn-primary" type="button" data-add="dons-tahitian-barbarosi">Add to request</button>
+              <div class="add-slot">
+                <button class="btn btn-primary add-btn" type="button" data-add="dons-tahitian-barbarosi">
+                  <span class="add-btn-idle">Add to request</span>
+                  <span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>
+                </button>
+                <a class="add-view" href="cart.html" hidden>View request list</a>
+              </div>
             </article>
-            <article class="product-card">
+            <article class="product-card reveal spotlight-card">
               <img class="product-photo" src="assets/product-dons-tahiti-five-wives.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Tahiti Beans, Five Wives Vodka">
               <h3>Tahiti Beans · Five Wives Vodka · 4 oz</h3>
               <p>All Natural. Don's Reserve collaboration — Tahiti beans in Five Wives vodka.</p>
               <p class="price">$40 <span class="provisional">Provisional</span></p>
-              <button class="btn btn-primary" type="button" data-add="dons-tahiti-five-wives">Add to request</button>
+              <div class="add-slot">
+                <button class="btn btn-primary add-btn" type="button" data-add="dons-tahiti-five-wives">
+                  <span class="add-btn-idle">Add to request</span>
+                  <span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>
+                </button>
+                <a class="add-view" href="cart.html" hidden>View request list</a>
+              </div>
             </article>
           </div>
         </div>

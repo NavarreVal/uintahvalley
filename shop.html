@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shop | Uintah Valley</title>
-  <meta name="description" content="Uintah Valley vanilla shop. Mainline Pure Vanilla Extract is sold out indefinitely. Don's Reserve batches can be requested.">
+  <meta name="description" content="Uintah Valley vanilla shop. Mainline Pure Vanilla Extract is sold out indefinitely. Available items can be requested.">
   <meta property="og:title" content="Shop Uintah Valley">
-  <meta property="og:description" content="Homemade vanilla from Utah. Mainline is out of stock; Don's Reserve can be requested.">
+  <meta property="og:description" content="Homemade vanilla from Utah. Mainline is out of stock; available items can be requested.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://uintahvalley.com/shop">
   <link rel="canonical" href="https://uintahvalley.com/shop">
@@ -53,6 +53,27 @@
       <p class="lede">Handmade product. Small batch. White glove service.</p>
     </header>
 
+    <section class="order-how order-how-inset" aria-labelledby="order-how-title">
+      <div class="order-how-head">
+        <h2 id="order-how-title">How ordering works</h2>
+        <p class="order-how-utah">Utah residents only</p>
+      </div>
+      <ol class="order-steps">
+        <li>
+          <span class="order-step-index" aria-hidden="true">1</span>
+          <p>Add items to your request list.</p>
+        </li>
+        <li>
+          <span class="order-step-index" aria-hidden="true">2</span>
+          <p>Email the request. No payment info on the site.</p>
+        </li>
+        <li>
+          <span class="order-step-index" aria-hidden="true">3</span>
+          <p>We reply with availability, a confirmed total, and how to pay.</p>
+        </li>
+      </ol>
+    </section>
+
     <section class="section" id="catalog">
       <div class="callout">
         <p><strong>Mainline Pure Vanilla Extract is out of stock indefinitely.</strong> It cannot be ordered here. Don's Reserve bottles can be requested.</p>
@@ -61,9 +82,10 @@
       <p>Our recipes are made in small batches with locally distilled spirits and high quality vanilla beans.<br>
       No water, no chemical flavors, no added sugar or HFCS, NEVER castoreum!</p>
       <div class="shop-filter" role="group" aria-label="Filter products" data-shop-filter>
-        <button type="button" data-filter="all" aria-pressed="true">All</button>
-        <button type="button" data-filter="mainline">Uintah Valley</button>
-        <button type="button" data-filter="dons-reserve">Don's Reserve</button>
+        <span class="shop-filter-thumb" aria-hidden="true"></span>
+        <button type="button" data-filter="all" aria-pressed="true">All <span class="filter-count">6</span></button>
+        <button type="button" data-filter="mainline" aria-pressed="false">Uintah Valley <span class="filter-count">3</span></button>
+        <button type="button" data-filter="dons-reserve" aria-pressed="false">Don's Reserve <span class="filter-count">3</span></button>
       </div>
       <div class="product-row shop-grid">
         <article class="product-card" data-shop-card data-line="mainline">
@@ -87,27 +109,76 @@
           <span class="sold-note">Sold out indefinitely</span>
           <button class="btn" type="button" disabled aria-disabled="true">Unavailable</button>
         </article>
-        <article class="product-card" data-shop-card data-line="dons-reserve">
+        <article class="product-card spotlight-card" data-shop-card data-line="dons-reserve">
           <img class="product-photo" src="assets/product-dons-madagascar-dented-brick.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Madagascar Beans, Dented Brick Craft Rum">
           <h3>Madagascar Beans · Dented Brick Craft Rum · 4 oz</h3>
           <p>All Natural. Don's Reserve collaboration — Madagascar beans in Dented Brick craft rum.</p>
           <p class="price">$40 <span class="provisional">Provisional</span></p>
-          <button class="btn btn-primary" type="button" data-add="dons-madagascar-dented-brick">Add to request</button>
+          <div class="add-slot">
+            <button class="btn btn-primary add-btn" type="button" data-add="dons-madagascar-dented-brick">
+              <span class="add-btn-idle">Add to request</span>
+              <span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>
+            </button>
+            <a class="add-view" href="cart.html" hidden>View request list</a>
+          </div>
         </article>
-        <article class="product-card" data-shop-card data-line="dons-reserve">
+        <article class="product-card spotlight-card" data-shop-card data-line="dons-reserve">
           <img class="product-photo" src="assets/product-dons-tahitian-barbarosi.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Tahitian Barbarosi Spiced Rum">
           <h3>Tahitian Barbarosi Spiced Rum · 4 oz</h3>
           <p>All Natural. Don's Reserve collaboration — Tahitian vanilla in Barbarosi spiced rum.</p>
           <p class="price">$40 <span class="provisional">Provisional</span></p>
-          <button class="btn btn-primary" type="button" data-add="dons-tahitian-barbarosi">Add to request</button>
+          <div class="add-slot">
+            <button class="btn btn-primary add-btn" type="button" data-add="dons-tahitian-barbarosi">
+              <span class="add-btn-idle">Add to request</span>
+              <span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>
+            </button>
+            <a class="add-view" href="cart.html" hidden>View request list</a>
+          </div>
         </article>
-        <article class="product-card" data-shop-card data-line="dons-reserve">
+        <article class="product-card spotlight-card" data-shop-card data-line="dons-reserve">
           <img class="product-photo" src="assets/product-dons-tahiti-five-wives.jpg" width="1400" height="1050" alt="All Natural bottle: Vanilla Tahiti Beans, Five Wives Vodka">
           <h3>Tahiti Beans · Five Wives Vodka · 4 oz</h3>
           <p>All Natural. Don's Reserve collaboration — Tahiti beans in Five Wives vodka.</p>
           <p class="price">$40 <span class="provisional">Provisional</span></p>
-          <button class="btn btn-primary" type="button" data-add="dons-tahiti-five-wives">Add to request</button>
+          <div class="add-slot">
+            <button class="btn btn-primary add-btn" type="button" data-add="dons-tahiti-five-wives">
+              <span class="add-btn-idle">Add to request</span>
+              <span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>
+            </button>
+            <a class="add-view" href="cart.html" hidden>View request list</a>
+          </div>
         </article>
+      </div>
+    </section>
+
+    <!-- FAQ look adapted from the Accessible Accordion by a11ypros, https://21st.dev/@a11ypros/components/a11y-accordion, MIT. Native details/summary; no script. -->
+    <section class="section faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">Questions</h2>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Why only Utah?</summary>
+          <p>Currently we can only sell to Utah residents. This is a homemade food product for home use, not for resale, processed and prepared without state or local inspection, under Utah's cottage food program. If that's not you, reach out anyways and we'll see what we can do for you.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I pay on this site?</summary>
+          <p>No. There is no live checkout, and we won't ask for your payment info here. Add items to a request list, then email the request from the <a href="cart.html">Request List page</a>. We reply with availability, a confirmed total, and how to pay. Payment and confirmation is arranged off-site.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Does it contain alcohol?</summary>
+          <p>Yes. The extract contains alcohol, which is the best extractive, and we don't water it down. It is made with locally distilled spirits and imported vanilla beans.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What's in it?</summary>
+          <p>No water, no chemical flavors, no added sugar or HFCS, and never castoreum. Locally distilled spirits and high quality vanilla. Nothing else goes in to make the extract.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I order the mainline Pure Vanilla Extract?</summary>
+          <p>Mainline Pure Vanilla Extract is sold out for now. It cannot be ordered here. Other items can still be requested.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Are the prices final?</summary>
+          <p>Prices are provisional. Sending a request is not a paid order. We reply with a confirmed total.</p>
+        </details>
       </div>
     </section>
   </main>
