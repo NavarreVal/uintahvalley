@@ -17,9 +17,12 @@ const CANONICAL = {
   "about.html": "https://uintahvalley.com/about",
   "contact.html": "https://uintahvalley.com/contact",
   "privacy.html": "https://uintahvalley.com/privacy",
+  "terms.html": "https://uintahvalley.com/terms",
   "copyright.html": "https://uintahvalley.com/copyright",
   "cart.html": "https://uintahvalley.com/cart"
 };
+
+const PAGES = Object.keys(CANONICAL).concat(["404.html"]);
 
 test("indexable pages use one extensionless canonical and the same og:url", function () {
   Object.keys(CANONICAL).forEach(function (name) {
@@ -40,11 +43,23 @@ test("cart is noindex and 404 is noindex without a canonical", function () {
   assert.equal(missing.includes('rel="canonical"'), false);
 });
 
-test("internal page links stay on the .html files", function () {
-  const home = html("index.html");
-  ["shop.html", "about.html", "contact.html", "cart.html", "index.html"].forEach(function (href) {
-    assert.equal(home.includes('href="' + href + '"'), true, href);
+test("internal page links use the final extensionless URLs", function () {
+  const files = PAGES.concat(["js/cart.js"]);
+  files.forEach(function (name) {
+    const page = name.endsWith(".js")
+      ? readFileSync(join(root, name), "utf8")
+      : html(name);
+    const hrefs = page.match(/href="[^"]+"/g) || [];
+    hrefs.forEach(function (href) {
+      assert.equal(/\.html"/.test(href), false, name + " " + href);
+    });
   });
+  const home = html("index.html");
+  ['href="/"', 'href="/shop"', 'href="/about"', 'href="/contact"', 'href="/cart"'].forEach(function (href) {
+    assert.equal(home.includes(href), true, href);
+  });
+  assert.equal(home.includes('href="index.html"'), false);
+  assert.equal(home.includes('href="/index"'), false);
 });
 
 test("sitemap lists the indexable extensionless URLs and not cart or 404", function () {
@@ -58,14 +73,19 @@ test("sitemap lists the indexable extensionless URLs and not cart or 404", funct
     "https://uintahvalley.com/about",
     "https://uintahvalley.com/contact",
     "https://uintahvalley.com/privacy",
+    "https://uintahvalley.com/terms",
     "https://uintahvalley.com/copyright"
   ]);
+  assert.equal(xml.includes(".html"), false);
   assert.equal(xml.includes("cart"), false);
   assert.equal(xml.includes("404"), false);
-  const dates = xml.match(/<lastmod>[^<]+<\/lastmod>/g);
-  assert.equal(dates.length, locs.length);
-  dates.forEach(function (date) {
-    assert.equal(date, "<lastmod>2026-10-31</lastmod>");
+  const dates = {};
+  xml.replace(/<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g, function (_, loc, date) {
+    dates[loc] = date;
+    return _;
+  });
+  locs.forEach(function (loc) {
+    assert.equal(dates[loc], loc.endsWith("/terms") ? "2026-11-01" : "2026-10-31", loc);
   });
 });
 
@@ -130,7 +150,7 @@ test("html routes are private and uncached while assets stay public", function (
     return values.join(", ");
   }
 
-  ["/", "/index.html", "/shop", "/shop.html", "/about", "/about.html", "/contact", "/contact.html", "/cart", "/cart.html", "/privacy", "/privacy.html", "/copyright", "/copyright.html", "/404", "/404.html"].forEach(function (pathname) {
+  ["/", "/index.html", "/shop", "/shop.html", "/about", "/about.html", "/contact", "/contact.html", "/cart", "/cart.html", "/privacy", "/privacy.html", "/terms", "/terms.html", "/copyright", "/copyright.html", "/404", "/404.html"].forEach(function (pathname) {
     assert.equal(cacheControl(pathname), "private, no-cache", pathname);
   });
   assert.equal(cacheControl("/assets/hero-home.jpg"), "public, max-age=604800");
@@ -141,18 +161,9 @@ test("html routes are private and uncached while assets stay public", function (
 });
 
 test("pages keep scripts and styles in files", function () {
-  [
-    "index.html",
-    "shop.html",
-    "about.html",
-    "contact.html",
-    "cart.html",
-    "privacy.html",
-    "copyright.html",
-    "404.html"
-  ].forEach(function (name) {
+  PAGES.concat(["404.html"]).forEach(function (name) {
     const page = html(name);
-    assert.equal(/<script(?![^>]*\bsrc=)/i.test(page), false, name);
+    assert.equal(/<script(?![^>]*\bsrc=)(?![^>]*\btype="application\/ld\+json")/i.test(page), false, name);
     assert.equal(/\son[a-z]+\s*=/i.test(page), false, name);
     assert.equal(/\sstyle\s*=/i.test(page), false, name);
   });
@@ -169,12 +180,136 @@ test("pages keep scripts and styles in files", function () {
   assert.deepEqual(urls, ["https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"]);
 });
 
-test("_redirects still points old product URLs at shop and the license record stays", function () {
+test("_redirects sends old product URLs to /shop in one 301 and the license record stays", function () {
   const redirects = readFileSync(join(root, "_redirects"), "utf8");
-  assert.match(redirects, /\/experimental\.html\s+\/shop\.html\s+302/);
-  assert.match(redirects, /\/experimental\s+\/shop\.html\s+302/);
-  assert.match(redirects, /\/product\.html\s+\/shop\.html\s+302/);
-  assert.match(redirects, /\/product\s+\/shop\.html\s+302/);
+  assert.match(redirects, /\/experimental\.html\s+\/shop\s+301/);
+  assert.match(redirects, /\/experimental\s+\/shop\s+301/);
+  assert.match(redirects, /\/product\.html\s+\/shop\s+301/);
+  assert.match(redirects, /\/product\s+\/shop\s+301/);
+  const rules = redirects.split(/\r?\n/).filter(function (line) {
+    return line && !/^\s*#/.test(line);
+  });
+  const ruleText = rules.join("\n");
+  assert.equal(ruleText.includes("/shop.html"), false);
+  assert.equal(ruleText.includes("302"), false);
+  assert.equal(rules.some(function (line) { return line.includes("/*"); }), false);
   const licenses = readFileSync(join(root, "IMAGE-LICENSES.md"), "utf8");
   assert.match(licenses, /Shutterstock/);
+});
+
+test("the hero photo reserves its intrinsic size", function () {
+  const home = html("index.html");
+  assert.match(home, /<img class="hero-photo" src="assets\/hero-home\.jpg" width="2048" height="1365" alt="Forested mountain valley with snow-patched peaks under a blue sky">/);
+  const css = readFileSync(join(root, "css/styles.css"), "utf8");
+  assert.match(css, /\.hero-photo\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*object-fit:\s*cover/s);
+});
+
+function jsonLd(name) {
+  const blocks = html(name).match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g) || [];
+  return blocks.map(function (block) {
+    return JSON.parse(block.replace(/^<script type="application\/ld\+json">/, "").replace(/<\/script>$/, ""));
+  });
+}
+
+test("organization JSON-LD uses the public logo and city only", function () {
+  ["index.html", "about.html"].forEach(function (name) {
+    const blocks = jsonLd(name);
+    assert.equal(blocks.length, 1, name);
+    const org = blocks[0];
+    assert.equal(org["@context"], "https://schema.org");
+    assert.equal(org["@type"], "Organization");
+    assert.equal(org.name, "Uintah Valley LLC");
+    assert.equal(org.url, "https://uintahvalley.com/");
+    assert.equal(org.logo, "https://uintahvalley.com/assets/logo-square.png");
+    assert.equal(org.email, "hello@uintahvalley.com");
+    assert.deepEqual(Object.keys(org.address).sort(), ["@type", "addressLocality", "addressRegion"]);
+    assert.equal(org.address["@type"], "PostalAddress");
+    assert.equal(org.address.addressLocality, "Parowan");
+    assert.equal(org.address.addressRegion, "Utah");
+    assert.equal(JSON.stringify(org).includes("streetAddress"), false);
+    assert.equal(/%|\bABV\b|\bproof\b/i.test(JSON.stringify(org)), false);
+  });
+  assert.match(html("about.html"), /based out of Parowan Utah/);
+  assert.match(html("index.html"), /hello@uintahvalley.com/);
+  assert.equal(jsonLd("shop.html")[0]["@type"], undefined);
+});
+
+test("shop JSON-LD matches the prices and sold-out state on the page", function () {
+  const page = html("shop.html");
+  const data = jsonLd("shop.html");
+  assert.equal(data.length, 1);
+  const graph = data[0]["@graph"];
+  assert.equal(data[0]["@context"], "https://schema.org");
+  const list = graph.find(function (node) { return node["@type"] === "ItemList"; });
+  const products = graph.filter(function (node) { return node["@type"] === "Product"; });
+  assert.equal(products.length, 6);
+  assert.equal(list.numberOfItems, 6);
+  assert.equal(list.itemListElement.length, 6);
+  const cards = page.split("<article").slice(1).map(function (chunk) {
+    const end = chunk.indexOf("</article>");
+    return end === -1 ? chunk : chunk.slice(0, end);
+  });
+  assert.equal(cards.length, 6);
+  cards.forEach(function (card, index) {
+    const name = card.match(/<h3>([^<]+)<\/h3>/)[1];
+    const description = card.match(/<p>([^<]+)<\/p>/)[1];
+    const image = card.match(/src="(assets\/[^"]+)"/)[1];
+    const product = products[index];
+    assert.equal(product.name, name);
+    assert.equal(product.description, description);
+    assert.equal(product.image, "https://uintahvalley.com/" + image);
+    assert.equal(product.url, "https://uintahvalley.com/shop");
+    assert.equal(product.brand.name, "Uintah Valley");
+    assert.equal(product.offers["@type"], "Offer");
+    assert.equal(product.offers.url, "https://uintahvalley.com/shop");
+    assert.equal(list.itemListElement[index].position, index + 1);
+    assert.equal(list.itemListElement[index].item["@id"], product["@id"]);
+    const soldOut = card.includes("Sold out indefinitely");
+    const price = card.match(/class="price">\$([0-9]+)/);
+    if (soldOut) {
+      assert.equal(price, null, name);
+      assert.equal(product.offers.availability, "https://schema.org/OutOfStock");
+      assert.equal(Object.prototype.hasOwnProperty.call(product.offers, "price"), false, name);
+      assert.equal(Object.prototype.hasOwnProperty.call(product.offers, "priceCurrency"), false, name);
+    } else {
+      assert.equal(price[1], "40", name);
+      assert.equal(product.offers.availability, "https://schema.org/InStock");
+      assert.equal(product.offers.price, 40);
+      assert.equal(product.offers.priceCurrency, "USD");
+    }
+    assert.equal(/%|\bABV\b|\bproof\b/i.test(JSON.stringify(product)), false, name);
+  });
+  assert.equal(page.includes("streetAddress"), false);
+});
+
+test("terms gathers the existing request wording and stays generic", function () {
+  const page = html("terms.html");
+  [
+    "Utah residents only",
+    "Add items to your request list.",
+    "Email the request. No payment info on the site.",
+    "We reply with availability, a confirmed total, and how to pay.",
+    "Currently we can only sell to Utah residents. This is a homemade food product for home use, not for resale, processed and prepared without state or local inspection, under Utah's cottage food program.",
+    "There is no live checkout, and we won't ask for your payment info here.",
+    "Sending a request is not a paid order.",
+    "Prices are provisional.",
+    "Prices shown are provisional until confirmed in reply.",
+    "Stored only in this browser.",
+    "Some items are sold out indefinitely and cannot be ordered here. Other items can still be requested.",
+    "Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol."
+  ].forEach(function (line) {
+    assert.equal(page.includes(line), true, line);
+  });
+  const visible = page.replace(/<!--[\s\S]*?-->/g, "");
+  ["Don's Reserve", "mainline", "Pure Vanilla", "Madagascar", "Tahitian", "Dented Brick", "Five Wives", "Barbarosi", "Gift Box"].forEach(function (name) {
+    assert.equal(visible.includes(name), false, name);
+  });
+  assert.equal(/%|\bABV\b|\bproof\b/i.test(visible), false);
+  assert.equal(visible.includes("not a purchase"), false);
+  assert.equal(page.includes('href="/terms" aria-current="page"'), true);
+  PAGES.concat(["404.html"]).forEach(function (name) {
+    assert.equal(html(name).includes('href="/terms"'), true, name);
+  });
+  const owners = page.match(/<!-- OWNER: [\s\S]*? -->/g) || [];
+  assert.equal(owners.length >= 4, true);
 });
