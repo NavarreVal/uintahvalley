@@ -18,7 +18,7 @@ function articles(page) {
 }
 
 const STEPS = [
-  "Add Don's Reserve bottles to your request list.",
+  "Add Items to your request list.",
   "Email the request. No payment info on the site.",
   "We reply with availability, a confirmed total, and how to pay."
 ];

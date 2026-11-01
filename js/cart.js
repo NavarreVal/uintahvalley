@@ -334,7 +334,7 @@
       '<p class="eyebrow">Request sent</p>' +
       "<h2>What happens next</h2>" +
       "<p>We reply with availability, a confirmed total, and how to pay.</p>" +
-      '<p><a class="btn btn-primary" href="shop.html#dons-reserve">Browse Don\'s Reserve</a></p>' +
+      '<p><a class="btn btn-primary" href="shop.html">Browse the shop</a></p>' +
       "</div>"
     );
   }
