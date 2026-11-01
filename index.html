@@ -17,12 +17,29 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/favicon-180.png">
   <link rel="stylesheet" href="css/styles.css">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://uintahvalley.com/#organization",
+      "name": "Uintah Valley LLC",
+      "alternateName": "Uintah Valley",
+      "url": "https://uintahvalley.com/",
+      "logo": "https://uintahvalley.com/assets/logo-square.png",
+      "email": "hello@uintahvalley.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Parowan",
+        "addressRegion": "Utah"
+      }
+    }
+  </script>
 </head>
 <body class="page-home">
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap header-inner">
-      <a class="brand" href="index.html">
+      <a class="brand" href="/">
         <picture class="brand-mark">
           <source srcset="assets/logo-color.svg" type="image/svg+xml">
           <img src="assets/logo-color.png" width="96" height="130" alt="">
@@ -34,18 +51,18 @@
       </a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
       <nav class="site-nav" id="site-nav">
-        <a href="index.html" aria-current="page">Home</a>
-        <a href="shop.html">Shop</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a class="cart-link" href="cart.html">Request list <span class="cart-count" data-cart-count>0</span></a>
+        <a href="/" aria-current="page">Home</a>
+        <a href="/shop">Shop</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+        <a class="cart-link" href="/cart">Request list <span class="cart-count" data-cart-count>0</span></a>
       </nav>
     </div>
   </header>
 
   <main id="main">
     <section class="hero" aria-label="Homepage hero">
-      <img class="hero-photo" src="assets/hero-home.jpg" alt="Forested mountain valley with snow-patched peaks under a blue sky">
+      <img class="hero-photo" src="assets/hero-home.jpg" width="2048" height="1365" alt="Forested mountain valley with snow-patched peaks under a blue sky">
       <div class="hero-scrim" aria-hidden="true"></div>
       <div class="hero-stage">
         <div class="hero-lockup">
@@ -59,7 +76,7 @@
           </div>
         </div>
         <div class="hero-actions actions">
-          <a class="btn btn-primary" href="shop.html">See the shop</a>
+          <a class="btn btn-primary" href="/shop">See the shop</a>
         </div>
       </div>
     </section>
@@ -135,7 +152,7 @@
                   <span class="add-btn-idle">Add to request</span>
                   <span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>
                 </button>
-                <a class="add-view" href="cart.html" hidden>View request list</a>
+                <a class="add-view" href="/cart" hidden>View request list</a>
               </div>
             </article>
             <article class="product-card reveal spotlight-card">
@@ -148,7 +165,7 @@
                   <span class="add-btn-idle">Add to request</span>
                   <span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>
                 </button>
-                <a class="add-view" href="cart.html" hidden>View request list</a>
+                <a class="add-view" href="/cart" hidden>View request list</a>
               </div>
             </article>
             <article class="product-card reveal spotlight-card">
@@ -161,7 +178,7 @@
                   <span class="add-btn-idle">Add to request</span>
                   <span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>
                 </button>
-                <a class="add-view" href="cart.html" hidden>View request list</a>
+                <a class="add-view" href="/cart" hidden>View request list</a>
               </div>
             </article>
           </div>
@@ -200,14 +217,14 @@
         </div>
       </div>
       <div>
-        <div><a href="shop.html">Shop</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a> · <a href="cart.html">Request list</a></div>
+        <div><a href="/shop">Shop</a> · <a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/cart">Request list</a></div>
         <p>Orders: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a></p>
       </div>
     </div>
     <div class="wrap legal">
       <p>Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol.</p>
       <p>© <span data-year>2026</span> Uintah Valley LLC</p>
-      <p><a href="privacy.html">Privacy</a> · <a href="copyright.html">Copyright</a></p>
+      <p><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/copyright">Copyright</a></p>
       <p class="footer-credit">Built by <a href="https://navarreval.com/">Navarre</a> and The <a href="https://x.ai/bot">Grok Bot</a> crew of the SS Argus - Gad Kyrath XO</p>
     </div>
   </footer>

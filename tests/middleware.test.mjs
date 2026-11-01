@@ -255,6 +255,7 @@ test("site assets and seo files are served", async function () {
     "/contact",
     "/cart",
     "/privacy",
+    "/terms",
     "/copyright",
     "/404.html",
     "/css/styles.css",

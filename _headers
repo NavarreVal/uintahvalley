@@ -26,6 +26,9 @@
 /privacy
   Cache-Control: private, no-cache
 
+/terms
+  Cache-Control: private, no-cache
+
 /copyright
   Cache-Control: private, no-cache
 

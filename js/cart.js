@@ -151,7 +151,7 @@
       '<span class="add-btn-idle">Add to request</span>' +
       '<span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>' +
       "</button>" +
-      '<a class="add-view" href="cart.html" hidden>View request list</a>' +
+      '<a class="add-view" href="/cart" hidden>View request list</a>' +
       "</div>"
     );
   }
@@ -334,7 +334,7 @@
       '<p class="eyebrow">Request sent</p>' +
       "<h2>What happens next</h2>" +
       "<p>We reply with availability, a confirmed total, and how to pay.</p>" +
-      '<p><a class="btn btn-primary" href="shop.html">Browse the shop</a></p>' +
+      '<p><a class="btn btn-primary" href="/shop">Browse the shop</a></p>' +
       "</div>"
     );
   }

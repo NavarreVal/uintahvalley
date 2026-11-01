@@ -1,7 +1,10 @@
-# Old Experimental / product bookmarks → Shop.
-# Do not add a /* splat here — it can intercept POST /api/contact on the
-# custom domain (Pages still serves 404.html for unknown static paths).
-/experimental.html    /shop.html      302
-/experimental         /shop.html      302
-/product.html         /shop.html      302
-/product              /shop.html      302
+# Old Experimental / product bookmarks → the final shop URL.
+# 301, one hop. A 302 to /shop.html would hop again: Pages 308s *.html
+# to the extensionless path. Do not add a /* splat here — it can intercept
+# POST /api/contact on the custom domain (Pages still serves 404.html for
+# unknown static paths). Existing *.html pages stay files; Pages already
+# 308s those to extensionless URLs, so old .html addresses keep working.
+/experimental.html    /shop    301
+/experimental         /shop    301
+/product.html         /shop    301
+/product              /shop    301
