@@ -117,6 +117,45 @@
     }
   };
 
+  const RESERVE_PICKS = [
+    {
+      id: "dons-madagascar-dented-brick",
+      image: "assets/product-dons-madagascar-dented-brick.jpg",
+      alt: "All Natural bottle: Vanilla Madagascar Beans, Dented Brick Craft Rum",
+      blurb: "All Natural. Don's Reserve collaboration — Madagascar beans in Dented Brick craft rum."
+    },
+    {
+      id: "dons-tahitian-barbarosi",
+      image: "assets/product-dons-tahitian-barbarosi.jpg",
+      alt: "All Natural bottle: Vanilla Tahitian Barbarosi Spiced Rum",
+      blurb: "All Natural. Don's Reserve collaboration — Tahitian vanilla in Barbarosi spiced rum."
+    },
+    {
+      id: "dons-tahiti-five-wives",
+      image: "assets/product-dons-tahiti-five-wives.jpg",
+      alt: "All Natural bottle: Vanilla Tahiti Beans, Five Wives Vodka",
+      blurb: "All Natural. Don's Reserve collaboration — Tahiti beans in Five Wives vodka."
+    }
+  ];
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[ch];
+    });
+  }
+
+  function addSlotHtml(id) {
+    return (
+      '<div class="add-slot">' +
+      '<button class="btn btn-primary add-btn" type="button" data-add="' + escapeHtml(id) + '">' +
+      '<span class="add-btn-idle">Add to request</span>' +
+      '<span class="add-btn-done" aria-hidden="true">Added <span aria-hidden="true">✓</span></span>' +
+      "</button>" +
+      '<a class="add-view" href="cart.html" hidden>View request list</a>' +
+      "</div>"
+    );
+  }
+
   function isAvailable(product) {
     return !!(product && product.available);
   }
@@ -178,6 +217,10 @@
     }
     saveCart(cart);
     showToast(product.name + " added to your request list.");
+    requestJustSent = false;
+    pulseCartCount();
+    if (document.querySelector("[data-cart-root]")) renderCartPage();
+    else syncAddedButtons();
   }
 
   function setQty(id, qty) {
@@ -232,6 +275,70 @@
     return loadCart().items.length > 0;
   }
 
+  let requestJustSent = false;
+
+  function syncAddedButtons() {
+    const ids = {};
+    loadCart().items.forEach(function (item) { ids[item.id] = true; });
+    document.querySelectorAll("[data-add]").forEach(function (btn) {
+      const on = !!ids[btn.getAttribute("data-add")];
+      btn.classList.toggle("is-added", on);
+      const idle = btn.querySelector(".add-btn-idle");
+      const done = btn.querySelector(".add-btn-done");
+      if (idle) idle.setAttribute("aria-hidden", on ? "true" : "false");
+      if (done) done.setAttribute("aria-hidden", on ? "false" : "true");
+      if (on) btn.setAttribute("aria-label", "Added to your request list");
+      else btn.removeAttribute("aria-label");
+      const slot = btn.closest(".add-slot");
+      const link = slot && slot.querySelector(".add-view");
+      if (link) link.hidden = !on;
+    });
+  }
+
+  function pulseCartCount() {
+    document.querySelectorAll("[data-cart-count]").forEach(function (el) {
+      el.classList.remove("is-pulsing");
+      void el.offsetWidth;
+      el.classList.add("is-pulsing");
+      window.clearTimeout(el._pulseTimer);
+      el._pulseTimer = window.setTimeout(function () {
+        el.classList.remove("is-pulsing");
+      }, 500);
+    });
+  }
+
+  function emptyCartHtml() {
+    const cards = RESERVE_PICKS.map(function (pick) {
+      const product = PRODUCTS[pick.id];
+      return (
+        '<article class="product-card spotlight-card">' +
+        '<img class="product-photo" src="' + escapeHtml(pick.image) + '" width="1400" height="1050" alt="' + escapeHtml(pick.alt) + '">' +
+        "<h3>" + escapeHtml(product.name + " · " + product.size) + "</h3>" +
+        "<p>" + escapeHtml(pick.blurb) + "</p>" +
+        '<p class="price">' + money(product.price) + ' <span class="provisional">Provisional</span></p>' +
+        addSlotHtml(pick.id) +
+        "</article>"
+      );
+    }).join("");
+    return (
+      '<div class="empty-cart empty-cart-picks">' +
+      "<p>Your request list is empty.</p>" +
+      '<div class="product-row empty-picks">' + cards + "</div>" +
+      "</div>"
+    );
+  }
+
+  function sentCartHtml() {
+    return (
+      '<div class="request-sent" role="status">' +
+      '<p class="eyebrow">Request sent</p>' +
+      "<h2>What happens next</h2>" +
+      "<p>We reply with availability, a confirmed total, and how to pay.</p>" +
+      '<p><a class="btn btn-primary" href="shop.html#dons-reserve">Browse Don\'s Reserve</a></p>' +
+      "</div>"
+    );
+  }
+
   function syncRequestMailButton() {
     const empty = !cartHasItems();
     document.querySelectorAll("[data-request-mail], [data-request-clear]").forEach(function (btn) {
@@ -239,7 +346,7 @@
       btn.setAttribute("aria-disabled", empty ? "true" : "false");
     });
     document.querySelectorAll("[data-request-empty-hint]").forEach(function (el) {
-      el.hidden = !empty;
+      el.hidden = !empty || requestJustSent;
     });
   }
 
@@ -249,14 +356,12 @@
     const cart = loadCart();
     saveCart(cart);
     if (!cart.items.length) {
-      root.innerHTML =
-        '<div class="empty-cart">' +
-        "<p>Your request list is empty.</p>" +
-        '<p><a class="btn btn-primary" href="shop.html#dons-reserve">Browse Don\'s Reserve</a></p>' +
-        "</div>";
+      root.innerHTML = requestJustSent ? sentCartHtml() : emptyCartHtml();
       syncRequestMailButton();
+      syncAddedButtons();
       return;
     }
+    requestJustSent = false;
 
     const rows = cart.items.map(function (item) {
       const product = PRODUCTS[item.id];
@@ -292,6 +397,7 @@
     });
 
     syncRequestMailButton();
+    syncAddedButtons();
   }
 
   document.addEventListener("click", function (event) {
@@ -423,6 +529,7 @@
     btn.addEventListener("click", function () {
       if (!cartHasItems()) return;
       if (!window.confirm("Clear list?")) return;
+      requestJustSent = false;
       clearCart();
     });
   });
@@ -500,6 +607,7 @@
         }).then(function (result) {
           if (result.ok) {
             requestForm.reset();
+            requestJustSent = true;
             clearCart();
             setRequestStatus("ok", "Request sent. We will reply by email.");
           } else {
@@ -536,4 +644,5 @@
 
   updateCartCount();
   renderCartPage();
+  syncAddedButtons();
 })();

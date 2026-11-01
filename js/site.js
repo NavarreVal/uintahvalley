@@ -1,4 +1,6 @@
 (function () {
+  document.documentElement.classList.add("js");
+
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".site-nav");
   if (toggle && nav) {
@@ -35,6 +37,7 @@
         const match = panel.getAttribute("data-discover-panel") === line;
         panel.hidden = !match;
       });
+      armReveals();
     }
 
     tabs.forEach(function (tab) {
@@ -202,4 +205,79 @@
       });
     });
   }
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function armReveals() {
+    const nodes = document.querySelectorAll(".reveal");
+    if (!nodes.length) return;
+    if (reduceMotion || typeof IntersectionObserver !== "function") {
+      nodes.forEach(function (el) { el.classList.add("is-revealed"); });
+      return;
+    }
+    if (!armReveals.observer) {
+      armReveals.observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-revealed");
+          armReveals.observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.2, rootMargin: "0px 0px -8% 0px" });
+    }
+    nodes.forEach(function (el) {
+      if (el.classList.contains("is-revealed")) return;
+      if (el.closest("[hidden]")) {
+        el.classList.add("reveal-pending");
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      const inView = rect.width > 0 && rect.top < window.innerHeight * 0.92 && rect.bottom > 32;
+      if (inView && !el.classList.contains("reveal-pending")) {
+        el.classList.add("is-revealed");
+        return;
+      }
+      el.classList.add("reveal-pending");
+      armReveals.observer.observe(el);
+    });
+  }
+
+  armReveals();
+
+  // Spotlight Card, ported for Don's Reserve product cards only.
+  // Source: https://reactbits.dev/components/spotlight-card
+  // Copyright (c) 2026 David Haz. MIT License + Commons Clause.
+  // Embedded in this site. Not redistributed as a standalone component.
+  // Pointer highlight only. Off for touch and prefers-reduced-motion.
+  function initSpotlight() {
+    if (reduceMotion) return;
+    // Phones and tablets report a coarse pointer. A mouse still works on a
+    // touch laptop, and those events are ignored below when the pointer is touch.
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    let active = null;
+    function clearSpot() {
+      if (!active) return;
+      active.classList.remove("is-spot");
+      active = null;
+    }
+    document.addEventListener("pointermove", function (event) {
+      if (event.pointerType && event.pointerType !== "mouse") return;
+      const card = event.target && event.target.closest ? event.target.closest(".spotlight-card") : null;
+      if (!card) {
+        clearSpot();
+        return;
+      }
+      if (active && active !== card) active.classList.remove("is-spot");
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty("--spot-x", (event.clientX - rect.left) + "px");
+      card.style.setProperty("--spot-y", (event.clientY - rect.top) + "px");
+      card.classList.add("is-spot");
+      active = card;
+    });
+    document.addEventListener("pointerout", function (event) {
+      if (event.relatedTarget) return;
+      clearSpot();
+    });
+  }
+
+  initSpotlight();
 })();

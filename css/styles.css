@@ -68,6 +68,11 @@
   box-sizing: border-box;
 }
 
+/* Author display values must not override the hidden attribute. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -558,29 +563,89 @@ h3,
   grid-template-columns: 1fr;
 }
 
+/* Segmented filter.
+   Adapted from Uiverse.io by 00Kubi
+   https://uiverse.io/00Kubi/smooth-termite-31
+   MIT License
+   Copyright (c) 2026 00Kubi
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+   The sliding thumb is restyled for this site. The controls stay buttons
+   with aria-pressed. */
+
 .shop-filter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.4rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(100%, 40rem);
   margin: 1.5rem 0 1.2rem;
+  padding: 0.28rem;
+  background: #e7e1cc;
+  border-radius: 999px;
+}
+
+.shop-filter-thumb {
+  position: absolute;
+  z-index: 0;
+  top: 0.28rem;
+  bottom: 0.28rem;
+  left: 0.28rem;
+  width: calc((100% - 0.56rem) / 3);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(20, 25, 22, 0.16);
+  transition: transform 0.24s ease;
+}
+
+.shop-filter:has(button[data-filter="mainline"][aria-pressed="true"]) .shop-filter-thumb {
+  transform: translateX(100%);
+}
+
+.shop-filter:has(button[data-filter="dons-reserve"][aria-pressed="true"]) .shop-filter-thumb {
+  transform: translateX(200%);
 }
 
 .shop-filter button {
+  position: relative;
+  z-index: 1;
   appearance: none;
   border: 0;
-  background: none;
-  padding: 0.2rem 0 0.45rem;
-  color: #8b8f84;
+  background: transparent;
+  padding: 0.55rem 0.45rem;
+  color: #3a4036;
   font: inherit;
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.2;
   cursor: pointer;
-  border-bottom: 4px solid transparent;
+  border-radius: 999px;
 }
 
 .shop-filter button[aria-pressed="true"] {
-  color: var(--forest);
-  border-bottom-color: var(--lime);
+  color: var(--forest-deep);
+  font-weight: 700;
+}
+
+.filter-count {
+  display: inline-block;
+  min-width: 1.2rem;
+  margin-left: 0.28rem;
+  padding: 0 0.28rem;
+  border-radius: 999px;
+  background: rgba(20, 73, 22, 0.1);
+  color: var(--forest-deep);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.25rem;
+  text-align: center;
 }
 
 .shop-grid {
@@ -1122,5 +1187,386 @@ body.modal-open {
 
   .brand-name {
     font-size: 1.15rem;
+  }
+
+  .shop-filter {
+    border-radius: 0.9rem;
+  }
+
+  .shop-filter-thumb {
+    border-radius: 0.7rem;
+  }
+
+  .shop-filter button {
+    font-size: 0.78rem;
+    white-space: normal;
+    min-height: 2.8rem;
+  }
+}
+
+/* How ordering works */
+
+.order-how,
+.discover,
+.faq,
+.team,
+#catalog {
+  scroll-margin-top: calc(var(--header-h) + 1rem);
+}
+
+.order-how {
+  padding: 3rem 0 2.6rem;
+  background: var(--cream);
+}
+
+.page-home .order-how {
+  border-bottom: 1px solid var(--line);
+}
+
+.order-how-inset {
+  margin: 1.5rem 0 0.25rem;
+  padding: 1.15rem 1.15rem 1.25rem;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.order-how-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.order-how h2,
+.request-sent h2 {
+  margin: 0;
+  font-size: clamp(1.7rem, 3.5vw, 2.3rem);
+}
+
+.order-how-utah {
+  margin: 0;
+  color: var(--forest-deep);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.order-steps {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.8rem;
+  align-items: start;
+  margin: 0;
+  padding: 0.95rem 1rem;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.order-how-inset .order-steps li {
+  background: var(--paper);
+}
+
+.order-steps p {
+  margin: 0;
+  color: var(--ink);
+}
+
+.order-step-index {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--forest-deep);
+  color: var(--cream);
+  font-weight: 700;
+}
+
+/* FAQ.
+   Look adapted from the Accessible Accordion by a11ypros
+   https://21st.dev/@a11ypros/components/a11y-accordion
+   MIT License. Copyright (c) a11ypros.
+   Ported to native details/summary. No JavaScript. */
+
+.faq-list {
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.25rem;
+  padding: 0.85rem 1rem;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.35;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: "";
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-right: 2px solid var(--forest-deep);
+  border-bottom: 2px solid var(--forest-deep);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.faq-item[open] summary::after {
+  transform: rotate(225deg);
+}
+
+.faq-item summary:hover {
+  background: var(--paper);
+}
+
+.faq-item p {
+  margin: 0;
+  padding: 0 1rem 1.05rem;
+  color: var(--ink-soft);
+}
+
+/* Add-to-request confirmation.
+   Adapted from Uiverse.io by Df12345677
+   https://uiverse.io/Df12345677/black-rat-82
+   MIT License
+   Copyright (c) 2026 Df12345677
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+   The original hover-shrink is a click confirmation here: "Added" plus a link. */
+
+.add-slot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.7rem;
+  align-self: flex-start;
+  margin-top: 0.7rem;
+}
+
+.product-card .add-slot .btn {
+  margin-top: 0;
+}
+
+.add-btn {
+  position: relative;
+  overflow: hidden;
+  min-width: 9.2rem;
+}
+
+.add-btn-idle,
+.add-btn-done {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.add-btn-done {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transform: translateY(70%);
+  opacity: 0;
+}
+
+.add-btn.is-added .add-btn-idle {
+  transform: translateY(-70%);
+  opacity: 0;
+}
+
+.add-btn.is-added .add-btn-done {
+  transform: none;
+  opacity: 1;
+}
+
+.add-btn.is-added,
+.add-btn.is-added:hover {
+  background: var(--forest-deep);
+  color: var(--cream);
+}
+
+.add-view {
+  color: var(--forest-deep);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.add-view[hidden] {
+  display: none;
+}
+
+@keyframes cart-count-pulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+
+.cart-count.is-pulsing {
+  animation: cart-count-pulse 0.45s ease;
+}
+
+/* Request list empty picks and the sent summary */
+
+.empty-cart-picks {
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.empty-cart-picks > p {
+  margin-top: 0;
+}
+
+.request-sent {
+  padding: 1.3rem 1.35rem 1.4rem;
+  background: var(--cream);
+  border: 2px solid var(--forest);
+}
+
+.request-sent p {
+  max-width: 40rem;
+}
+
+.request-sent .btn {
+  margin-top: 0.35rem;
+}
+
+/* Scroll reveal, in the spirit of Magic UI Blur Fade
+   https://magicui.design/docs/components/blur-fade
+   MIT License. Copyright (c) Magic UI.
+   Recreated with IntersectionObserver. The hero animation is not part of this. */
+
+html.js .reveal.reveal-pending {
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(6px);
+  transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+}
+
+html.js .reveal.reveal-pending.is-revealed {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.product-row .reveal.reveal-pending:nth-child(2),
+.team-grid .reveal.reveal-pending:nth-child(2) {
+  transition-delay: 0.08s;
+}
+
+.product-row .reveal.reveal-pending:nth-child(3) {
+  transition-delay: 0.16s;
+}
+
+/* Spotlight Card
+   Source: https://reactbits.dev/components/spotlight-card
+   Copyright (c) 2026 David Haz
+   MIT License + Commons Clause
+   Permission is granted to use this software as part of an application, website,
+   or product. Do not sell, sublicense, or redistribute the component itself,
+   including as a ported version.
+   Ported here as plain CSS and a pointermove handler, and applied only to
+   Don's Reserve product cards. Off for touch and prefers-reduced-motion. */
+
+.product-card.spotlight-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 0.7rem 0.7rem 0.85rem;
+  border: 1px solid rgba(46, 100, 35, 0.38);
+  border-radius: 0.85rem;
+  background: #fff;
+}
+
+.product-card.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    150px circle at var(--spot-x, 50%) var(--spot-y, 40%),
+    rgba(114, 168, 19, 0.42),
+    rgba(114, 168, 19, 0) 70%
+  );
+  transition: opacity 0.35s ease;
+}
+
+.product-card.spotlight-card.is-spot::before {
+  opacity: 1;
+}
+
+.product-card.spotlight-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 760px) {
+  .order-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .order-steps li {
+    grid-template-columns: 1fr;
+    min-height: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-filter-thumb,
+  .add-btn-idle,
+  .add-btn-done,
+  .faq-item summary::after,
+  .product-card.spotlight-card::before {
+    transition: none;
+  }
+
+  .cart-count.is-pulsing {
+    animation: none;
+  }
+
+  html.js .reveal.reveal-pending,
+  html.js .reveal.reveal-pending.is-revealed,
+  .product-row .reveal.reveal-pending,
+  .team-grid .reveal.reveal-pending {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+    transition-delay: 0s;
   }
 }
