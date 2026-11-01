@@ -300,7 +300,7 @@ test("terms gathers the existing request wording and stays generic", function ()
     "Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol.",
     "Effective October 31, 2026",
     "reach out anyway",
-    'Terms questions: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a>.'
+    'Email <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a>.'
   ].forEach(function (line) {
     assert.equal(page.includes(line), true, line);
   });
