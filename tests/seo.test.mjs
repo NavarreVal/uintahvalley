@@ -292,11 +292,15 @@ test("terms gathers the existing request wording and stays generic", function ()
     "Currently we can only sell to Utah residents. This is a homemade food product for home use, not for resale, processed and prepared without state or local inspection, under Utah's cottage food program.",
     "There is no live checkout, and we won't ask for your payment info here.",
     "Sending a request is not a paid order.",
+    "A request is not a purchase.",
     "Prices are provisional.",
     "Prices shown are provisional until confirmed in reply.",
     "Stored only in this browser.",
-    "Some items are sold out indefinitely and cannot be ordered here. Other items can still be requested.",
-    "Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol."
+    "Some items are sold out for now and cannot be ordered here. Other items can still be requested.",
+    "Homemade food product for home use. Not for resale. Processed and prepared without state or local inspection. Contains alcohol.",
+    "Effective October 31, 2026",
+    "reach out anyway",
+    'Terms questions: <a href="mailto:hello@uintahvalley.com">hello@uintahvalley.com</a>.'
   ].forEach(function (line) {
     assert.equal(page.includes(line), true, line);
   });
@@ -304,12 +308,18 @@ test("terms gathers the existing request wording and stays generic", function ()
   ["Don's Reserve", "mainline", "Pure Vanilla", "Madagascar", "Tahitian", "Dented Brick", "Five Wives", "Barbarosi", "Gift Box"].forEach(function (name) {
     assert.equal(visible.includes(name), false, name);
   });
+  assert.equal(visible.includes("anyways"), false);
+  assert.equal(visible.includes("sold out indefinitely"), false);
   assert.equal(/%|\bABV\b|\bproof\b/i.test(visible), false);
-  assert.equal(visible.includes("not a purchase"), false);
   assert.equal(page.includes('href="/terms" aria-current="page"'), true);
   PAGES.concat(["404.html"]).forEach(function (name) {
     assert.equal(html(name).includes('href="/terms"'), true, name);
   });
+  ["shop.html", "contact.html", "cart.html"].forEach(function (name) {
+    assert.equal(html(name).includes("reach out anyway"), true, name);
+    assert.equal(html(name).includes("anyways"), false, name);
+  });
+  assert.equal(html("shop.html").includes("Sold out indefinitely"), true);
   const owners = page.match(/<!-- OWNER: [\s\S]*? -->/g) || [];
-  assert.equal(owners.length >= 4, true);
+  assert.deepEqual(owners, ["<!-- OWNER: Returns, shipping, and cancellation will be added later. -->"]);
 });
